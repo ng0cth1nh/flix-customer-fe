@@ -37,7 +37,9 @@ const RequestForm = function ({
     setDateVisible(false);
   };
   return (
-    <ScrollView style={{marginLeft: 20, marginRight: 20}}>
+    <ScrollView
+      style={{marginLeft: 20, marginRight: 20}}
+      showsVerticalScrollIndicator={false}>
       <View
         style={[styles.box, {height: 0.25 * height, flexDirection: 'column'}]}>
         <View style={styles.boxHeader}>
