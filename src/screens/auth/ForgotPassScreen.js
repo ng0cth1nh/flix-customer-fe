@@ -13,7 +13,7 @@ const {height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import HeaderComponent from '../../components/HeaderComponent';
 import BackButton from '../../components/BackButton';
-import Button from '../../components/Button';
+import Button from '../../components/SubmitButton';
 
 export default function ForgotPassScreen({navigation}) {
   const [password, setPassword] = useState('');
@@ -58,62 +58,66 @@ export default function ForgotPassScreen({navigation}) {
       <SafeAreaView>
         <Card cornerRadius={20} elevation={10} style={styles.loginForm}>
           <Text style={styles.headerText}>Đổi Mật Khẩu</Text>
-          <View
-            style={[
-              styles.inputView,
-              {borderColor: passwordInputError ? '#FF6442' : '#CACACA'},
-            ]}>
-            <TextInput
+          <View style={{height: '60%'}}>
+            <View
               style={[
-                styles.input,
-                {
-                  fontSize:
-                    coverPassword === true && password.trim() !== '' ? 20 : 14,
-                },
-              ]}
-              secureTextEntry={coverPassword}
-              onChangeText={text => setPassword(text)}
-              value={password}
-              placeholder="Mật khẩu"
-            />
-            <TouchableOpacity
-              style={styles.iconView}
-              onPress={() => setCoverPassword(!coverPassword)}>
-              <Icon name="eye-slash" size={18} />
-            </TouchableOpacity>
-          </View>
-          {passwordInputError && (
-            <Text style={styles.errorMessage}>{passwordInputError}</Text>
-          )}
-          <View
-            style={[
-              styles.inputView,
-              {borderColor: repasswordInputError ? '#FF6442' : '#CACACA'},
-            ]}>
-            <TextInput
+                styles.inputView,
+                {borderColor: passwordInputError ? '#FF6442' : '#CACACA'},
+              ]}>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    fontSize:
+                      coverPassword === true && password.trim() !== ''
+                        ? 20
+                        : 14,
+                  },
+                ]}
+                secureTextEntry={coverPassword}
+                onChangeText={text => setPassword(text)}
+                value={password}
+                placeholder="Mật khẩu"
+              />
+              <TouchableOpacity
+                style={styles.iconView}
+                onPress={() => setCoverPassword(!coverPassword)}>
+                <Icon name="eye-slash" size={18} />
+              </TouchableOpacity>
+            </View>
+            {passwordInputError && (
+              <Text style={styles.errorMessage}>{passwordInputError}</Text>
+            )}
+            <View
               style={[
-                styles.input,
-                {
-                  fontSize:
-                    coverRepassword === true && password.trim() !== ''
-                      ? 20
-                      : 14,
-                },
-              ]}
-              secureTextEntry={coverRepassword}
-              onChangeText={text => setRepassword(text)}
-              value={repassword}
-              placeholder="Nhập lại mật khẩu"
-            />
-            <TouchableOpacity
-              style={styles.iconView}
-              onPress={() => setCoverRepassword(!coverRepassword)}>
-              <Icon name="eye-slash" size={18} />
-            </TouchableOpacity>
+                styles.inputView,
+                {borderColor: repasswordInputError ? '#FF6442' : '#CACACA'},
+              ]}>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    fontSize:
+                      coverRepassword === true && password.trim() !== ''
+                        ? 20
+                        : 14,
+                  },
+                ]}
+                secureTextEntry={coverRepassword}
+                onChangeText={text => setRepassword(text)}
+                value={repassword}
+                placeholder="Nhập lại mật khẩu"
+              />
+              <TouchableOpacity
+                style={styles.iconView}
+                onPress={() => setCoverRepassword(!coverRepassword)}>
+                <Icon name="eye-slash" size={18} />
+              </TouchableOpacity>
+            </View>
+            {repasswordInputError && (
+              <Text style={styles.errorMessage}>{repasswordInputError}</Text>
+            )}
           </View>
-          {repasswordInputError && (
-            <Text style={styles.errorMessage}>{repasswordInputError}</Text>
-          )}
           <Button
             style={{marginBottom: 30}}
             onPress={changePassHandler}
