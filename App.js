@@ -51,7 +51,7 @@ function App() {
   return (
     <>
       <NavigationContainer ref={navigationRef}>
-        {state.token ? (
+        {!state.token ? (
           <Tab.Navigator
             tabBarOptions={{
               showLabel: false,
