@@ -2,17 +2,16 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   Image,
   SafeAreaView,
-  TextInput,
   TouchableOpacity,
   FlatList,
+  Dimensions,
   StatusBar,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import React, {useState, useRef, useEffect} from 'react';
+const {width, height} = Dimensions.get('window');
 
 const NOTIFICATIONS = [
   {
@@ -42,7 +41,7 @@ const NOTIFICATIONS = [
     isRead: true,
   },
   {
-    id: 3,
+    id: 4,
     time: '20:59 - 13/05/2022',
     title: 'Bạn có 1 mã giảm giá mới',
     content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
@@ -50,7 +49,7 @@ const NOTIFICATIONS = [
     isRead: true,
   },
   {
-    id: 3,
+    id: 5,
     time: '20:59 - 13/05/2022',
     title: 'Bạn có 1 mã giảm giá mới',
     content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
@@ -58,7 +57,7 @@ const NOTIFICATIONS = [
     isRead: true,
   },
   {
-    id: 3,
+    id: 6,
     time: '20:59 - 13/05/2022',
     title: 'Bạn có 1 mã giảm giá mới',
     content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
@@ -66,7 +65,7 @@ const NOTIFICATIONS = [
     isRead: true,
   },
   {
-    id: 3,
+    id: 7,
     time: '20:59 - 13/05/2022',
     title: 'Bạn có 1 mã giảm giá mới',
     content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
@@ -74,7 +73,7 @@ const NOTIFICATIONS = [
     isRead: true,
   },
   {
-    id: 3,
+    id: 8,
     time: '20:59 - 13/05/2022',
     title: 'Bạn có 1 mã giảm giá mới',
     content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
@@ -82,7 +81,7 @@ const NOTIFICATIONS = [
     isRead: true,
   },
   {
-    id: 3,
+    id: 9,
     time: '20:59 - 13/05/2022',
     title: 'Bạn có 1 mã giảm giá mới',
     content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
@@ -94,86 +93,112 @@ const NOTIFICATIONS = [
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
 
-  const handleOnDelete = () => {};
-
   useEffect(() => {
     setNotifications(NOTIFICATIONS);
   }, []);
 
+  const handleOnDelete = () => {};
+
+  const renderItem = ({item}) => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          height: 96,
+          backgroundColor: item.isRead ? 'white' : '#F0F0F0',
+          borderBottomColor: '#7C7C7C',
+          borderBottomWidth: 1,
+        }}>
+        <Image
+          source={{uri: item.icon}}
+          style={{
+            height: 24,
+            width: 24,
+            alignSelf: 'center',
+            marginHorizontal: 14,
+          }}
+        />
+        <View style={{paddingRight: 60, alignSelf: 'center'}}>
+          <Text
+            style={{
+              fontSize: 14,
+              color: '#E67F1E',
+              fontWeight: 'bold',
+            }}>
+            {item.title}
+          </Text>
+          <Text
+            style={{
+              fontSize: 13,
+              color: 'black',
+              flexWrap: 'wrap',
+              marginVertical: 8,
+            }}>
+            {item.content}
+          </Text>
+          <Text
+            style={{
+              fontSize: 8,
+              color: '#7C7C7C',
+            }}>
+            {item.time}
+          </Text>
+          <TouchableOpacity
+            onPress={handleOnDelete}
+            style={{
+              height: 12,
+              width: 12,
+              position: 'absolute',
+              top: 6,
+              right: 56,
+            }}>
+            <Image
+              source={require('../../../assets/images/type/cancel.png')}
+              style={{
+                height: 12,
+                width: 12,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <SafeAreaView style={{flex: 1}}>
-        <Text style={styles.headerText}>Thông báo</Text>
-        <ScrollView style={{}}>
-          {notifications.map((item, index) => {
-            return (
-              <View
-                key={index}
-                style={{
-                  flexDirection: 'row',
-                  height: 96,
-                  backgroundColor: item.isRead ? 'white' : '#F0F0F0',
-                  borderBottomColor: '#7C7C7C',
-                  borderBottomWidth: 1,
-                }}>
-                <Image
-                  source={{uri: item.icon}}
-                  style={{
-                    height: 24,
-                    width: 24,
-                    alignSelf: 'center',
-                    marginHorizontal: 14,
-                  }}
-                />
-                <View style={{paddingRight: 60, alignSelf: 'center'}}>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: '#E67F1E',
-                      fontWeight: 'bold',
-                    }}>
-                    {item.title}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      color: 'black',
-                      flexWrap: 'wrap',
-                      marginVertical: 8,
-                    }}>
-                    {item.content}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 8,
-                      color: '#7C7C7C',
-                    }}>
-                    {item.time}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={handleOnDelete}
-                    style={{
-                      height: 12,
-                      width: 12,
-                      position: 'absolute',
-                      top: 6,
-                      right: 56,
-                    }}>
-                    <Image
-                      source={require('../../../assets/images/type/cancel.png')}
-                      style={{
-                        height: 12,
-                        width: 12,
-                      }}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            );
-          })}
-        </ScrollView>
-      </SafeAreaView>
+    <View style={styles.overlay}>
+      <View
+        style={{
+          width: width,
+          height: 212,
+          zIndex: 1,
+        }}>
+        <Text>Bạn có chắc chắn muốn xóa thông báo này không?</Text>
+        <View>
+          <TouchableOpacity
+            style={{
+              height: 38,
+              width: 152,
+              backgroundColor: '#FEC54B',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 32,
+            }}>
+            <Text style={{fontSize: 14, fontWeight: '700'}}>Xóa</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={{backgroundColor: 'white', flex: 1}}>
+        <StatusBar barStyle="dark-content" backgroundColor="white" />
+        <SafeAreaView style={{flex: 1}}>
+          <Text style={styles.headerText}>Thông báo</Text>
+          <FlatList
+            data={notifications}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+          />
+        </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -189,6 +214,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.7,
     borderBottomColor: '#CACACA',
     width: '100%',
+  },
+  overlay: {
+    flex: 1,
+    zIndex: 2,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    opacity: 0.1,
+    backgroundColor: 'black',
+    width: width,
+    height: height,
   },
 });
 export default NotificationScreen;
