@@ -16,14 +16,13 @@ import ConfirmOTPScreen from './src/screens/auth/ConfirmOTPScreen';
 import TermsOfUseScreen from './src/screens/auth/TermsOfUseScreen';
 import ForgotPassScreen from './src/screens/auth/ForgotPassScreen';
 import OrderScreen from './src/screens/order/OrderScreen';
-import AddAddressScreen from './src/screens/address/AddAddressScreen';
+import OrderHistoryScreen from './src/screens/order/OrderHistoryScreen';
 import HomeScreen from './src/screens/main/HomeScreen';
 import NotificationScreen from './src/screens/main/NotificationScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
 import MajorListScreen from './src/screens/main/MajorListScreen';
 import ServiceListScreen from './src/screens/main/ServiceListScreen';
 import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
-import OrderHistoryScreen from './src/screens/order/OrderHistoryScreen';
 import Toast from 'react-native-toast-message';
 
 import {
