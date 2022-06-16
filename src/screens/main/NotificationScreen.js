@@ -166,28 +166,33 @@ const NotificationScreen = () => {
   };
 
   return (
-    <View style={styles.overlay}>
-      <View
-        style={{
-          width: width,
-          height: 212,
-          zIndex: 1,
-        }}>
-        <Text>Bạn có chắc chắn muốn xóa thông báo này không?</Text>
-        <View>
-          <TouchableOpacity
-            style={{
-              height: 38,
-              width: 152,
-              backgroundColor: '#FEC54B',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 32,
-            }}>
-            <Text style={{fontSize: 14, fontWeight: '700'}}>Xóa</Text>
-          </TouchableOpacity>
+    <View>
+      <View>
+        <View
+          style={{
+            width: width,
+            height: 212,
+            zIndex: 2,
+            backgroundColor: 'white',
+          }}>
+          <Text>Bạn có chắc chắn muốn xóa thông báo này không?</Text>
+          <View>
+            <TouchableOpacity
+              style={{
+                height: 38,
+                width: 152,
+                backgroundColor: '#FEC54B',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 32,
+              }}>
+              <Text style={{fontSize: 14, fontWeight: '700'}}>Xóa</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+        <View style={styles.overlay}></View>
       </View>
+
       <View style={{backgroundColor: 'white', flex: 1}}>
         <StatusBar barStyle="dark-content" backgroundColor="white" />
         <SafeAreaView style={{flex: 1}}>
@@ -217,11 +222,11 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    zIndex: 2,
+    zIndex: 1,
     position: 'absolute',
     left: 0,
     top: 0,
-    opacity: 0.1,
+    opacity: 0.01,
     backgroundColor: 'black',
     width: width,
     height: height,
