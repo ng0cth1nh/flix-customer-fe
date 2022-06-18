@@ -17,7 +17,6 @@ import Carousel from 'react-native-snap-carousel';
 import BannerSlider from '../../components/BannerSlider';
 import ForwardButton from '../../components/ForwardButton';
 import MajorComponent from '../../components/MajorComponent';
-
 const ENTRIES = [
   {
     title: 'Ưu đãi hôm nay',
@@ -32,44 +31,40 @@ const ENTRIES = [
 
 const MAJORS = [
   {
-    title: 'Thiết bị giặt ủi',
+    id: 2,
+    title: 'Điện lạnh',
     image:
       'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
   },
   {
-    title: 'Thiết bị nhà bếp',
-    image:
-      'https://i.postimg.cc/dQRnmHqg/erik-mclean-a-Po-F91-L-n6k-unsplash.jpg',
-  },
-  {
-    title: 'Thiết bị giải trí',
+    id: 1,
+    title: 'Điện tử',
     image:
       'https://i.postimg.cc/NjjN06vS/fabio-silva-nm-Tm7kn-Unqs-unsplash.jpg',
   },
   {
-    title: 'Thiết bị văn phòng',
+    id: 4,
+    title: 'Điện dân dụng',
     image:
-      'https://i.postimg.cc/ZKVcXWvc/linus-mimietz-gvpt-Kmonylk-unsplash.jpg',
+      'https://images.unsplash.com/photo-1580894524720-add657e0ec07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80',
+  },
+  {
+    id: 3,
+    title: 'Điện nước',
+    image:
+      'https://drivinvibin.com/wp-content/uploads/2021/01/on-demand-water-heater.jpg',
   },
 ];
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
   const [search, setSearch] = useState('');
-  const [entries, setEntries] = useState([]);
-  const [majors, setMajors] = useState([]);
+  const [entries, setEntries] = useState(ENTRIES);
+  const [majors, setMajors] = useState(MAJORS);
   const carouselRef = useRef(null);
 
   const goForward = () => {
     carouselRef.current.snapToNext();
   };
-
-  useEffect(() => {
-    setEntries(ENTRIES);
-  }, []);
-
-  useEffect(() => {
-    setMajors(MAJORS);
-  }, []);
 
   const renderBanner = ({item, index}) => {
     return <BannerSlider data={item} />;
@@ -119,7 +114,10 @@ const HomeScreen = () => {
               }}>
               Dịch vụ sửa chữa nổi bật
             </Text>
-            <ForwardButton color="black" onPressHandler={console.log('a')} />
+            <ForwardButton
+              color="black"
+              onPressHandler={() => navigation.push('MajorListScreen')}
+            />
           </View>
           <View
             style={{
@@ -132,7 +130,12 @@ const HomeScreen = () => {
                 <MajorComponent
                   key={index}
                   data={data}
-                  onPressHandler={console.log('a')}
+                  onPressHandler={() =>
+                    navigation.push('ServiceListScreen', {
+                      majorId: data.id,
+                      majorName: data.title,
+                    })
+                  }
                 />
               );
             })}
@@ -248,7 +251,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   container: {
-    paddingHorizontal: '7%',
+    paddingHorizontal: '5%',
     paddingTop: 16,
     backgroundColor: 'white',
     height: '100%',
