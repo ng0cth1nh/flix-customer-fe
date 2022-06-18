@@ -13,10 +13,14 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 
 import BackButton from '../../components/BackButton';
 import Button from '../../components/SubmitButton';
+import Toast from 'react-native-toast-message';
 
 const ChoosePaymentMethodScreen = ({navigation}) => {
   const buttonClicked = () => {
-    //do smth
+    Toast.show({
+      type: 'customToast',
+      text1: 'This is an info message',
+    });
   };
   const [checked, setChecked] = useState('first');
   return (

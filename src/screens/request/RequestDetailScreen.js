@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import BackButton from '../../components/BackButton';
 import RequestForm from '../../components/RequestForm';
 
-const OrderDetailScreen = ({navigation}) => {
+const RequestDetailScreen = ({navigation}) => {
   const [date, setDate] = useState(moment());
   const [description, setDiscription] = useState('');
   function handlerButtonClick() {
@@ -51,7 +51,7 @@ const OrderDetailScreen = ({navigation}) => {
           description={description}
           setDiscription={setDiscription}
           editable={false}
-          isOrderIdVisible={true}
+          isRequestIdVisible={true}
         />
       </SafeAreaView>
     </View>
@@ -68,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OrderDetailScreen;
+export default RequestDetailScreen;

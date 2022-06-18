@@ -27,7 +27,7 @@ const RequestForm = function ({
   description,
   setDiscription,
   editable,
-  isOrderIdVisible = false,
+  isRequestIdVisible = false,
 }) {
   const [dateVisible, setDateVisible] = useState(false);
   const handlerDateConfirm = selectedDate => {
@@ -240,7 +240,7 @@ const RequestForm = function ({
           <Text style={{color: 'black', fontSize: 16}}>Tiền mặt</Text>
         </View>
       </View>
-      {isOrderIdVisible && (
+      {isRequestIdVisible && (
         <View
           style={[
             styles.box,

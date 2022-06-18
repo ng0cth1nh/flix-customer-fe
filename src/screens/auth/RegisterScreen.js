@@ -78,7 +78,6 @@ export default function RegisterScreen({navigation}) {
       cropping: true,
     })
       .then(image => {
-        console.log(image);
         setAvatar(image);
       })
       .catch(err => {
