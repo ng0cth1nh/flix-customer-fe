@@ -9,7 +9,7 @@ import {
 import React from 'react';
 const {width, height} = Dimensions.get('window');
 
-const ServiceComponent = ({data, onPressPriceHandler, onPressOrderHandler}) => {
+const ServiceComponent = ({data, onPressPriceHandler, onPressRequestHandler}) => {
   return (
     <View
       style={{
@@ -31,7 +31,7 @@ const ServiceComponent = ({data, onPressPriceHandler, onPressOrderHandler}) => {
           <TouchableOpacity style={styles.button} onPress={onPressPriceHandler}>
             <Text style={styles.textBold}>Xem giá dịch vụ</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={onPressOrderHandler}>
+          <TouchableOpacity style={styles.button} onPress={onPressRequestHandler}>
             <Text style={styles.textBold}>Đặt lịch</Text>
           </TouchableOpacity>
         </View>

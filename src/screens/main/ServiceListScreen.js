@@ -91,8 +91,8 @@ const ServiceListScreen = ({route, navigation}) => {
                     serviceName: item.serviceName,
                   })
                 }
-                onPressOrderHandler={() =>
-                  navigation.push('OrderScreen', {
+                onPressRequestHandler={() =>
+                  navigation.push('RequestScreen', {
                     serviceId: item.serviceId,
                   })
                 }

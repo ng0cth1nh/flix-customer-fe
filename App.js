@@ -18,8 +18,8 @@ import TermsOfUseScreen from './src/screens/auth/TermsOfUseScreen';
 import ForgotPassScreen from './src/screens/auth/ForgotPassScreen';
 import RequestScreen from './src/screens/request/RequestScreen';
 import RequestDetailScreen from './src/screens/request/RequestDetailScreen';
-import ChoosePaymentMethodScreen from './src/screens/request/ChoosePaymentMethodScreen';
 import RequestHistoryScreen from './src/screens/request/RequestHistoryScreen';
+import ChoosePaymentMethodScreen from './src/screens/request/ChoosePaymentMethodScreen';
 import AddAddressScreen from './src/screens/address/AddAddressScreen';
 import AddressListScreen from './src/screens/address/AddressListScreen';
 import EditAddressScreen from './src/screens/address/EditAddressScreen';
@@ -89,7 +89,7 @@ function App() {
           name="ServicePriceScreen"
           component={ServicePriceScreen}
         />
-        <Stack.Screen name="OrderScreen" component={OrderScreen} />
+        <Stack.Screen name="RequestScreen" component={RequestScreen} />
       </Stack.Navigator>
     );
   }
@@ -130,60 +130,58 @@ function App() {
                   clearErrorMessage();
                 }
               },
-            })}>
-            <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen
-              name="RequestHistory"
-              component={RequestHistoryScreen}
-            />
-            <Tab.Screen name="Notification" component={NotificationScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
-          </Tab.Navigator>
-        ) : (
-          <Stack.Navigator screenOptions={{headerShown: false}}>
-            <Stack.Screen
-              name="LoginScreen"
-              component={LoginScreen}
-              listeners={{
-                focus: e => {
-                  if (state.errorMessage !== '') {
-                    clearErrorMessage();
-                  }
-                },
-              }}
-            />
-            <Stack.Screen
-              name="RegisterScreen"
-              component={RegisterScreen}
-              listeners={{
-                focus: e => {
-                  if (state.errorMessage !== '') {
-                    clearErrorMessage();
-                  }
-                },
-              }}
-            />
-            <Stack.Screen
-              name="ForgotPassScreen"
-              component={ForgotPassScreen}
-              listeners={{
-                focus: e => {
-                  if (state.errorMessage !== '') {
-                    clearErrorMessage();
-                  }
-                },
-              }}
-            />
-            <Stack.Screen
-              name="TermsOfUseScreen"
-              component={TermsOfUseScreen}
-            />
-            <Stack.Screen
-              name="ConfirmOTPScreen"
-              component={ConfirmOTPScreen}
-            />
-          </Stack.Navigator>
-        )}
+            }}
+          />
+          <Stack.Screen name="TermsOfUseScreen" component={TermsOfUseScreen} />
+          <Stack.Screen name="ConfirmOTPScreen" component={ConfirmOTPScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      <Toast />
+    </>
+  ) : (
+    <>
+      <NavigationContainer ref={navigationRef}>
+        <Tab.Navigator
+          tabBarOptions={{
+            showLabel: false,
+            keyboardHidesTabBar: true,
+            style: {
+              backgroundColor: '#FEC54B',
+            },
+          }}
+          screenOptions={({route}) => ({
+            tabBarShowLabel: false,
+            headerShown: false,
+            tabBarStyle: {
+              height: 50,
+            },
+            tabBarIcon: ({focused, size, color}) => {
+              let icon;
+              if (route.name === 'HomeStackScreen') {
+                icon = focused
+                  ? require('./assets/images/type/home-active.png')
+                  : require('./assets/images/type/home.png');
+              } else if (route.name === 'RequestHistory') {
+                icon = focused
+                  ? require('./assets/images/type/archive-active.png')
+                  : require('./assets/images/type/archive.png');
+              } else if (route.name === 'Notification') {
+                icon = focused
+                  ? require('./assets/images/type/bell-ring-active.png')
+                  : require('./assets/images/type/bell-ring.png');
+              } else if (route.name === 'Profile') {
+                icon = focused
+                  ? require('./assets/images/type/user-profile-active.png')
+                  : require('./assets/images/type/user-profile.png');
+              }
+              return <Image style={{height: 24, width: 24}} source={icon} />;
+            },
+          })}>
+          <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />
+          <Tab.Screen name="RequestHistory" component={RequestHistoryScreen} />
+          <Tab.Screen name="Notification" component={NotificationScreen} />
+          <Tab.Screen name="Profile" component={ProfileScreen} />
+        </Tab.Navigator>
       </NavigationContainer>
       <Toast
         config={toastConfig}
