@@ -95,7 +95,7 @@ const ServicePriceScreen = ({route, navigation}) => {
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       <BackButton onPressHandler={navigation.goBack} color="black" />
       <View style={{flex: 1}}>
-        <Text style={styles.headerText}>Giá dịch vụ sửa {serviceName}</Text>
+        <Text style={styles.headerText}>{serviceName}</Text>
         <View
           style={{
             flexDirection: 'row',
