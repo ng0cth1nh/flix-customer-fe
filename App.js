@@ -27,7 +27,7 @@ import EditAddressScreen from './src/screens/address/EditAddressScreen';
 import HomeScreen from './src/screens/main/HomeScreen';
 import NotificationScreen from './src/screens/main/NotificationScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
-import MajorListScreen from './src/screens/main/MajorListScreen';
+import CategoryListScreen from './src/screens/main/CategoryListScreen';
 import ServiceListScreen from './src/screens/main/ServiceListScreen';
 import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
 import Toast from 'react-native-toast-message';
@@ -83,7 +83,10 @@ function App() {
     return (
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="MajorListScreen" component={MajorListScreen} />
+        <Stack.Screen
+          name="CategoryListScreen"
+          component={CategoryListScreen}
+        />
         <Stack.Screen name="ServiceListScreen" component={ServiceListScreen} />
         <Stack.Screen
           name="ServicePriceScreen"

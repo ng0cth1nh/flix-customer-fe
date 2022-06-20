@@ -9,7 +9,11 @@ import {
 import React from 'react';
 const {width, height} = Dimensions.get('window');
 
-const ServiceComponent = ({data, onPressPriceHandler, onPressRequestHandler}) => {
+const ServiceComponent = ({
+  data,
+  onPressPriceHandler,
+  onPressRequestHandler,
+}) => {
   return (
     <View
       style={{
@@ -18,6 +22,7 @@ const ServiceComponent = ({data, onPressPriceHandler, onPressRequestHandler}) =>
         borderRadius: 10,
         marginBottom: 12,
         height: height * 0.152,
+        marginHorizontal: '5%',
       }}>
       <Image source={{uri: data.imageUrl}} style={styles.image} />
       <View style={{alignSelf: 'center'}}>
@@ -31,7 +36,9 @@ const ServiceComponent = ({data, onPressPriceHandler, onPressRequestHandler}) =>
           <TouchableOpacity style={styles.button} onPress={onPressPriceHandler}>
             <Text style={styles.textBold}>Xem giá dịch vụ</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={onPressRequestHandler}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={onPressRequestHandler}>
             <Text style={styles.textBold}>Đặt lịch</Text>
           </TouchableOpacity>
         </View>

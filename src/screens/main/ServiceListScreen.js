@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {
+  ScrollView,
+  FlatList,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import BackButton from '../../components/BackButton';
 import ServiceComponent from '../../components/ServiceComponent';
@@ -77,29 +84,28 @@ const ServiceListScreen = ({route, navigation}) => {
       <BackButton onPressHandler={navigation.goBack} color="black" />
       <View style={{flex: 1}}>
         <Text style={styles.headerText}>{majorName}</Text>
-        <ScrollView
+        <FlatList
           showsVerticalScrollIndicator={false}
-          style={{marginHorizontal: 20}}>
-          {services.map((item, index) => {
-            return (
-              <ServiceComponent
-                key={index}
-                data={item}
-                onPressPriceHandler={() =>
-                  navigation.push('ServicePriceScreen', {
-                    serviceId: item.serviceId,
-                    serviceName: item.serviceName,
-                  })
-                }
-                onPressRequestHandler={() =>
-                  navigation.push('RequestScreen', {
-                    serviceId: item.serviceId,
-                  })
-                }
-              />
-            );
-          })}
-        </ScrollView>
+          data={services}
+          keyExtractor={item => item.id}
+          renderItem={({item, index}) => (
+            <ServiceComponent
+              key={index}
+              data={item}
+              onPressPriceHandler={() =>
+                navigation.push('ServicePriceScreen', {
+                  serviceId: item.serviceId,
+                  serviceName: item.serviceName,
+                })
+              }
+              onPressRequestHandler={() =>
+                navigation.push('RequestScreen', {
+                  serviceId: item.serviceId,
+                })
+              }
+            />
+          )}
+        />
       </View>
     </View>
   );

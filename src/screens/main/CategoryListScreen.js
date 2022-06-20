@@ -128,7 +128,7 @@ const SERVICE_PRICE = [
   },
 ];
 
-const MajorListScreen = ({navigation}) => {
+const CategoryListScreen = ({navigation}) => {
   const [search, setSearch] = useState('');
 
   return (
@@ -207,4 +207,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MajorListScreen;
+export default CategoryListScreen;
