@@ -116,7 +116,7 @@ const HomeScreen = ({navigation}) => {
             </Text>
             <ForwardButton
               color="black"
-              onPressHandler={() => navigation.push('MajorListScreen')}
+              onPressHandler={() => navigation.push('CategoryListScreen')}
             />
           </View>
           <View
