@@ -31,6 +31,8 @@ import CategoryListScreen from './src/screens/main/CategoryListScreen';
 import ServiceListScreen from './src/screens/main/ServiceListScreen';
 import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
 import Toast from 'react-native-toast-message';
+import ProfileInfoScreen from './src/screens/auth/profile/ProfileInfoScreen';
+import EditProfileInfoScreen from './src/screens/auth/profile/EditProfileInfoScreen';
 
 import {
   requestUserPermission,
@@ -97,11 +99,27 @@ function App() {
     );
   }
 
-  return !state.token ? (
+  function ProfileStackScreen() {
+    return (
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="ProfileInfoScreen" component={ProfileInfoScreen} />
+        <Stack.Screen
+          name="EditProfileInfoScreen"
+          component={EditProfileInfoScreen}
+        />
+      </Stack.Navigator>
+    );
+  }
+
+  return state.token ? (
     <>
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {/* <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} /> */}
+          {/* <Stack.Screen
+            name="EditAddressScreen"
+            component={EditAddressScreen}
+          /> */}
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}
@@ -172,7 +190,7 @@ function App() {
                 icon = focused
                   ? require('./assets/images/type/bell-ring-active.png')
                   : require('./assets/images/type/bell-ring.png');
-              } else if (route.name === 'Profile') {
+              } else if (route.name === 'ProfileStackScreen') {
                 icon = focused
                   ? require('./assets/images/type/user-profile-active.png')
                   : require('./assets/images/type/user-profile.png');
@@ -183,7 +201,10 @@ function App() {
           <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />
           <Tab.Screen name="RequestHistory" component={RequestHistoryScreen} />
           <Tab.Screen name="Notification" component={NotificationScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
+          <Tab.Screen
+            name="ProfileStackScreen"
+            component={ProfileStackScreen}
+          />
         </Tab.Navigator>
       </NavigationContainer>
       <Toast

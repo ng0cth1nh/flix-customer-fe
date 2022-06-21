@@ -214,6 +214,7 @@ export default function RegisterScreen({navigation}) {
                   ? require('../../../assets/images/login_register_bg/default_avatar.png')
                   : {uri: avatar.path}
               }
+              imageStyle={{borderRadius: width * 0.5}}
               style={styles.avatar}
               resizeMode="cover">
               <TouchableOpacity
