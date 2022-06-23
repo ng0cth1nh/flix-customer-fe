@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import React, {useState, useRef, useContext, useEffect} from 'react';
 const {height, width} = Dimensions.get('window');
-import BackButton from '../../../components/BackButton';
-import {Root, SPSheet} from 'react-native-popup-confirm-toast';
+import BackButton from '../../components/BackButton';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 
 const ProfileInfoScreen = ({route, navigation}) => {
@@ -46,7 +45,7 @@ const ProfileInfoScreen = ({route, navigation}) => {
           }}>
           <Image
             style={{width: 24, height: 24}}
-            source={require('../../../../assets/images/type/edit.png')}
+            source={require('../../../assets/images/type/edit.png')}
           />
         </TouchableOpacity>
       </View>
@@ -94,7 +93,7 @@ const ProfileInfoScreen = ({route, navigation}) => {
             <View style={styles.boxHeader}>
               <Image
                 style={{width: 24, height: 24}}
-                source={require('../../../../assets/images/type/user.png')}
+                source={require('../../../assets/images/type/user.png')}
               />
               <Text style={styles.tittleText}>Thông tin tài khoản</Text>
             </View>
@@ -138,7 +137,13 @@ const ProfileInfoScreen = ({route, navigation}) => {
                 <TextInput
                   style={profile.sex ? styles.valueText : styles.valueTextBlur}
                   editable={false}
-                  value={profile.sex ? profile.sex : 'Chưa cập nhật'}
+                  value={
+                    profile.sex
+                      ? profile.sex === 'nam'
+                        ? 'Nam'
+                        : 'Nữ'
+                      : 'Chưa cập nhật'
+                  }
                 />
               </View>
             </View>

@@ -6,13 +6,14 @@ import {
   StyleSheet,
   StatusBar,
   TextInput,
+  Dimensions,
   ScrollView,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+const {height} = Dimensions.get('window');
 import Button from './SubmitButton';
 import BackButton from './BackButton';
 
@@ -28,20 +29,17 @@ const CreateAddressForm = ({
     <View style={{backgroundColor: 'white', flex: 1}}>
       <View>
         <StatusBar barStyle="dark-content" backgroundColor="white" />
+        <BackButton onPressHandler={navigation.goBack} color="black" />
         <Text style={styles.headerText}>
           {isAddAddress ? 'Thêm địa chỉ' : 'Sửa địa chỉ'}
         </Text>
       </View>
       <SafeAreaView style={{flex: 1}}>
         <ScrollView
+          showsVerticalScrollIndicator={false}
           style={{
             paddingLeft: 20,
             paddingRight: 20,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
           }}>
           <View
             style={{
@@ -168,20 +166,24 @@ const CreateAddressForm = ({
             </View>
             {!isAddAddress && (
               <Button
-                style={{marginTop: 10, marginBottom: 10}}
+                style={{marginVertical: 10, height: height * 0.05}}
                 onPress={showModal}
                 buttonText="Xóa địa chỉ"
               />
             )}
           </View>
-          <Button
-            style={{marginTop: 20, marginBottom: 40}}
-            onPress={saveButtonClicked}
-            buttonText={isAddAddress ? 'THÊM ĐỊA CHỈ' : 'LƯU LẠI'}
-          />
         </ScrollView>
+        <Button
+          style={{
+            marginTop: 15,
+            marginBottom: 15,
+            width: '90%',
+            alignSelf: 'center',
+          }}
+          onPress={saveButtonClicked}
+          buttonText={isAddAddress ? 'THÊM ĐỊA CHỈ' : 'LƯU LẠI'}
+        />
       </SafeAreaView>
-      <BackButton onPressHandler={navigation.goBack} color="black" />
     </View>
   );
 };

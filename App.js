@@ -23,7 +23,7 @@ import ChoosePaymentMethodScreen from './src/screens/request/ChoosePaymentMethod
 import AddAddressScreen from './src/screens/address/AddAddressScreen';
 import AddressListScreen from './src/screens/address/AddressListScreen';
 import EditAddressScreen from './src/screens/address/EditAddressScreen';
-
+import ChangePasswordScreen from './src/screens/profile/ChangePasswordScreen';
 import HomeScreen from './src/screens/main/HomeScreen';
 import NotificationScreen from './src/screens/main/NotificationScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
@@ -31,8 +31,8 @@ import CategoryListScreen from './src/screens/main/CategoryListScreen';
 import ServiceListScreen from './src/screens/main/ServiceListScreen';
 import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
 import Toast from 'react-native-toast-message';
-import ProfileInfoScreen from './src/screens/auth/profile/ProfileInfoScreen';
-import EditProfileInfoScreen from './src/screens/auth/profile/EditProfileInfoScreen';
+import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
+import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 
 import {
   requestUserPermission,
@@ -107,6 +107,13 @@ function App() {
         <Stack.Screen
           name="EditProfileInfoScreen"
           component={EditProfileInfoScreen}
+        />
+        <Stack.Screen name="AddressListScreen" component={AddressListScreen} />
+        <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} />
+        <Stack.Screen name="EditAddressScreen" component={EditAddressScreen} />
+        <Stack.Screen
+          name="ChangePasswordScreen"
+          component={ChangePasswordScreen}
         />
       </Stack.Navigator>
     );

@@ -90,7 +90,7 @@ const ServiceListScreen = ({route, navigation}) => {
           keyExtractor={item => item.id}
           renderItem={({item, index}) => (
             <ServiceComponent
-              key={index}
+              key={item.serviceId}
               data={item}
               onPressPriceHandler={() =>
                 navigation.push('ServicePriceScreen', {

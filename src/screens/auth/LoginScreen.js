@@ -106,7 +106,11 @@ export default function LoginScreen({navigation}) {
             <TouchableOpacity
               style={styles.iconView}
               onPress={() => setCoverPassword(!coverPassword)}>
-              <Icon name="eye-slash" size={18} />
+              {coverPassword ? (
+                <Icon name="eye" size={18} />
+              ) : (
+                <Icon name="eye-slash" size={18} />
+              )}
             </TouchableOpacity>
           </View>
           {passwordInputError && (

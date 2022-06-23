@@ -29,17 +29,21 @@ const AddressListScreen = ({navigation, cityId, setCityId, isAddAddress}) => {
   };
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <SafeAreaView>
+      <View>
+        <StatusBar barStyle="dark-content" backgroundColor="white" />
+        <BackButton onPressHandler={navigation.goBack} color="black" />
+        <Text style={styles.headerText}>Địa chỉ của bạn</Text>
+      </View>
+      <SafeAreaView style={{flex: 1}}>
         <ScrollView
+          showsVerticalScrollIndicator={false}
           style={{
             marginLeft: 20,
             marginRight: 20,
-            height: 0.83 * height,
+            height: 0.78 * height,
             borderBottomWidth: 1,
             borderBottomColor: '#CACACA',
           }}>
-          <Text style={styles.headerText}>Địa chỉ của bạn</Text>
           <View
             style={{
               paddingBottom: 10,
@@ -47,7 +51,9 @@ const AddressListScreen = ({navigation, cityId, setCityId, isAddAddress}) => {
             <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
               <View style={styles.boxHeader}>
                 <Text style={styles.tittleText}>Nguyễn Văn A</Text>
-                <TouchableOpacity style={styles.editTouch}>
+                <TouchableOpacity
+                  style={styles.editTouch}
+                  onPress={() => navigation.push('EditAddressScreen')}>
                   <Text style={styles.editText}>Thay đổi</Text>
                 </TouchableOpacity>
               </View>
@@ -71,17 +77,130 @@ const AddressListScreen = ({navigation, cityId, setCityId, isAddAddress}) => {
             </View>
             <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
               <View style={styles.boxHeader}>
-                <Text style={styles.tittleText}>Nguyễn Văn B</Text>
-                <TouchableOpacity style={styles.editTouch}>
+                <Text style={styles.tittleText}>Nguyễn Văn A</Text>
+                <TouchableOpacity
+                  style={styles.editTouch}
+                  onPress={() => navigation.push('EditAddressScreen')}>
                   <Text style={styles.editText}>Thay đổi</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.addressInfo}>
                 <RadioButton
-                  value="second"
-                  status={checked === 'second' ? 'checked' : 'unchecked'}
+                  value="first"
+                  status={checked === 'first' ? 'checked' : 'unchecked'}
                   color="#FFBC00"
-                  onPress={() => setChecked('second')}
+                  onPress={() => {
+                    setChecked('first');
+                    showToast();
+                  }}
+                />
+                <View>
+                  <Text style={styles.textBold}>0912345678</Text>
+                  <Text>
+                    123 Minh Khai, Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
+              <View style={styles.boxHeader}>
+                <Text style={styles.tittleText}>Nguyễn Văn A</Text>
+                <TouchableOpacity
+                  style={styles.editTouch}
+                  onPress={() => navigation.push('EditAddressScreen')}>
+                  <Text style={styles.editText}>Thay đổi</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.addressInfo}>
+                <RadioButton
+                  value="first"
+                  status={checked === 'first' ? 'checked' : 'unchecked'}
+                  color="#FFBC00"
+                  onPress={() => {
+                    setChecked('first');
+                    showToast();
+                  }}
+                />
+                <View>
+                  <Text style={styles.textBold}>0912345678</Text>
+                  <Text>
+                    123 Minh Khai, Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
+              <View style={styles.boxHeader}>
+                <Text style={styles.tittleText}>Nguyễn Văn A</Text>
+                <TouchableOpacity
+                  style={styles.editTouch}
+                  onPress={() => navigation.push('EditAddressScreen')}>
+                  <Text style={styles.editText}>Thay đổi</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.addressInfo}>
+                <RadioButton
+                  value="first"
+                  status={checked === 'first' ? 'checked' : 'unchecked'}
+                  color="#FFBC00"
+                  onPress={() => {
+                    setChecked('first');
+                    showToast();
+                  }}
+                />
+                <View>
+                  <Text style={styles.textBold}>0912345678</Text>
+                  <Text>
+                    123 Minh Khai, Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
+              <View style={styles.boxHeader}>
+                <Text style={styles.tittleText}>Nguyễn Văn A</Text>
+                <TouchableOpacity
+                  style={styles.editTouch}
+                  onPress={() => navigation.push('EditAddressScreen')}>
+                  <Text style={styles.editText}>Thay đổi</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.addressInfo}>
+                <RadioButton
+                  value="first"
+                  status={checked === 'first' ? 'checked' : 'unchecked'}
+                  color="#FFBC00"
+                  onPress={() => {
+                    setChecked('first');
+                    showToast();
+                  }}
+                />
+                <View>
+                  <Text style={styles.textBold}>0912345678</Text>
+                  <Text>
+                    123 Minh Khai, Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
+              <View style={styles.boxHeader}>
+                <Text style={styles.tittleText}>Nguyễn Văn A</Text>
+                <TouchableOpacity
+                  style={styles.editTouch}
+                  onPress={() => navigation.push('EditAddressScreen')}>
+                  <Text style={styles.editText}>Thay đổi</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.addressInfo}>
+                <RadioButton
+                  value="first"
+                  status={checked === 'first' ? 'checked' : 'unchecked'}
+                  color="#FFBC00"
+                  onPress={() => {
+                    setChecked('first');
+                    showToast();
+                  }}
                 />
                 <View>
                   <Text style={styles.textBold}>0912345678</Text>
@@ -94,14 +213,18 @@ const AddressListScreen = ({navigation, cityId, setCityId, isAddAddress}) => {
           </View>
         </ScrollView>
         <SubmitButton
-          style={{marginTop: 10, width: '90%', alignSelf: 'center'}}
+          style={{
+            marginTop: 15,
+            marginBottom: 15,
+            width: '90%',
+            alignSelf: 'center',
+          }}
           onPress={() => {
-            console.log('handle clicked');
+            navigation.push('AddAddressScreen');
           }}
           buttonText="THÊM ĐỊA CHỈ"
         />
       </SafeAreaView>
-      <BackButton onPressHandler={navigation.goBack} color="black" />
     </View>
   );
 };
@@ -120,7 +243,7 @@ const styles = StyleSheet.create({
   },
   box: {
     backgroundColor: '#F0F0F0',
-    borderRadius: 20,
+    borderRadius: 10,
     paddingLeft: 20,
     paddingRight: 20,
   },

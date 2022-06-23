@@ -12,8 +12,7 @@ import {
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import React, {useState, useEffect} from 'react';
 const {width, height} = Dimensions.get('window');
-import {Root, SPSheet} from 'react-native-popup-confirm-toast';
-import BottomToast from '../../components/BottomToast';
+import CustomModal from '../../components/CustomModal';
 
 const NOTIFICATIONS = [
   {
@@ -94,6 +93,12 @@ const NOTIFICATIONS = [
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
+  const [idDelete, setIdDelete] = useState(-1);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const showModal = () => {
+    setModalVisible(true);
+  };
 
   useEffect(() => {
     setNotifications(NOTIFICATIONS);
@@ -149,18 +154,8 @@ const NotificationScreen = () => {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              const spSheet = SPSheet;
-              spSheet.show({
-                component: () => (
-                  <BottomToast
-                    id={item.id}
-                    spSheet={spSheet}
-                    handleOnDelete={handleOnDelete}
-                  />
-                ),
-                dragFromTopOnly: true,
-                height: height * 0.44,
-              });
+              setIdDelete(item.id);
+              showModal();
             }}
             style={{
               height: 12,
@@ -183,20 +178,47 @@ const NotificationScreen = () => {
   };
 
   return (
-    <Root>
-      <View style={{backgroundColor: 'white', flex: 1}}>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <SafeAreaView style={{flex: 1}}>
-          <Text style={styles.headerText}>Thông báo</Text>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={notifications}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-          />
-        </SafeAreaView>
-      </View>
-    </Root>
+    <View
+      style={[
+        {backgroundColor: 'white', flex: 1},
+        modalVisible ? {opacity: 0.3} : {},
+      ]}>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <SafeAreaView style={{flex: 1}}>
+        <Text style={styles.headerText}>Thông báo</Text>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={notifications}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+        />
+      </SafeAreaView>
+      <CustomModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        modalRatio={0.35}>
+        <Text style={styles.modalText}>
+          Bạn có chắc chắn muốn xóa thông báo này không?
+        </Text>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+          }}>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonOpen]}
+            onPress={() => console.log('delete id ' + idDelete)}>
+            <Text style={styles.textStyle}>XÓA</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setModalVisible(!modalVisible)}>
+            <Text style={styles.textStyle}>THOÁT</Text>
+          </TouchableOpacity>
+        </View>
+      </CustomModal>
+    </View>
   );
 };
 
@@ -212,16 +234,28 @@ const styles = StyleSheet.create({
     borderBottomColor: '#CACACA',
     width: '100%',
   },
-  overlay: {
-    flex: 1,
-    zIndex: 1,
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    opacity: 0.01,
-    backgroundColor: 'black',
-    width: width,
-    height: height,
+  button: {
+    width: '40%',
+    borderRadius: 20,
+    paddingVertical: 10,
+  },
+  buttonOpen: {
+    backgroundColor: '#FEC54B',
+  },
+  buttonClose: {
+    backgroundColor: '#F0F0F0',
+  },
+  textStyle: {
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 40,
+    textAlign: 'center',
   },
 });
 export default NotificationScreen;

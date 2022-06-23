@@ -13,14 +13,34 @@ import {
 import React, {useState, useRef, useContext, useEffect} from 'react';
 const {height, width} = Dimensions.get('window');
 import ImagePicker from 'react-native-image-crop-picker';
-import BackButton from '../../../components/BackButton';
-import {Root, SPSheet} from 'react-native-popup-confirm-toast';
+import BackButton from '../../components/BackButton';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
+import CustomDatePicker from '../../components/CustomDatePicker';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Button from '../../components/SubmitButton';
+import RNPickerSelect from 'react-native-picker-select';
+import moment from 'moment';
 
 const EditProfileInfoScreen = ({route, navigation}) => {
   const {profileData} = route.params;
-  const [profile, setProfile] = useState(profileData);
+  //const [profile, setProfile] = useState(profileData);
+
   const [avatar, setAvatar] = useState(null);
+  const [name, setName] = useState(profileData.name);
+  const [phone, setPhone] = useState(profileData.phone);
+  const [sex, setSex] = useState(profileData.sex);
+  const [email, setEmail] = useState(profileData.email);
+  const [birthDate, setBirthDate] = useState(
+    profileData.birthDate ? new Date(profileData.birthDate) : null,
+  );
+  const [dateVisible, setDateVisible] = useState(false);
+  const handlerDateConfirm = selectedDate => {
+    setBirthDate(moment(selectedDate));
+    setDateVisible(false);
+  };
+  const hideDatePicker = () => {
+    setDateVisible(false);
+  };
 
   const selectAvatar = () => {
     ImagePicker.openPicker({
@@ -52,7 +72,9 @@ const EditProfileInfoScreen = ({route, navigation}) => {
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <ImageBackground
-          source={avatar === null ? {uri: profile.avatar} : {uri: avatar.path}}
+          source={
+            avatar === null ? {uri: profileData.avatar} : {uri: avatar.path}
+          }
           style={styles.avatar}
           imageStyle={{borderRadius: width * 0.5}}
           resizeMode="cover">
@@ -62,7 +84,7 @@ const EditProfileInfoScreen = ({route, navigation}) => {
                 width: 20,
                 height: 20,
               }}
-              source={require('../../../../assets/images/login_register_bg/camera_icon.png')}
+              source={require('../../../assets/images/login_register_bg/camera_icon.png')}
             />
           </TouchableOpacity>
         </ImageBackground>
@@ -75,7 +97,7 @@ const EditProfileInfoScreen = ({route, navigation}) => {
             marginBottom: 50,
             marginTop: 16,
           }}>
-          {profile.name}
+          {name}
         </Text>
         <View
           style={{
@@ -97,7 +119,7 @@ const EditProfileInfoScreen = ({route, navigation}) => {
             <View style={styles.boxHeader}>
               <Image
                 style={{width: 24, height: 24}}
-                source={require('../../../../assets/images/type/user.png')}
+                source={require('../../../assets/images/type/user.png')}
               />
               <Text style={styles.tittleText}>Thông tin tài khoản</Text>
             </View>
@@ -106,8 +128,8 @@ const EditProfileInfoScreen = ({route, navigation}) => {
               <View style={styles.valueSpace}>
                 <TextInput
                   style={styles.valueText}
-                  editable={false}
-                  value={profile.name}
+                  value={name}
+                  onChangeText={text => setName(text)}
                 />
               </View>
             </View>
@@ -116,32 +138,67 @@ const EditProfileInfoScreen = ({route, navigation}) => {
               <View style={styles.valueSpace}>
                 <TextInput
                   style={styles.valueText}
-                  editable={false}
-                  value={profile.phone}
+                  value={phone}
+                  onChangeText={text => setPhone(text)}
                 />
               </View>
             </View>
             <View style={styles.inputField}>
               <Text style={styles.inputLabel}>Ngày sinh</Text>
               <View style={styles.valueSpace}>
-                <TextInput
-                  style={
-                    profile.birthDate ? styles.valueText : styles.valueTextBlur
-                  }
-                  editable={false}
-                  value={
-                    profile.birthDate ? profile.birthDate : 'Chưa cập nhật'
-                  }
-                />
+                <TouchableOpacity
+                  style={styles.datePicker}
+                  onPress={() => setDateVisible(true)}>
+                  <Text
+                    style={[
+                      birthDate ? styles.valueText : styles.valueTextBlur,
+                    ]}>
+                    {birthDate ? birthDate.format('DD/MM/YYYY') : 'Chọn ngày'}
+                  </Text>
+                  <Ionicons
+                    name="chevron-down-sharp"
+                    size={20}
+                    style={{
+                      color: 'black',
+                      marginLeft: 'auto',
+                    }}
+                  />
+                  <CustomDatePicker
+                    isVisible={dateVisible}
+                    handleConfirm={handlerDateConfirm}
+                    hideDatePicker={hideDatePicker}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={styles.inputField}>
               <Text style={styles.inputLabel}>Giới tính</Text>
               <View style={styles.valueSpace}>
-                <TextInput
-                  style={profile.sex ? styles.valueText : styles.valueTextBlur}
-                  editable={false}
-                  value={profile.sex ? profile.sex : 'Chưa cập nhật'}
+                <RNPickerSelect
+                  value={sex ? sex : 'Chọn giới tính'}
+                  fixAndroidTouchableBug={true}
+                  onValueChange={value => setSex(value)}
+                  placeholder={{
+                    label: 'Chọn giới tính',
+                    value: null,
+                  }}
+                  useNativeAndroidPickerStyle={false}
+                  style={styles.pickerStyle}
+                  items={[
+                    {label: 'Nam', value: 'nam'},
+                    {label: 'Nữ', value: 'nu'},
+                  ]}
+                  Icon={() => (
+                    <Ionicons
+                      name="chevron-down-sharp"
+                      size={20}
+                      style={{
+                        color: 'black',
+                        marginLeft: 'auto',
+                        marginTop: 10,
+                      }}
+                    />
+                  )}
                 />
               </View>
             </View>
@@ -149,15 +206,20 @@ const EditProfileInfoScreen = ({route, navigation}) => {
               <Text style={styles.inputLabel}>Email</Text>
               <View style={styles.valueSpace}>
                 <TextInput
-                  style={
-                    profile.email ? styles.valueText : styles.valueTextBlur
-                  }
-                  editable={false}
-                  value={profile.email ? profile.email : 'Chưa cập nhật'}
+                  style={email ? styles.valueText : styles.valueTextBlur}
+                  onChangeText={text => setEmail(text)}
+                  value={email}
+                  placeholder="Nhập email"
+                  placeholderTextColor="#DFDFDF"
                 />
               </View>
             </View>
           </View>
+          <Button
+            style={{marginBottom: 20, height: height * 0.05}}
+            onPress={() => console.log('a')}
+            buttonText="Lưu lại"
+          />
         </View>
       </ScrollView>
     </View>
@@ -231,8 +293,7 @@ const styles = StyleSheet.create({
   },
   valueTextBlur: {
     fontSize: 16,
-    color: 'black',
-    opacity: 0.5,
+    color: '#DFDFDF',
   },
   pickerStyle: {
     inputIOS: {
@@ -243,6 +304,18 @@ const styles = StyleSheet.create({
       fontSize: 16,
       color: 'black',
     },
+  },
+  datePicker: {
+    flexDirection: 'row',
+    width: '100%',
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    textAlign: 'center',
+    backgroundColor: 'white',
+  },
+  textBold: {
+    color: 'black',
   },
 });
 
