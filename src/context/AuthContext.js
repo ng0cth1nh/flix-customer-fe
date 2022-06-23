@@ -9,19 +9,24 @@ import getErrorMessage from '../utils/getErrorMessage';
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'add_error':
-      return {...state, errorMessage: action.payload};
+      return {...state, errorMessage: action.payload, loading: false};
     case 'login':
-      return {errorMessage: '', token: action.payload};
+      return {errorMessage: '', token: action.payload, loading: false};
     case 'clear_error_message':
-      return {...state, errorMessage: ''};
+      return {...state, errorMessage: '', loading: false};
+    case 'show_loader':
+      return {...state, loading: true};
     case 'logout':
-      return {token: null, errorMessage: ''};
+      return {token: null, errorMessage: '', loading: false};
     default:
       return state;
   }
 };
 const clearErrorMessage = dispatch => {
   return () => dispatch({type: 'clear_error_message'});
+};
+const showLoader = dispatch => {
+  return () => dispatch({type: 'show_loader'});
 };
 
 const TryLocalLogin = dispatch =>
@@ -104,6 +109,7 @@ const refreshToken = dispatch => async () => {
 };
 const login = dispatch => async params => {
   try {
+    //await showLoader();
     const response = await axios.post(
       constants.LOGIN_API,
       qs.stringify(params),
@@ -132,6 +138,7 @@ export const {Provider, Context} = createDataContext(
   authReducer,
   {
     login,
+    showLoader,
     register,
     logout,
     clearErrorMessage,

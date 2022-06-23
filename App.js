@@ -119,7 +119,7 @@ function App() {
     );
   }
 
-  return state.token ? (
+  return !state.token ? (
     <>
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
