@@ -87,10 +87,10 @@ const ServiceListScreen = ({route, navigation}) => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={services}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (
             <ServiceComponent
-              key={index}
+              key={item.serviceId}
               data={item}
               onPressPriceHandler={() =>
                 navigation.push('ServicePriceScreen', {

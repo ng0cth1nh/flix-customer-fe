@@ -207,19 +207,26 @@ export default function RegisterScreen({navigation}) {
       <BackButton onPressHandler={navigation.goBack} color="#FEC54B" />
       <SafeAreaView>
         <Card cornerRadius={20} elevation={10} style={styles.registerForm}>
-          <ScrollView style={styles.scrollView}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={styles.scrollView}>
             <ImageBackground
               source={
                 avatar === null
                   ? require('../../../assets/images/login_register_bg/default_avatar.png')
                   : {uri: avatar.path}
               }
+              imageStyle={{borderRadius: width * 0.5}}
               style={styles.avatar}
               resizeMode="cover">
               <TouchableOpacity
                 style={styles.cameraButton}
                 onPress={selectAvatar}>
                 <Image
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
                   source={require('../../../assets/images/login_register_bg/camera_icon.png')}
                 />
               </TouchableOpacity>
@@ -362,7 +369,11 @@ export default function RegisterScreen({navigation}) {
               <TouchableOpacity
                 style={styles.iconView}
                 onPress={() => setCoverPassword(!coverPassword)}>
-                <Icon name="eye-slash" size={18} />
+                {coverPassword ? (
+                  <Icon name="eye" size={18} />
+                ) : (
+                  <Icon name="eye-slash" size={18} />
+                )}
               </TouchableOpacity>
             </View>
             {passwordInputError && (
@@ -391,7 +402,11 @@ export default function RegisterScreen({navigation}) {
               <TouchableOpacity
                 style={styles.iconView}
                 onPress={() => setCoverRepassword(!coverRepassword)}>
-                <Icon name="eye-slash" size={18} />
+                {coverRepassword ? (
+                  <Icon name="eye" size={18} />
+                ) : (
+                  <Icon name="eye-slash" size={18} />
+                )}
               </TouchableOpacity>
             </View>
             {repasswordInputError && (

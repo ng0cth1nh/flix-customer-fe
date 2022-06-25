@@ -23,7 +23,7 @@ import ChoosePaymentMethodScreen from './src/screens/request/ChoosePaymentMethod
 import AddAddressScreen from './src/screens/address/AddAddressScreen';
 import AddressListScreen from './src/screens/address/AddressListScreen';
 import EditAddressScreen from './src/screens/address/EditAddressScreen';
-
+import ChangePasswordScreen from './src/screens/profile/ChangePasswordScreen';
 import HomeScreen from './src/screens/main/HomeScreen';
 import NotificationScreen from './src/screens/main/NotificationScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
@@ -31,6 +31,9 @@ import CategoryListScreen from './src/screens/main/CategoryListScreen';
 import ServiceListScreen from './src/screens/main/ServiceListScreen';
 import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
 import Toast from 'react-native-toast-message';
+import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
+import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
+import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 
 import {
   requestUserPermission,
@@ -97,11 +100,35 @@ function App() {
     );
   }
 
-  return !state.token ? (
+  function ProfileStackScreen() {
+    return (
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="ProfileInfoScreen" component={ProfileInfoScreen} />
+        <Stack.Screen
+          name="EditProfileInfoScreen"
+          component={EditProfileInfoScreen}
+        />
+        <Stack.Screen name="AddressListScreen" component={AddressListScreen} />
+        <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} />
+        <Stack.Screen name="EditAddressScreen" component={EditAddressScreen} />
+        <Stack.Screen name="FeedbackScreen" component={FeedbackScreen} />
+        <Stack.Screen
+          name="ChangePasswordScreen"
+          component={ChangePasswordScreen}
+        />
+      </Stack.Navigator>
+    );
+  }
+
+  return state.token ? (
     <>
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {/* <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} /> */}
+          {/* <Stack.Screen
+            name="EditAddressScreen"
+            component={EditAddressScreen}
+          /> */}
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}
@@ -172,7 +199,7 @@ function App() {
                 icon = focused
                   ? require('./assets/images/type/bell-ring-active.png')
                   : require('./assets/images/type/bell-ring.png');
-              } else if (route.name === 'Profile') {
+              } else if (route.name === 'ProfileStackScreen') {
                 icon = focused
                   ? require('./assets/images/type/user-profile-active.png')
                   : require('./assets/images/type/user-profile.png');
@@ -183,7 +210,10 @@ function App() {
           <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />
           <Tab.Screen name="RequestHistory" component={RequestHistoryScreen} />
           <Tab.Screen name="Notification" component={NotificationScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
+          <Tab.Screen
+            name="ProfileStackScreen"
+            component={ProfileStackScreen}
+          />
         </Tab.Navigator>
       </NavigationContainer>
       <Toast

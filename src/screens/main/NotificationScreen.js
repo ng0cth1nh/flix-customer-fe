@@ -8,12 +8,14 @@ import {
   FlatList,
   Dimensions,
   StatusBar,
+  RefreshControl,
+  ActivityIndicator,
+  TouchableHighlight,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import React, {useState, useEffect} from 'react';
 const {width, height} = Dimensions.get('window');
-import {Root, SPSheet} from 'react-native-popup-confirm-toast';
-import BottomToast from '../../components/BottomToast';
+import CustomModal from '../../components/CustomModal';
 
 const NOTIFICATIONS = [
   {
@@ -58,42 +60,18 @@ const NOTIFICATIONS = [
     icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
     isRead: true,
   },
-  {
-    id: 6,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 7,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 8,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 9,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
 ];
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
+  const [idDelete, setIdDelete] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshControl, setRefreshControl] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const showModal = () => {
+    setModalVisible(true);
+  };
 
   useEffect(() => {
     setNotifications(NOTIFICATIONS);
@@ -149,18 +127,8 @@ const NotificationScreen = () => {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              const spSheet = SPSheet;
-              spSheet.show({
-                component: () => (
-                  <BottomToast
-                    id={item.id}
-                    spSheet={spSheet}
-                    handleOnDelete={handleOnDelete}
-                  />
-                ),
-                dragFromTopOnly: true,
-                height: height * 0.44,
-              });
+              setIdDelete(item.id);
+              showModal();
             }}
             style={{
               height: 12,
@@ -183,20 +151,144 @@ const NotificationScreen = () => {
   };
 
   return (
-    <Root>
-      <View style={{backgroundColor: 'white', flex: 1}}>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <SafeAreaView style={{flex: 1}}>
-          <Text style={styles.headerText}>Thông báo</Text>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={notifications}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-          />
-        </SafeAreaView>
-      </View>
-    </Root>
+    <View
+      style={[
+        {backgroundColor: 'white', flex: 1},
+        modalVisible ? {opacity: 0.3} : {},
+      ]}>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <SafeAreaView style={{flex: 1}}>
+        <Text style={styles.headerText}>Thông báo</Text>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={notifications}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshControl}
+              onRefresh={() => {
+                setRefreshControl(true);
+                console.log('lam moi');
+                // setData(mang_du_lieu)
+                setNotifications(
+                  notifications.concat([
+                    {
+                      id: 6,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                    {
+                      id: 7,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                    {
+                      id: 8,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                    {
+                      id: 9,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                  ]),
+                );
+                setRefreshControl(false);
+              }}
+              colors={['#FEC54B']}
+            />
+          }
+          ListFooterComponent={() =>
+            isLoading ? ( //  a==b ? b : a
+              <View
+                style={{
+                  marginTop: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  padding: 10,
+                }}>
+                <ActivityIndicator size="small" color="#FEC54B" />
+              </View>
+            ) : null
+          }
+          onEndReached={() => {
+            setIsLoading(true);
+            console.log('Load More');
+            // setData(mang_du_lieu)
+            setTimeout(() => {
+              setNotifications(
+                notifications.concat([
+                  {
+                    id: 8,
+                    time: '20:59 - 13/05/2022',
+                    title: 'Bạn có 1 mã giảm giá mới',
+                    content:
+                      'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                    isRead: true,
+                  },
+                  {
+                    id: 9,
+                    time: '20:59 - 13/05/2022',
+                    title: 'Bạn có 1 mã giảm giá mới',
+                    content:
+                      'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                    isRead: true,
+                  },
+                ]),
+              );
+              setIsLoading(false);
+            }, 2000);
+          }}
+          onEndReachedThreshold={0.5}
+        />
+      </SafeAreaView>
+      <CustomModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        modalRatio={0.35}>
+        <Text style={styles.modalText}>
+          Bạn có chắc chắn muốn xóa thông báo này không?
+        </Text>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+          }}>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonOpen]}
+            onPress={() => console.log('delete id ' + idDelete)}>
+            <Text style={styles.textStyle}>XÓA</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setModalVisible(!modalVisible)}>
+            <Text style={styles.textStyle}>THOÁT</Text>
+          </TouchableOpacity>
+        </View>
+      </CustomModal>
+    </View>
   );
 };
 
@@ -212,16 +304,28 @@ const styles = StyleSheet.create({
     borderBottomColor: '#CACACA',
     width: '100%',
   },
-  overlay: {
-    flex: 1,
-    zIndex: 1,
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    opacity: 0.01,
-    backgroundColor: 'black',
-    width: width,
-    height: height,
+  button: {
+    width: '40%',
+    borderRadius: 20,
+    paddingVertical: 10,
+  },
+  buttonOpen: {
+    backgroundColor: '#FEC54B',
+  },
+  buttonClose: {
+    backgroundColor: '#F0F0F0',
+  },
+  textStyle: {
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 40,
+    textAlign: 'center',
   },
 });
 export default NotificationScreen;
