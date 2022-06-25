@@ -10,5 +10,6 @@ const ApiConstants = {
     'https://flix-lj7prqscta-as.a.run.app/api/v1/address/district',
   GET_COMMUNE_BY_DISTRICT_API:
     'https://flix-lj7prqscta-as.a.run.app/api/v1/address/commune',
+  GET_SERVICES_BY_CATEGORY_API: '/category/services',
 };
 export default ApiConstants;

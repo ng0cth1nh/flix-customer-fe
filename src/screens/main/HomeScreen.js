@@ -132,8 +132,8 @@ const HomeScreen = ({navigation}) => {
                   data={data}
                   onPressHandler={() =>
                     navigation.push('ServiceListScreen', {
-                      majorId: data.id,
-                      majorName: data.title,
+                      categoryId: data.id,
+                      categoryName: data.title,
                     })
                   }
                 />
