@@ -44,7 +44,7 @@ const ChangePasswordScreen = ({navigation}) => {
           style={[
             styles.box,
             {
-              height: 'auto',
+              height: height * 0.6,
               flexDirection: 'column',
               marginVertical: '5%',
             },

@@ -33,6 +33,7 @@ import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
 import Toast from 'react-native-toast-message';
 import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
 import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
+import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 
 import {
   requestUserPermission,
@@ -111,6 +112,7 @@ function App() {
         <Stack.Screen name="AddressListScreen" component={AddressListScreen} />
         <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} />
         <Stack.Screen name="EditAddressScreen" component={EditAddressScreen} />
+        <Stack.Screen name="FeedbackScreen" component={FeedbackScreen} />
         <Stack.Screen
           name="ChangePasswordScreen"
           component={ChangePasswordScreen}
@@ -119,7 +121,7 @@ function App() {
     );
   }
 
-  return !state.token ? (
+  return state.token ? (
     <>
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={{headerShown: false}}>

@@ -71,7 +71,13 @@ const ProfileScreen = ({navigation}) => {
           borderTopRightRadius: 18,
           paddingTop: 40,
         }}>
-        <View style={styles.wrapper}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.push('ProfileInfoScreen', {
+              profileData: profile,
+            })
+          }
+          style={styles.wrapper}>
           <View style={styles.container}>
             <View style={{flexDirection: 'row', flex: 11, marginLeft: 16}}>
               <Image
@@ -80,21 +86,15 @@ const ProfileScreen = ({navigation}) => {
               />
               <Text style={styles.title}>Thông tin tài khoản</Text>
             </View>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.push('ProfileInfoScreen', {
-                  profileData: profile,
-                })
-              }
-              style={{flex: 1}}>
-              <Image
-                style={styles.iconNext}
-                source={require('../../../assets/images/type/right-arrow.png')}
-              />
-            </TouchableOpacity>
+            <Image
+              style={styles.iconNext}
+              source={require('../../../assets/images/type/right-arrow.png')}
+            />
           </View>
-        </View>
-        <View style={styles.wrapper}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.push('ChangePasswordScreen')}
+          style={styles.wrapper}>
           <View style={styles.container}>
             <View style={{flexDirection: 'row', flex: 11, marginLeft: 16}}>
               <Image
@@ -103,17 +103,15 @@ const ProfileScreen = ({navigation}) => {
               />
               <Text style={styles.title}>Thay đổi mật khẩu</Text>
             </View>
-            <TouchableOpacity
-              style={{flex: 1}}
-              onPress={() => navigation.push('ChangePasswordScreen')}>
-              <Image
-                style={styles.iconNext}
-                source={require('../../../assets/images/type/right-arrow.png')}
-              />
-            </TouchableOpacity>
+            <Image
+              style={styles.iconNext}
+              source={require('../../../assets/images/type/right-arrow.png')}
+            />
           </View>
-        </View>
-        <View style={styles.wrapper}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.push('AddressListScreen')}
+          style={styles.wrapper}>
           <View style={styles.container}>
             <View style={{flexDirection: 'row', flex: 11, marginLeft: 16}}>
               <Image
@@ -122,17 +120,15 @@ const ProfileScreen = ({navigation}) => {
               />
               <Text style={styles.title}>Sổ địa chỉ</Text>
             </View>
-            <TouchableOpacity
-              style={{flex: 1}}
-              onPress={() => navigation.push('AddressListScreen')}>
-              <Image
-                style={styles.iconNext}
-                source={require('../../../assets/images/type/right-arrow.png')}
-              />
-            </TouchableOpacity>
+            <Image
+              style={styles.iconNext}
+              source={require('../../../assets/images/type/right-arrow.png')}
+            />
           </View>
-        </View>
-        <View style={styles.wrapper}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.push('FeedbackScreen')}
+          style={styles.wrapper}>
           <View style={styles.container}>
             <View style={{flexDirection: 'row', flex: 11, marginLeft: 16}}>
               <Image
@@ -141,15 +137,13 @@ const ProfileScreen = ({navigation}) => {
               />
               <Text style={styles.title}>Yêu cầu hỗ trợ</Text>
             </View>
-            <TouchableOpacity style={{flex: 1}}>
-              <Image
-                style={styles.iconNext}
-                source={require('../../../assets/images/type/right-arrow.png')}
-              />
-            </TouchableOpacity>
+            <Image
+              style={styles.iconNext}
+              source={require('../../../assets/images/type/right-arrow.png')}
+            />
           </View>
-        </View>
-        <View style={styles.wrapper}>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={showModal} style={styles.wrapper}>
           <View style={styles.container}>
             <View style={{flexDirection: 'row', flex: 11, marginLeft: 16}}>
               <Image
@@ -158,14 +152,12 @@ const ProfileScreen = ({navigation}) => {
               />
               <Text style={styles.title}>Đăng xuất</Text>
             </View>
-            <TouchableOpacity style={{flex: 1}} onPress={showModal}>
-              <Image
-                style={styles.iconNext}
-                source={require('../../../assets/images/type/right-arrow.png')}
-              />
-            </TouchableOpacity>
+            <Image
+              style={styles.iconNext}
+              source={require('../../../assets/images/type/right-arrow.png')}
+            />
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
       <CustomModal
         modalVisible={modalVisible}
@@ -200,6 +192,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   container: {
     flexDirection: 'row',
@@ -212,8 +205,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginVertical: 8,
   },
-  icon: {width: 24, height: 24, marginRight: 24},
-  iconNext: {width: 20, height: 20},
+  icon: {width: 24, height: 24, marginRight: 24, alignSelf: 'center'},
+  iconNext: {width: 20, height: 20, marginRight: 16},
   title: {
     fontSize: 20,
     fontWeight: 'bold',

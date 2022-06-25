@@ -87,7 +87,7 @@ const ServiceListScreen = ({route, navigation}) => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={services}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (
             <ServiceComponent
               key={item.serviceId}

@@ -8,6 +8,9 @@ import {
   FlatList,
   Dimensions,
   StatusBar,
+  RefreshControl,
+  ActivityIndicator,
+  TouchableHighlight,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import React, {useState, useEffect} from 'react';
@@ -57,45 +60,15 @@ const NOTIFICATIONS = [
     icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
     isRead: true,
   },
-  {
-    id: 6,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 7,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 8,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 9,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
 ];
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [idDelete, setIdDelete] = useState(-1);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshControl, setRefreshControl] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+
   const showModal = () => {
     setModalVisible(true);
   };
@@ -190,7 +163,104 @@ const NotificationScreen = () => {
           showsVerticalScrollIndicator={false}
           data={notifications}
           renderItem={renderItem}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => index.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshControl}
+              onRefresh={() => {
+                setRefreshControl(true);
+                console.log('lam moi');
+                // setData(mang_du_lieu)
+                setNotifications(
+                  notifications.concat([
+                    {
+                      id: 6,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                    {
+                      id: 7,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                    {
+                      id: 8,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                    {
+                      id: 9,
+                      time: '20:59 - 13/05/2022',
+                      title: 'Bạn có 1 mã giảm giá mới',
+                      content:
+                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                      isRead: true,
+                    },
+                  ]),
+                );
+                setRefreshControl(false);
+              }}
+              colors={['#FEC54B']}
+            />
+          }
+          ListFooterComponent={() =>
+            isLoading ? ( //  a==b ? b : a
+              <View
+                style={{
+                  marginTop: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  padding: 10,
+                }}>
+                <ActivityIndicator size="small" color="#FEC54B" />
+              </View>
+            ) : null
+          }
+          onEndReached={() => {
+            setIsLoading(true);
+            console.log('Load More');
+            // setData(mang_du_lieu)
+            setTimeout(() => {
+              setNotifications(
+                notifications.concat([
+                  {
+                    id: 8,
+                    time: '20:59 - 13/05/2022',
+                    title: 'Bạn có 1 mã giảm giá mới',
+                    content:
+                      'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                    isRead: true,
+                  },
+                  {
+                    id: 9,
+                    time: '20:59 - 13/05/2022',
+                    title: 'Bạn có 1 mã giảm giá mới',
+                    content:
+                      'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
+                    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
+                    isRead: true,
+                  },
+                ]),
+              );
+              setIsLoading(false);
+            }, 2000);
+          }}
+          onEndReachedThreshold={0.5}
         />
       </SafeAreaView>
       <CustomModal
