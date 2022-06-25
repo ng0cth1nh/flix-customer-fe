@@ -12,11 +12,13 @@ import BackButton from '../../components/BackButton';
 import ServiceComponent from '../../components/ServiceComponent';
 import customerAPI from '../../api/customer';
 import ApiConstants from '../../constants/Api';
+import NotFound from '../../components/NotFound';
 
 const ServiceListScreen = ({route, navigation}) => {
   const {categoryName, categoryId} = route.params;
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -30,7 +32,7 @@ const ServiceListScreen = ({route, navigation}) => {
         );
         setServices(response.data.services);
       } catch (err) {
-        console.log('err');
+        setIsError(true);
       } finally {
         setLoading(false);
       }
@@ -53,6 +55,7 @@ const ServiceListScreen = ({route, navigation}) => {
             }}
           />
         ) : null}
+        {isError ? <NotFound /> : null}
         <FlatList
           showsVerticalScrollIndicator={false}
           data={services}

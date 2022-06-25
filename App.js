@@ -125,10 +125,6 @@ function App() {
     <>
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {/* <Stack.Screen
-            name="EditAddressScreen"
-            component={EditAddressScreen}
-          /> */}
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}
