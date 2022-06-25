@@ -1,81 +1,42 @@
 import React, {useEffect, useState} from 'react';
 import {
-  ScrollView,
   FlatList,
   StatusBar,
   StyleSheet,
   Text,
+  ActivityIndicator,
   View,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import BackButton from '../../components/BackButton';
 import ServiceComponent from '../../components/ServiceComponent';
-
-const SERVICES = [
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 10,
-    serviceName: 'Lò nướng',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 11,
-    serviceName: 'Lò vi sóng',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 12,
-    serviceName: 'Lò vi ba',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 13,
-    serviceName: 'Bếp từ',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-];
+import customerAPI from '../../api/customer';
+import ApiConstants from '../../constants/Api';
+import NotFound from '../../components/NotFound';
 
 const ServiceListScreen = ({route, navigation}) => {
-  const {majorName, majorId} = route.params;
+  const {categoryName, categoryId} = route.params;
   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    setServices(SERVICES);
+    (async () => {
+      try {
+        setLoading(true);
+        let response = await customerAPI.get(
+          ApiConstants.GET_SERVICES_BY_CATEGORY_API,
+          {
+            params: {categoryId: categoryId},
+          },
+        );
+        setServices(response.data.services);
+      } catch (err) {
+        setIsError(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   return (
@@ -83,7 +44,18 @@ const ServiceListScreen = ({route, navigation}) => {
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       <BackButton onPressHandler={navigation.goBack} color="black" />
       <View style={{flex: 1}}>
-        <Text style={styles.headerText}>{majorName}</Text>
+        <Text style={styles.headerText}>{categoryName}</Text>
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color="#FEC54B"
+            style={{
+              alignSelf: 'center',
+              flex: 1,
+            }}
+          />
+        ) : null}
+        {isError ? <NotFound /> : null}
         <FlatList
           showsVerticalScrollIndicator={false}
           data={services}

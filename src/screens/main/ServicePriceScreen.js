@@ -1,75 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {
+  StatusBar,
+  StyleSheet,
+  ActivityIndicator,
+  FlatList,
+  Text,
+  View,
+} from 'react-native';
 import BackButton from '../../components/BackButton';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-
-const SERVICE_PRICE = [
-  {
-    id: 1,
-    price: 60000,
-    name: 'Kiểm tra cơ bản ',
-  },
-  {
-    id: 2,
-    price: 30000,
-    name: 'Nạp ga điều hòa',
-  },
-  {
-    id: 3,
-    price: 25000,
-    name: 'Hỏng chức năng làm lạnh',
-  },
-  {
-    id: 4,
-    price: 2000000,
-    name: 'Băng tuyết bám thành mảng trên dàn nhiệt độ',
-  },
-  {
-    id: 5,
-    price: 1300000,
-    name: 'Điều hòa có tiếng ồn lớn, bất thường',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-];
+import ApiConstants from '../../constants/Api';
+import NotFound from '../../components/NotFound';
+import customerAPI from '../../api/customer';
 
 function numberWithCommas(inputNumber) {
   let formattedNumber = Number(inputNumber)
@@ -84,10 +26,27 @@ function numberWithCommas(inputNumber) {
 
 const ServicePriceScreen = ({route, navigation}) => {
   const {serviceName, serviceId} = route.params;
-  const [servicePrice, setServicePrice] = useState([]);
+  const [servicePrice, setServicePrice] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    setServicePrice(SERVICE_PRICE);
+    (async () => {
+      try {
+        setLoading(true);
+        let response = await customerAPI.get(
+          ApiConstants.GET_SERVICE_DETAIL_API,
+          {
+            params: {serviceId: serviceId},
+          },
+        );
+        setServicePrice(response.data.services);
+      } catch (err) {
+        setIsError(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   return (
@@ -96,47 +55,61 @@ const ServicePriceScreen = ({route, navigation}) => {
       <BackButton onPressHandler={navigation.goBack} color="black" />
       <View style={{flex: 1}}>
         <Text style={styles.headerText}>{serviceName}</Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#F0F0F0',
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-            marginHorizontal: 20,
-            height: 40,
-          }}>
-          <Text
-            style={{
-              flex: 5,
-              color: 'black',
-              alignSelf: 'center',
-              fontSize: 16,
-              fontWeight: 'bold',
-              paddingLeft: 10,
-            }}>
-            Các vấn đề thường gặp
-          </Text>
-          <Text
-            style={{
-              flex: 2,
-              color: 'black',
-              alignSelf: 'center',
-              fontSize: 16,
-              fontWeight: 'bold',
-            }}>
-            Giá dịch vụ
-          </Text>
-        </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{marginHorizontal: 20}}>
-          {servicePrice.map((item, index) => {
-            return (
+        <View style={{flex: 1, marginHorizontal: '5%'}}>
+          {isError ? <NotFound /> : null}
+          {servicePrice ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                backgroundColor: '#F0F0F0',
+                borderTopLeftRadius: 10,
+                borderTopRightRadius: 10,
+                height: 40,
+              }}>
+              <Text
+                style={{
+                  flex: 5,
+                  color: 'black',
+                  alignSelf: 'center',
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  paddingLeft: 10,
+                }}>
+                Các vấn đề thường gặp
+              </Text>
+              <Text
+                style={{
+                  flex: 2,
+                  color: 'black',
+                  alignSelf: 'center',
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                }}>
+                Giá dịch vụ
+              </Text>
+            </View>
+          ) : null}
+          {loading ? (
+            <ActivityIndicator
+              size="small"
+              color="#FEC54B"
+              style={{
+                alignSelf: 'center',
+                flex: 1,
+              }}
+            />
+          ) : null}
+
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={servicePrice}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item, index}) => (
               <View
                 key={index}
                 style={{
-                  borderBottomWidth: 1,
-                  borderBottomColor: '#CACACA',
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: '#DDDDDD',
                   flexDirection: 'row',
                   backgroundColor: 'white',
                   paddingLeft: 15,
@@ -163,9 +136,9 @@ const ServicePriceScreen = ({route, navigation}) => {
                   {numberWithCommas(item.price)}
                 </Text>
               </View>
-            );
-          })}
-        </ScrollView>
+            )}
+          />
+        </View>
       </View>
     </View>
   );
