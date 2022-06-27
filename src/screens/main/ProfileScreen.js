@@ -7,14 +7,18 @@ import {
   StatusBar,
   StyleSheet,
 } from 'react-native';
-import React, {useState, useRef, useContext, useEffect} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 const {height, width} = Dimensions.get('window');
 import {Context as AuthContext} from '../../context/AuthContext';
+import {Context as ProfileContext} from '../../context/ProfileContext';
 import CustomModal from '../../components/CustomModal';
 
 const ProfileScreen = ({navigation}) => {
   const {logout} = useContext(AuthContext);
-  const [profile, setProfile] = useState({});
+  const {
+    state: {avatarUrl, fullName},
+    getProfile,
+  } = useContext(ProfileContext);
   const [modalVisible, setModalVisible] = useState(false);
 
   const showModal = () => {
@@ -22,15 +26,9 @@ const ProfileScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    setProfile({
-      name: 'Nguyễn Thanh Long',
-      phone: '0962706248',
-      birthDate: null,
-      sex: null,
-      email: null,
-      avatar:
-        'http://baoquangngai.vn/dataimages/202002/original/images2263788_40dd6ac05283bbdde292.jpg',
-    });
+    (async () => {
+      await getProfile();
+    })();
   }, []);
 
   return (
@@ -51,7 +49,7 @@ const ProfileScreen = ({navigation}) => {
           marginTop: 50,
           marginBottom: 10,
         }}
-        source={{uri: profile.avatar}}
+        source={{uri: avatarUrl}}
       />
       <Text
         style={{
@@ -61,7 +59,7 @@ const ProfileScreen = ({navigation}) => {
           color: 'black',
           marginBottom: 50,
         }}>
-        {profile.name}
+        {fullName}
       </Text>
       <View
         style={{
@@ -72,11 +70,7 @@ const ProfileScreen = ({navigation}) => {
           paddingTop: 40,
         }}>
         <TouchableOpacity
-          onPress={() =>
-            navigation.push('ProfileInfoScreen', {
-              profileData: profile,
-            })
-          }
+          onPress={() => navigation.push('ProfileInfoScreen')}
           style={styles.wrapper}>
           <View style={styles.container}>
             <View style={{flexDirection: 'row', flex: 11, marginLeft: 16}}>

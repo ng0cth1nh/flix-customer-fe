@@ -10,74 +10,69 @@ import {
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import BackButton from '../../components/BackButton';
 import ServiceComponent from '../../components/ServiceComponent';
-import customerAPI from '../../api/customer';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
+import useFetchData from '../../hooks/useFetchData';
 
 const ServiceListScreen = ({route, navigation}) => {
   const {categoryName, categoryId} = route.params;
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        let response = await customerAPI.get(
-          ApiConstants.GET_SERVICES_BY_CATEGORY_API,
-          {
-            params: {categoryId: categoryId},
-          },
-        );
-        setServices(response.data.services);
-      } catch (err) {
-        setIsError(true);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const {loading, data, isError} = useFetchData(
+    ApiConstants.GET_SERVICES_BY_CATEGORY_API,
+    {
+      params: {categoryId: categoryId},
+    },
+  );
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       <BackButton onPressHandler={navigation.goBack} color="black" />
-      <View style={{flex: 1}}>
-        <Text style={styles.headerText}>{categoryName}</Text>
+      <Text style={styles.headerText}>{categoryName}</Text>
+      <View
+        style={{
+          flex: 1,
+        }}>
         {loading ? (
           <ActivityIndicator
             size="small"
             color="#FEC54B"
             style={{
-              alignSelf: 'center',
-              flex: 1,
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           />
         ) : null}
         {isError ? <NotFound /> : null}
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={services}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({item, index}) => (
-            <ServiceComponent
-              key={item.serviceId}
-              data={item}
-              onPressPriceHandler={() =>
-                navigation.push('ServicePriceScreen', {
-                  serviceId: item.serviceId,
-                  serviceName: item.serviceName,
-                })
-              }
-              onPressRequestHandler={() =>
-                navigation.push('RequestScreen', {
-                  serviceId: item.serviceId,
-                })
-              }
-            />
-          )}
-        />
+        {data !== null ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={data.services}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item}) => (
+              <ServiceComponent
+                key={item.serviceId}
+                data={item}
+                onPressPriceHandler={() =>
+                  navigation.push('ServicePriceScreen', {
+                    serviceId: item.serviceId,
+                    serviceName: item.serviceName,
+                  })
+                }
+                onPressRequestHandler={() =>
+                  navigation.push('RequestScreen', {
+                    serviceId: item.serviceId,
+                  })
+                }
+              />
+            )}
+          />
+        ) : null}
       </View>
     </View>
   );
