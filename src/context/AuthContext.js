@@ -89,7 +89,8 @@ const confirmOTP = dispatch => async params => {
 
 const refreshToken = dispatch => async () => {
   try {
-    const refresh_token = await AsyncStorage.get('refreshToken');
+    console.log('run refresh token');
+    const refresh_token = await AsyncStorage.getItem('refreshToken');
     if (!refresh_token) {
       throw new Error();
     }
@@ -98,18 +99,19 @@ const refreshToken = dispatch => async () => {
         Authorization: `Bearer ${refresh_token}`,
       },
     });
+    console.log('response refresh token: \n' + response);
     await AsyncStorage.setItem('token', response.data.accessToken);
     await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
     dispatch({type: 'login', payload: response.data.accessToken});
   } catch (err) {
-    await AsyncStorage.removeItem('accessToken');
-    await AsyncStorage.removeItem('kerefreshToken');
+    console.log(err.toString());
+    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('refreshToken');
     dispatch({type: 'logout'});
   }
 };
 const login = dispatch => async params => {
   try {
-    //await showLoader();
     const response = await axios.post(
       constants.LOGIN_API,
       qs.stringify(params),
@@ -128,6 +130,7 @@ const login = dispatch => async params => {
       type: 'add_error',
       payload: getErrorMessage(err),
     });
+    console.log(err.toString());
   }
 };
 const logout = dispatch => async () => {

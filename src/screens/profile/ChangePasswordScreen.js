@@ -15,6 +15,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import SubmitButton from '../../components/SubmitButton';
 import BackButton from '../../components/BackButton';
+import ApiConstants from '../../constants/Api';
+import useAxios from '../../hooks/useAxios';
+import getErrorMessage from '../../utils/getErrorMessage';
 
 const ChangePasswordScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
@@ -23,15 +26,82 @@ const ChangePasswordScreen = ({navigation}) => {
   const [coverPassword, setCoverPassword] = useState(true);
   const [coverNewPassword, setCoverNewPassword] = useState(true);
   const [coverReNewPassword, setCoverReNewPassword] = useState(true);
+  const [newPasswordInputError, setNewPasswordInputError] = useState(null);
+  const [passwordInputError, setPasswordInputError] = useState(null);
+  const [reNewPasswordInputError, setReNewPasswordInputError] = useState(null);
+  const customerAPI = useAxios();
 
-  const showToast = () => {
-    console.log('show toast');
-    Toast.show({
-      type: 'success',
-      text1: 'Flix',
-      text2: 'Thay đổi địa chỉ mặc định thành công!',
-    });
+  const checkPasswordValid = () => {
+    if (password.trim() === '') {
+      setPasswordInputError('Vui lòng nhập mật khẩu hiện tại');
+      return false;
+    }
+    setPasswordInputError(null);
+    return true;
   };
+
+  const checkNewPasswordValid = () => {
+    if (newPassword.trim() === '') {
+      setNewPasswordInputError('Vui lòng nhập mật khẩu mới');
+      return false;
+    } else if (
+      !/((?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,10})\b/.test(newPassword)
+    ) {
+      setNewPasswordInputError(
+        'Mật khẩu phải từ 6 đến 10 kí tự và bao gồm ít nhất 1 số hoặc 1 kí tự',
+      );
+      return false;
+    } else if (newPassword.indexOf(' ') >= 0) {
+      setNewPasswordInputError('Mật khẩu không bao gồm khoảng trắng');
+      return false;
+    }
+    setNewPasswordInputError(null);
+    return true;
+  };
+
+  const checkReNewPasswordValid = () => {
+    if (reNewPassword !== newPassword && newPassword.trim() !== '') {
+      setReNewPasswordInputError('Mật khẩu nhập lại không khớp');
+      return false;
+    }
+    setReNewPasswordInputError(null);
+    return true;
+  };
+
+  const handleChangePassword = async () => {
+    if (
+      checkPasswordValid() &&
+      checkNewPasswordValid() &&
+      checkReNewPasswordValid()
+    ) {
+      try {
+        const body = {
+          oldPassword: password,
+          newPassword,
+        };
+        const response = await customerAPI.put(
+          ApiConstants.CHANGE_PASSWORD_API,
+          JSON.stringify(body),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+        console.log(response.data);
+        if (response.status === 200) {
+          Toast.show({
+            type: 'customToast',
+            text1: 'Đổi mật khẩu thành công',
+          });
+        }
+      } catch (err) {
+        console.log(getErrorMessage(err));
+        setPasswordInputError(getErrorMessage(err));
+      }
+    }
+  };
+
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <View>
@@ -51,7 +121,13 @@ const ChangePasswordScreen = ({navigation}) => {
           ]}>
           <View style={styles.inputField}>
             <Text style={styles.inputLabel}>Nhập mật khẩu hiện tại</Text>
-            <View style={styles.valueSpace}>
+            <View
+              style={[
+                styles.valueSpace,
+                passwordInputError
+                  ? {borderColor: '#FF6442', borderWidth: 1}
+                  : null,
+              ]}>
               <TextInput
                 style={[
                   styles.valueText,
@@ -76,10 +152,19 @@ const ChangePasswordScreen = ({navigation}) => {
                 )}
               </TouchableOpacity>
             </View>
+            {passwordInputError && (
+              <Text style={styles.errorMessage}>{passwordInputError}</Text>
+            )}
           </View>
           <View style={styles.inputField}>
             <Text style={styles.inputLabel}>Nhập mật khẩu mới</Text>
-            <View style={styles.valueSpace}>
+            <View
+              style={[
+                styles.valueSpace,
+                newPasswordInputError
+                  ? {borderColor: '#FF6442', borderWidth: 1}
+                  : null,
+              ]}>
               <TextInput
                 style={[
                   styles.valueText,
@@ -104,10 +189,19 @@ const ChangePasswordScreen = ({navigation}) => {
                 )}
               </TouchableOpacity>
             </View>
+            {newPasswordInputError && (
+              <Text style={styles.errorMessage}>{newPasswordInputError}</Text>
+            )}
           </View>
           <View style={styles.inputField}>
             <Text style={styles.inputLabel}>Nhập lại mật khẩu mới</Text>
-            <View style={styles.valueSpace}>
+            <View
+              style={[
+                styles.valueSpace,
+                reNewPasswordInputError
+                  ? {borderColor: '#FF6442', borderWidth: 1}
+                  : null,
+              ]}>
               <TextInput
                 style={[
                   styles.valueText,
@@ -132,6 +226,9 @@ const ChangePasswordScreen = ({navigation}) => {
                 )}
               </TouchableOpacity>
             </View>
+            {reNewPasswordInputError && (
+              <Text style={styles.errorMessage}>{reNewPasswordInputError}</Text>
+            )}
           </View>
         </View>
         <SubmitButton
@@ -141,9 +238,7 @@ const ChangePasswordScreen = ({navigation}) => {
             width: '90%',
             alignSelf: 'center',
           }}
-          onPress={() => {
-            navigation.push('AddAddressScreen');
-          }}
+          onPress={handleChangePassword}
           buttonText="ĐỔI MẬT KHẨU"
         />
       </SafeAreaView>
@@ -215,6 +310,13 @@ const styles = StyleSheet.create({
   },
   iconView: {
     flex: 1,
+  },
+  errorMessage: {
+    position: 'absolute',
+    bottom: -14,
+    left: 5,
+    fontSize: 10,
+    color: '#FF6442',
   },
 });
 

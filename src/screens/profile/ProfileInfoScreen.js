@@ -12,11 +12,13 @@ import {
 import React, {useState, useRef, useContext, useEffect} from 'react';
 const {height, width} = Dimensions.get('window');
 import BackButton from '../../components/BackButton';
+import {Context as ProfileContext} from '../../context/ProfileContext';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 
-const ProfileInfoScreen = ({route, navigation}) => {
-  const {profileData} = route.params;
-  const [profile, setProfile] = useState(profileData);
+const ProfileInfoScreen = ({navigation}) => {
+  const {
+    state: {avatarUrl, fullName, phone, gender, email, dateOfBirth},
+  } = useContext(ProfileContext);
 
   return (
     <View style={{backgroundColor: '#FEC54B', flex: 1}}>
@@ -32,11 +34,7 @@ const ProfileInfoScreen = ({route, navigation}) => {
         }}>
         <BackButton onPressHandler={navigation.goBack} color="black" />
         <TouchableOpacity
-          onPress={() =>
-            navigation.push('EditProfileInfoScreen', {
-              profileData: profile,
-            })
-          }
+          onPress={() => navigation.push('EditProfileInfoScreen')}
           style={{
             position: 'absolute',
             zIndex: 1,
@@ -61,7 +59,7 @@ const ProfileInfoScreen = ({route, navigation}) => {
             marginTop: 80,
             marginBottom: 10,
           }}
-          source={{uri: profile.avatar}}
+          source={{uri: avatarUrl}}
         />
         <Text
           style={{
@@ -71,7 +69,7 @@ const ProfileInfoScreen = ({route, navigation}) => {
             color: 'black',
             marginBottom: 50,
           }}>
-          {profile.name}
+          {fullName}
         </Text>
         <View
           style={{
@@ -103,7 +101,7 @@ const ProfileInfoScreen = ({route, navigation}) => {
                 <TextInput
                   style={styles.valueText}
                   editable={false}
-                  value={profile.name}
+                  value={fullName}
                 />
               </View>
             </View>
@@ -113,7 +111,7 @@ const ProfileInfoScreen = ({route, navigation}) => {
                 <TextInput
                   style={styles.valueText}
                   editable={false}
-                  value={profile.phone}
+                  value={phone}
                 />
               </View>
             </View>
@@ -121,13 +119,9 @@ const ProfileInfoScreen = ({route, navigation}) => {
               <Text style={styles.inputLabel}>Ngày sinh</Text>
               <View style={styles.valueSpace}>
                 <TextInput
-                  style={
-                    profile.birthDate ? styles.valueText : styles.valueTextBlur
-                  }
+                  style={dateOfBirth ? styles.valueText : styles.valueTextBlur}
                   editable={false}
-                  value={
-                    profile.birthDate ? profile.birthDate : 'Chưa cập nhật'
-                  }
+                  value={dateOfBirth ? dateOfBirth : 'Chưa cập nhật'}
                 />
               </View>
             </View>
@@ -135,14 +129,10 @@ const ProfileInfoScreen = ({route, navigation}) => {
               <Text style={styles.inputLabel}>Giới tính</Text>
               <View style={styles.valueSpace}>
                 <TextInput
-                  style={profile.sex ? styles.valueText : styles.valueTextBlur}
+                  style={gender ? styles.valueText : styles.valueTextBlur}
                   editable={false}
                   value={
-                    profile.sex
-                      ? profile.sex === 'nam'
-                        ? 'Nam'
-                        : 'Nữ'
-                      : 'Chưa cập nhật'
+                    gender !== null ? (gender ? 'Nam' : 'Nữ') : 'Chưa cập nhật'
                   }
                 />
               </View>
@@ -151,11 +141,9 @@ const ProfileInfoScreen = ({route, navigation}) => {
               <Text style={styles.inputLabel}>Email</Text>
               <View style={styles.valueSpace}>
                 <TextInput
-                  style={
-                    profile.email ? styles.valueText : styles.valueTextBlur
-                  }
+                  style={email ? styles.valueText : styles.valueTextBlur}
                   editable={false}
-                  value={profile.email ? profile.email : 'Chưa cập nhật'}
+                  value={email ? email : 'Chưa cập nhật'}
                 />
               </View>
             </View>

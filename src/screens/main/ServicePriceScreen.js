@@ -11,7 +11,7 @@ import BackButton from '../../components/BackButton';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
-import customerAPI from '../../api/customer';
+import useFetchData from '../../hooks/useFetchData';
 
 function numberWithCommas(inputNumber) {
   let formattedNumber = Number(inputNumber)
@@ -26,28 +26,12 @@ function numberWithCommas(inputNumber) {
 
 const ServicePriceScreen = ({route, navigation}) => {
   const {serviceName, serviceId} = route.params;
-  const [servicePrice, setServicePrice] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        let response = await customerAPI.get(
-          ApiConstants.GET_SERVICE_DETAIL_API,
-          {
-            params: {serviceId: serviceId},
-          },
-        );
-        setServicePrice(response.data.services);
-      } catch (err) {
-        setIsError(true);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const {loading, data, isError} = useFetchData(
+    ApiConstants.GET_SERVICE_DETAIL_API,
+    {
+      params: {serviceId: serviceId},
+    },
+  );
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
@@ -57,7 +41,7 @@ const ServicePriceScreen = ({route, navigation}) => {
         <Text style={styles.headerText}>{serviceName}</Text>
         <View style={{flex: 1, marginHorizontal: '5%'}}>
           {isError ? <NotFound /> : null}
-          {servicePrice ? (
+          {data !== null ? (
             <View
               style={{
                 flexDirection: 'row',
@@ -94,50 +78,56 @@ const ServicePriceScreen = ({route, navigation}) => {
               size="small"
               color="#FEC54B"
               style={{
-                alignSelf: 'center',
-                flex: 1,
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             />
           ) : null}
-
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={servicePrice}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({item, index}) => (
-              <View
-                key={index}
-                style={{
-                  borderBottomWidth: 0.5,
-                  borderBottomColor: '#DDDDDD',
-                  flexDirection: 'row',
-                  backgroundColor: 'white',
-                  paddingLeft: 15,
-                  height: 50,
-                }}>
-                <Text
+          {data !== null ? (
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={data.services}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({item, index}) => (
+                <View
+                  key={index}
                   style={{
-                    flex: 3,
-                    color: 'black',
-                    fontSize: 14,
-                    alignSelf: 'center',
-                    paddingRight: 10,
+                    borderBottomWidth: 0.5,
+                    borderBottomColor: '#DDDDDD',
+                    flexDirection: 'row',
+                    backgroundColor: 'white',
+                    paddingLeft: 15,
+                    height: 50,
                   }}>
-                  {item.name}
-                </Text>
-                <Text
-                  style={{
-                    flex: 1,
-                    color: 'black',
-                    fontSize: 14,
-                    fontWeight: 'bold',
-                    alignSelf: 'center',
-                  }}>
-                  {numberWithCommas(item.price)}
-                </Text>
-              </View>
-            )}
-          />
+                  <Text
+                    style={{
+                      flex: 3,
+                      color: 'black',
+                      fontSize: 14,
+                      alignSelf: 'center',
+                      paddingRight: 10,
+                    }}>
+                    {item.name}
+                  </Text>
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: 'black',
+                      fontSize: 14,
+                      fontWeight: 'bold',
+                      alignSelf: 'center',
+                    }}>
+                    {numberWithCommas(item.price)}
+                  </Text>
+                </View>
+              )}
+            />
+          ) : null}
         </View>
       </View>
     </View>

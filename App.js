@@ -5,11 +5,11 @@ import {Image, View, Text, Dimensions} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from './src/RootNavigation';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-
 import {
   Provider as AuthProvider,
   Context as AuthContext,
 } from './src/context/AuthContext';
+import {Provider as ProfileProvider} from './src/context/ProfileContext';
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
@@ -224,7 +224,9 @@ function App() {
 export default () => {
   return (
     <AuthProvider>
-      <App />
+      <ProfileProvider>
+        <App />
+      </ProfileProvider>
     </AuthProvider>
   );
 };
