@@ -88,7 +88,6 @@ const ChangePasswordScreen = ({navigation}) => {
             },
           },
         );
-        console.log(response.data);
         if (response.status === 200) {
           Toast.show({
             type: 'customToast',
@@ -96,7 +95,8 @@ const ChangePasswordScreen = ({navigation}) => {
           });
         }
       } catch (err) {
-        console.log(getErrorMessage(err));
+        //console.log('status: ' + err.response.status);
+        // console.log('ERRo' + err.data.response);
         setPasswordInputError(getErrorMessage(err));
       }
     }

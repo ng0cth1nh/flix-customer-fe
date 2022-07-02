@@ -9,16 +9,15 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
-import React, {useState, useRef, useContext, useEffect} from 'react';
+import React from 'react';
 const {height, width} = Dimensions.get('window');
 import BackButton from '../../components/BackButton';
-import {Context as ProfileContext} from '../../context/ProfileContext';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../features/user/userSlice';
 
 const ProfileInfoScreen = ({navigation}) => {
-  const {
-    state: {avatarUrl, fullName, phone, gender, email, dateOfBirth},
-  } = useContext(ProfileContext);
+  const user = useSelector(selectUser);
 
   return (
     <View style={{backgroundColor: '#FEC54B', flex: 1}}>
@@ -59,7 +58,7 @@ const ProfileInfoScreen = ({navigation}) => {
             marginTop: 80,
             marginBottom: 10,
           }}
-          source={{uri: avatarUrl}}
+          source={{uri: user.avatarUrl}}
         />
         <Text
           style={{
@@ -69,7 +68,7 @@ const ProfileInfoScreen = ({navigation}) => {
             color: 'black',
             marginBottom: 50,
           }}>
-          {fullName}
+          {user.fullName}
         </Text>
         <View
           style={{
@@ -101,7 +100,7 @@ const ProfileInfoScreen = ({navigation}) => {
                 <TextInput
                   style={styles.valueText}
                   editable={false}
-                  value={fullName}
+                  value={user.fullName}
                 />
               </View>
             </View>
@@ -111,7 +110,7 @@ const ProfileInfoScreen = ({navigation}) => {
                 <TextInput
                   style={styles.valueText}
                   editable={false}
-                  value={phone}
+                  value={user.phone}
                 />
               </View>
             </View>
@@ -119,9 +118,11 @@ const ProfileInfoScreen = ({navigation}) => {
               <Text style={styles.inputLabel}>Ngày sinh</Text>
               <View style={styles.valueSpace}>
                 <TextInput
-                  style={dateOfBirth ? styles.valueText : styles.valueTextBlur}
+                  style={
+                    user.dateOfBirth ? styles.valueText : styles.valueTextBlur
+                  }
                   editable={false}
-                  value={dateOfBirth ? dateOfBirth : 'Chưa cập nhật'}
+                  value={user.dateOfBirth ? user.dateOfBirth : 'Chưa cập nhật'}
                 />
               </View>
             </View>
@@ -129,10 +130,14 @@ const ProfileInfoScreen = ({navigation}) => {
               <Text style={styles.inputLabel}>Giới tính</Text>
               <View style={styles.valueSpace}>
                 <TextInput
-                  style={gender ? styles.valueText : styles.valueTextBlur}
+                  style={user.gender ? styles.valueText : styles.valueTextBlur}
                   editable={false}
                   value={
-                    gender !== null ? (gender ? 'Nam' : 'Nữ') : 'Chưa cập nhật'
+                    user.gender !== null
+                      ? user.gender
+                        ? 'Nam'
+                        : 'Nữ'
+                      : 'Chưa cập nhật'
                   }
                 />
               </View>
@@ -141,9 +146,9 @@ const ProfileInfoScreen = ({navigation}) => {
               <Text style={styles.inputLabel}>Email</Text>
               <View style={styles.valueSpace}>
                 <TextInput
-                  style={email ? styles.valueText : styles.valueTextBlur}
+                  style={user.email ? styles.valueText : styles.valueTextBlur}
                   editable={false}
-                  value={email ? email : 'Chưa cập nhật'}
+                  value={user.email ? user.email : 'Chưa cập nhật'}
                 />
               </View>
             </View>

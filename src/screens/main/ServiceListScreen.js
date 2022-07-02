@@ -66,7 +66,7 @@ const ServiceListScreen = ({route, navigation}) => {
                 }
                 onPressRequestHandler={() =>
                   navigation.push('RequestScreen', {
-                    serviceId: item.serviceId,
+                    service: item,
                   })
                 }
               />

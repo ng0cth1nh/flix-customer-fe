@@ -12,22 +12,38 @@ const {height, width} = Dimensions.get('window');
 import {Context as AuthContext} from '../../context/AuthContext';
 import {Context as ProfileContext} from '../../context/ProfileContext';
 import CustomModal from '../../components/CustomModal';
+import {useSelector, useDispatch} from 'react-redux';
+// import {fetchUserInfo} from '../../redux/actions/userAction';
+import useAxios from '../../hooks/useAxios';
+import {
+  fetchProfile,
+  selectErrorMessage,
+  selectUser,
+} from '../../features/user/userSlice';
+import Toast from 'react-native-toast-message';
 
 const ProfileScreen = ({navigation}) => {
   const {logout} = useContext(AuthContext);
-  const {
-    state: {avatarUrl, fullName},
-    getProfile,
-  } = useContext(ProfileContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const customerAPI = useAxios();
 
   const showModal = () => {
     setModalVisible(true);
   };
 
+  const errorMessage = useSelector(selectErrorMessage);
+  const user = useSelector(selectUser);
+
   useEffect(() => {
     (async () => {
-      await getProfile();
+      await dispatch(fetchProfile(customerAPI));
+      if (errorMessage) {
+        Toast.show({
+          type: 'customErrorToast',
+          text1: errorMessage,
+        });
+      }
     })();
   }, []);
 
@@ -49,7 +65,7 @@ const ProfileScreen = ({navigation}) => {
           marginTop: 50,
           marginBottom: 10,
         }}
-        source={{uri: avatarUrl}}
+        source={{uri: user.avatarUrl}}
       />
       <Text
         style={{
@@ -59,7 +75,7 @@ const ProfileScreen = ({navigation}) => {
           color: 'black',
           marginBottom: 50,
         }}>
-        {fullName}
+        {user.fullName}
       </Text>
       <View
         style={{
