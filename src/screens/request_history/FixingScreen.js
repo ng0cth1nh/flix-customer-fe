@@ -13,18 +13,28 @@ import Empty from '../../components/Empty';
 import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
-import {fetchRequest, setLoading} from '../../redux/actions/requestAction';
+import {
+  fetchRequests,
+  selectErrorMessage,
+  selectRequests,
+  selectIsLoading,
+} from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 
 const FixingScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  const {fixingRequests, loading} = useSelector(state => state.requestInfo);
+  const errorMessage = useSelector(selectErrorMessage);
+  const isLoading = useSelector(selectIsLoading);
+  const requests = useSelector(selectRequests);
+
   const [refreshControl, setRefreshControl] = useState(false);
   useEffect(() => {
     (async () => {
-      await dispatch(setLoading());
-      await dispatch(fetchRequest(customerAPI, RequestStatus.FIXING));
+      // await dispatch(setLoading());
+      await dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.FIXING}),
+      );
     })();
   }, []);
 
@@ -43,7 +53,7 @@ const FixingScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      {loading ? (
+      {isLoading ? (
         <ActivityIndicator
           size="small"
           color="#FEC54B"
@@ -59,10 +69,10 @@ const FixingScreen = ({navigation}) => {
         />
       ) : null}
       {/* {isError ? <NotFound /> : null} */}
-      {fixingRequests ? (
+      {requests.fixing ? (
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={fixingRequests}
+          data={requests.fixing}
           style={{marginHorizontal: 20}}
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={Empty}
@@ -71,7 +81,9 @@ const FixingScreen = ({navigation}) => {
               refreshing={refreshControl}
               onRefresh={async () => {
                 setRefreshControl(true);
-                await dispatch(fetchRequest(customerAPI, RequestStatus.FIXING));
+                await dispatch(
+                  fetchRequests({customerAPI, status: RequestStatus.FIXING}),
+                );
                 setRefreshControl(false);
               }}
               colors={['#FEC54B']}

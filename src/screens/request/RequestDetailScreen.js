@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   View,
@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import moment from 'moment';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
 import useFetchData from '../../hooks/useFetchData';
@@ -20,17 +19,17 @@ import {numberWithCommas, RequestStatus} from '../../utils/util';
 import BackButton from '../../components/BackButton';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';
-import getErrorMessage from '../../utils/getErrorMessage';
 import CustomModal from '../../components/CustomModal';
 import {RadioButton} from 'react-native-paper';
 import CancelReasons from '../../constants/CancelReasons';
 import Toast from 'react-native-toast-message';
 import {useSelector, useDispatch} from 'react-redux';
 import {
+  fetchRequests,
   cancelRequest,
-  fetchRequest,
-  setLoading,
-} from '../../redux/actions/requestAction';
+  setIsLoading,
+  selectIsLoading,
+} from '../../features/request/requestSlice';
 import ProgressLoader from 'rn-progress-loader';
 
 const RequestDetailScreen = ({route, navigation}) => {
@@ -38,6 +37,8 @@ const RequestDetailScreen = ({route, navigation}) => {
   const [date, setDate] = useState(moment());
   //const [data, setData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const isLoading = useSelector(selectIsLoading);
+  //  const errorMessage = useSelector(selectErrorMessage);
 
   const [reason, setReason] = useState({index: 0, reason: CancelReasons[0]});
   const [contentOtherReason, setContentOtherReason] = useState('');
@@ -50,7 +51,7 @@ const RequestDetailScreen = ({route, navigation}) => {
     console.log(date);
   }
 
-  const {errorMessage, isLoading} = useSelector(state => state.requestInfo);
+  // const {errorMessage, isLoading} = useSelector(state => state.requestInfo);
 
   const customerAPI = useAxios();
   const dispatch = useDispatch();
@@ -67,16 +68,31 @@ const RequestDetailScreen = ({route, navigation}) => {
   );
 
   const handlerCancelButtonClick = async () => {
-    await dispatch(setLoading());
-    await dispatch(cancelRequest(customerAPI, requestCode, reason.reason));
-    await dispatch(fetchRequest(customerAPI, RequestStatus.PENDING));
-    await dispatch(fetchRequest(customerAPI, RequestStatus.CANCELLED));
-    if (!errorMessage) {
+    try {
+      await dispatch(setIsLoading());
+      await dispatch(
+        cancelRequest({
+          customerAPI,
+          body: {requestCode, reason: reason.reason},
+        }),
+      ).unwrap();
+      setModalVisible(false);
       Toast.show({
         type: 'customToast',
         text1: 'Hủy yêu cầu thành công',
       });
+      dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.PENDING}),
+      ).unwrap();
       navigation.goBack();
+      dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.CANCELLED}),
+      ).unwrap();
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
     }
   };
 

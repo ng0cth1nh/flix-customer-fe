@@ -13,18 +13,28 @@ import Empty from '../../components/Empty';
 import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
-import {fetchRequest, setLoading} from '../../redux/actions/requestAction';
+import {
+  fetchRequests,
+  selectErrorMessage,
+  selectRequests,
+  selectIsLoading,
+} from '../../features/request/requestSlice';
+
 import useAxios from '../../hooks/useAxios';
 
 const CancelledScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  const {cancelledRequests, loading} = useSelector(state => state.requestInfo);
+  const errorMessage = useSelector(selectErrorMessage);
+  const isLoading = useSelector(selectIsLoading);
+  const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
   useEffect(() => {
     (async () => {
-      await dispatch(setLoading());
-      await dispatch(fetchRequest(customerAPI, RequestStatus.CANCELLED));
+      // await dispatch(setLoading());
+      await dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.CANCELLED}),
+      );
     })();
   }, []);
 
@@ -43,7 +53,7 @@ const CancelledScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      {loading ? (
+      {isLoading ? (
         <ActivityIndicator
           size="small"
           color="#FEC54B"
@@ -59,10 +69,10 @@ const CancelledScreen = ({navigation}) => {
         />
       ) : null}
       {/* {isError ? <NotFound /> : null} */}
-      {cancelledRequests ? (
+      {requests.cancelled ? (
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={cancelledRequests}
+          data={requests.cancelled}
           style={{marginHorizontal: 20}}
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={Empty}
@@ -72,7 +82,10 @@ const CancelledScreen = ({navigation}) => {
               onRefresh={async () => {
                 setRefreshControl(true);
                 await dispatch(
-                  fetchRequest(customerAPI, RequestStatus.CANCELLED),
+                  fetchRequests({
+                    customerAPI,
+                    status: RequestStatus.CANCELLED,
+                  }),
                 );
                 setRefreshControl(false);
               }}

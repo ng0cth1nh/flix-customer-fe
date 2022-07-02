@@ -14,32 +14,27 @@ import useFetchData from '../../hooks/useFetchData';
 import BackButton from '../../components/BackButton';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';
-import getErrorMessage from '../../utils/getErrorMessage';
 import Toast from 'react-native-toast-message';
-import {useSelector, useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   createRequest,
-  fetchRequest,
-  setLoading,
-} from '../../redux/actions/requestAction';
-import ProgressLoader from 'rn-progress-loader';
+  setIsLoading,
+  fetchRequests,
+  selectIsLoading,
+} from '../../features/request/requestSlice';
 import {RequestStatus} from '../../utils/util';
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import ProgressLoader from 'rn-progress-loader';
 
 const RequestScreen = ({navigation, route}) => {
   const {service} = route.params;
   const [date, setDate] = useState(moment().add(1, 'hours'));
   const [description, setDescription] = useState('');
   const [voucher, setVoucher] = useState(null);
+  const isLoading = useSelector(selectIsLoading);
   const [paymentMethod, setPaymentMethod] = useState({
     id: 'C',
     name: 'Tiền mặt',
   });
-
-  //const test = handlerSubmitButtonClick.bind(RequestForm);
-
-  const {errorMessage, isLoading} = useSelector(state => state.requestInfo);
-
   const customerAPI = useAxios();
   const dispatch = useDispatch();
 
@@ -59,35 +54,32 @@ const RequestScreen = ({navigation, route}) => {
   };
 
   const handlerSubmitButtonClick = async () => {
+    const body = {
+      serviceId: service.serviceId,
+      addressId: data.addressId,
+      expectFixingDay: date.format('yyyy-MM-DD HH:mm:ss'),
+      description,
+      voucherId: voucher,
+      paymentMethodId: paymentMethod.id,
+    };
     try {
-      const body = {
-        serviceId: service.serviceId,
-        addressId: data.addressId,
-        expectFixingDay: date.format('yyyy-MM-DD HH:mm:ss'),
-        description,
-        voucherId: voucher,
-        paymentMethodId: paymentMethod.id,
-      };
-      await dispatch(setLoading());
-      await dispatch(createRequest(customerAPI, body));
-      console.log('errorMessage: ' + errorMessage);
-      if (errorMessage === '') {
-        await dispatch(fetchRequest(customerAPI, RequestStatus.PENDING));
-        navigation.navigate('RequestHistoryStackScreen', {
-          screen: 'RequestHistoryScreen',
-        });
-        Toast.show({
-          type: 'customToast',
-          text1: 'Đặt lịch thành công',
-        });
-      } else {
-        Toast.show({
-          type: 'customErrorToast',
-          text1: errorMessage,
-        });
-      }
+      await dispatch(setIsLoading());
+      await dispatch(createRequest({customerAPI, body})).unwrap();
+      Toast.show({
+        type: 'customToast',
+        text1: 'Đặt lịch thành công',
+      });
+      dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.PENDING}),
+      ).unwrap();
+      navigation.navigate('RequestHistoryStackScreen', {
+        screen: 'RequestHistoryScreen',
+      });
     } catch (err) {
-      console.log(getErrorMessage(err));
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
     }
   };
 

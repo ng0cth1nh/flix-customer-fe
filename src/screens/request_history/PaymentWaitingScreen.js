@@ -13,22 +13,33 @@ import Empty from '../../components/Empty';
 import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
-import {fetchRequest, setLoading} from '../../redux/actions/requestAction';
+import {
+  fetchRequests,
+  selectErrorMessage,
+  selectRequests,
+  selectIsLoading,
+} from '../../features/request/requestSlice';
+
 import useAxios from '../../hooks/useAxios';
 
 const PaymentWaitingScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  const {paymentWaitingRequests, loading} = useSelector(
-    state => state.requestInfo,
-  );
+  // const {paymentWaitingRequests, loading} = useSelector(
+  //   state => state.requestInfo,
+  // );
 
   const [refreshControl, setRefreshControl] = useState(false);
 
+  const isLoading = useSelector(selectIsLoading);
+  const requests = useSelector(selectRequests);
+
   useEffect(() => {
     (async () => {
-      await dispatch(setLoading());
-      await dispatch(fetchRequest(customerAPI, RequestStatus.PAYMENT_WAITING));
+      // await dispatch(setLoading());
+      await dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
+      );
     })();
   }, []);
 
@@ -47,7 +58,7 @@ const PaymentWaitingScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      {loading ? (
+      {isLoading ? (
         <ActivityIndicator
           size="small"
           color="#FEC54B"
@@ -63,10 +74,10 @@ const PaymentWaitingScreen = ({navigation}) => {
         />
       ) : null}
       {/* {isError ? <NotFound /> : null} */}
-      {paymentWaitingRequests ? (
+      {requests.paymentWaiting ? (
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={paymentWaitingRequests}
+          data={requests.paymentWaiting}
           style={{marginHorizontal: 20}}
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={Empty}
@@ -76,7 +87,10 @@ const PaymentWaitingScreen = ({navigation}) => {
               onRefresh={async () => {
                 setRefreshControl(true);
                 await dispatch(
-                  fetchRequest(customerAPI, RequestStatus.PAYMENT_WAITING),
+                  fetchRequests({
+                    customerAPI,
+                    status: RequestStatus.PAYMENT_WAITING,
+                  }),
                 );
                 setRefreshControl(false);
               }}

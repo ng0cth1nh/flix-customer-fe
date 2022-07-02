@@ -9,7 +9,6 @@ import {
   Provider as AuthProvider,
   Context as AuthContext,
 } from './src/context/AuthContext';
-import {Provider as ProfileProvider} from './src/context/ProfileContext';
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
@@ -36,18 +35,18 @@ import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 import PickVoucherCodeScreen from './src/screens/voucher/PickVoucherCodeScreen';
 import {Provider} from 'react-redux';
-import {store} from './src/redux/store';
 import {
   requestUserPermission,
   notificationListener,
 } from './src/notification/PushNotification';
+import {store} from './src/features/store';
 
 const {width} = Dimensions.get('window');
 const toastConfig = {
   customToast: ({text1}) => (
     <View
       style={{
-        height: 60,
+        height: 64,
         backgroundColor: '#56CA76',
         borderRadius: 18,
         alignItems: 'center',
@@ -59,6 +58,7 @@ const toastConfig = {
           fontWeight: 'bold',
           fontSize: 18,
           color: 'white',
+          textAlign: 'center',
         }}>
         {text1}
       </Text>
@@ -67,7 +67,7 @@ const toastConfig = {
   customErrorToast: ({text1}) => (
     <View
       style={{
-        height: 60,
+        height: 64,
         backgroundColor: 'red',
         borderRadius: 18,
         alignItems: 'center',
@@ -79,6 +79,7 @@ const toastConfig = {
           fontWeight: 'bold',
           fontSize: 18,
           color: 'white',
+          textAlign: 'center',
         }}>
         {text1}
       </Text>
@@ -93,7 +94,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   let {state, TryLocalLogin, clearErrorMessage} = useContext(AuthContext);
   useEffect(() => {
-    // TryLocalLogin();
+    TryLocalLogin();
     requestUserPermission();
     notificationListener();
     setTimeout(() => {
@@ -269,13 +270,13 @@ function App() {
             />
           </Tab.Navigator>
         </NavigationContainer>
+        <Toast
+          config={toastConfig}
+          position="bottom"
+          visibilityTime={2000}
+          bottomOffset={90}
+        />
       </Provider>
-      <Toast
-        config={toastConfig}
-        position="bottom"
-        visibilityTime={2500}
-        bottomOffset={90}
-      />
     </>
   );
 }

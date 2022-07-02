@@ -13,18 +13,29 @@ import Empty from '../../components/Empty';
 import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
-import {fetchRequest, setLoading} from '../../redux/actions/requestAction';
+import {
+  fetchRequests,
+  selectErrorMessage,
+  selectRequests,
+  selectIsLoading,
+} from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 
 const ApprovedScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  const {approvedRequests, loading} = useSelector(state => state.requestInfo);
+  const errorMessage = useSelector(selectErrorMessage);
+  const isLoading = useSelector(selectIsLoading);
+  const requests = useSelector(selectRequests);
+
   const [refreshControl, setRefreshControl] = useState(false);
+
   useEffect(() => {
     (async () => {
-      await dispatch(setLoading());
-      await dispatch(fetchRequest(customerAPI, RequestStatus.APPROVED));
+      // await dispatch(setLoading());
+      await dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.APPROVED}),
+      );
     })();
   }, []);
 
@@ -43,7 +54,7 @@ const ApprovedScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      {loading ? (
+      {isLoading ? (
         <ActivityIndicator
           size="small"
           color="#FEC54B"
@@ -59,10 +70,10 @@ const ApprovedScreen = ({navigation}) => {
         />
       ) : null}
       {/* {isError ? <NotFound /> : null} */}
-      {approvedRequests ? (
+      {requests.approved ? (
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={approvedRequests}
+          data={requests.approved}
           style={{marginHorizontal: 20}}
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={Empty}
@@ -72,7 +83,7 @@ const ApprovedScreen = ({navigation}) => {
               onRefresh={async () => {
                 setRefreshControl(true);
                 await dispatch(
-                  fetchRequest(customerAPI, RequestStatus.APPROVED),
+                  fetchRequests({customerAPI, status: RequestStatus.APPROVED}),
                 );
                 setRefreshControl(false);
               }}

@@ -13,19 +13,29 @@ import Empty from '../../components/Empty';
 import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
-import {fetchRequest, setLoading} from '../../redux/actions/requestAction';
+
 import useAxios from '../../hooks/useAxios';
+import {
+  fetchRequests,
+  setIsLoading,
+  selectRequests,
+  selectIsLoading,
+} from '../../features/request/requestSlice';
 
 const PendingScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  const {pendingRequests, loading} = useSelector(state => state.requestInfo);
+  // const {pendingRequests, loading} = useSelector(state => state.requestInfo);
   const [refreshControl, setRefreshControl] = useState(false);
+  const isLoading = useSelector(selectIsLoading);
+  const requests = useSelector(selectRequests);
 
   useEffect(() => {
     (async () => {
-      await dispatch(setLoading());
-      await dispatch(fetchRequest(customerAPI, RequestStatus.PENDING));
+      await dispatch(setIsLoading());
+      await dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.PENDING}),
+      );
     })();
   }, []);
 
@@ -44,7 +54,7 @@ const PendingScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      {loading ? (
+      {isLoading ? (
         <ActivityIndicator
           size="small"
           color="#FEC54B"
@@ -60,10 +70,10 @@ const PendingScreen = ({navigation}) => {
         />
       ) : null}
       {/* {isError ? <NotFound /> : null} */}
-      {pendingRequests ? (
+      {requests.pending ? (
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={pendingRequests}
+          data={requests.pending}
           style={{marginHorizontal: 20}}
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={Empty}
@@ -73,7 +83,7 @@ const PendingScreen = ({navigation}) => {
               onRefresh={async () => {
                 setRefreshControl(true);
                 await dispatch(
-                  fetchRequest(customerAPI, RequestStatus.PENDING),
+                  fetchRequests({customerAPI, status: RequestStatus.PENDING}),
                 );
                 setRefreshControl(false);
               }}

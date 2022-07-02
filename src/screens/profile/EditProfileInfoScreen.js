@@ -20,35 +20,29 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Button from '../../components/SubmitButton';
 import RNPickerSelect from 'react-native-picker-select';
 import moment from 'moment';
-import {Context as ProfileContext} from '../../context/ProfileContext';
 import Toast from 'react-native-toast-message';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-  fetchUserInfo,
-  updateUserInfo,
-  updateAvatar,
-} from '../../redux/actions/userAction';
 import useAxios from '../../hooks/useAxios';
+import {
+  fetchProfile,
+  selectErrorMessage,
+  selectUser,
+  updateAvatar,
+  updateProfile,
+} from '../../features/user/userSlice';
 
 const EditProfileInfoScreen = ({navigation}) => {
-  // const {
-  //   state: {avatarUrl, fullName, phone, gender, email, dateOfBirth},
-  //   updateProfile,
-  //   getProfile,
-  //   updateAvatar,
-  // } = useContext(ProfileContext);
   const customerAPI = useAxios();
   const dispatch = useDispatch();
-  const {avatarUrl, fullName, phone, gender, email, dateOfBirth} = useSelector(
-    state => state.userInfo,
-  );
+  const errorMessage = useSelector(selectErrorMessage);
+  const user = useSelector(selectUser);
 
   const [avatar, setAvatar] = useState(null);
-  const [fullNames, setFullNames] = useState(fullName);
-  const [phones, setPhones] = useState(phone);
-  const [genders, setGenders] = useState(gender);
-  const [emails, setEmails] = useState(email);
-  const [dateOfBirths, setDateOfBirths] = useState(dateOfBirth);
+  const [fullNames, setFullNames] = useState(user.fullName);
+  const [phones, setPhones] = useState(user.phone);
+  const [genders, setGenders] = useState(user.gender);
+  const [emails, setEmails] = useState(user.email);
+  const [dateOfBirths, setDateOfBirths] = useState(user.dateOfBirth);
   const [dateVisible, setDateVisible] = useState(false);
   const [fullNameInputError, setFullNameInputError] = useState(null);
   const [emailInputError, setEmailInputError] = useState(null);
@@ -134,19 +128,26 @@ const EditProfileInfoScreen = ({navigation}) => {
       checkGenderValid() &&
       checkDateOfBirthValid()
     ) {
-      let fullName = fullNames;
-      let dateOfBirth = dateOfBirths.replace(/\//g, '-');
-      let gender = genders;
-      let email = emails;
-      await dispatch(
-        updateUserInfo(customerAPI, fullName, dateOfBirth, gender, email),
-      );
+      const body = {
+        fullName: fullNames,
+        dateOfBirth: dateOfBirths.replace(/\//g, '-'),
+        gender: genders,
+        email: emails,
+      };
+      await dispatch(updateProfile({customerAPI, body}));
       // await updateProfile(fullName, dateOfBirth, gender, email);
-      Toast.show({
-        type: 'customToast',
-        text1: 'Cập nhật thông tin thành công',
-      });
-      await dispatch(fetchUserInfo(customerAPI));
+      if (errorMessage) {
+        Toast.show({
+          type: 'customErrorToast',
+          text1: errorMessage,
+        });
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Cập nhật thông tin thành công',
+        });
+        await dispatch(fetchProfile(customerAPI));
+      }
     } else {
       checkFullNameValid();
       checkEmailValid();
@@ -156,12 +157,19 @@ const EditProfileInfoScreen = ({navigation}) => {
   };
 
   const handleUpdateAvatar = async avatar => {
-    await dispatch(updateAvatar(customerAPI, avatar));
-    Toast.show({
-      type: 'customToast',
-      text1: 'Cập nhật ảnh đại diện thành công',
-    });
-    await dispatch(fetchUserInfo(customerAPI));
+    await dispatch(updateAvatar({customerAPI, avatar}));
+    if (errorMessage) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: errorMessage,
+      });
+    } else {
+      Toast.show({
+        type: 'customToast',
+        text1: 'Cập nhật ảnh đại diện thành công',
+      });
+      await dispatch(fetchProfile(customerAPI));
+    }
   };
 
   const selectAvatar = async () => {
@@ -194,7 +202,7 @@ const EditProfileInfoScreen = ({navigation}) => {
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <ImageBackground
-          source={avatar === null ? {uri: avatarUrl} : {uri: avatar.path}}
+          source={avatar === null ? {uri: user.avatarUrl} : {uri: avatar.path}}
           style={styles.avatar}
           imageStyle={{borderRadius: width * 0.5}}
           resizeMode="cover">
@@ -217,7 +225,7 @@ const EditProfileInfoScreen = ({navigation}) => {
             marginBottom: 50,
             marginTop: 16,
           }}>
-          {fullName}
+          {user.fullName}
         </Text>
         <View
           style={{
