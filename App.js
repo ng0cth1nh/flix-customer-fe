@@ -34,7 +34,9 @@ import Toast from 'react-native-toast-message';
 import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
 import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
-
+import PickVoucherCodeScreen from './src/screens/voucher/PickVoucherCodeScreen';
+import {Provider} from 'react-redux';
+import {store} from './src/redux/store';
 import {
   requestUserPermission,
   notificationListener,
@@ -47,6 +49,26 @@ const toastConfig = {
       style={{
         height: 60,
         backgroundColor: '#56CA76',
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '90%',
+      }}>
+      <Text
+        style={{
+          fontWeight: 'bold',
+          fontSize: 18,
+          color: 'white',
+        }}>
+        {text1}
+      </Text>
+    </View>
+  ),
+  customErrorToast: ({text1}) => (
+    <View
+      style={{
+        height: 60,
+        backgroundColor: 'red',
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
@@ -96,6 +118,18 @@ function App() {
           component={ServicePriceScreen}
         />
         <Stack.Screen name="RequestScreen" component={RequestScreen} />
+        <Stack.Screen
+          name="PickVoucherCodeScreen"
+          component={PickVoucherCodeScreen}
+        />
+        <Stack.Screen
+          name="ChoosePaymentMethodScreen"
+          component={ChoosePaymentMethodScreen}
+        />
+        {/* <Stack.Screen
+          name="RequestHistoryScreen"
+          component={RequestHistoryScreen}
+        /> */}
       </Stack.Navigator>
     );
   }
@@ -116,6 +150,25 @@ function App() {
         <Stack.Screen
           name="ChangePasswordScreen"
           component={ChangePasswordScreen}
+        />
+      </Stack.Navigator>
+    );
+  }
+
+  function RequestHistoryStackScreen() {
+    return (
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen
+          name="RequestHistoryScreen"
+          component={RequestHistoryScreen}
+        />
+        <Stack.Screen
+          name="ServicePriceScreen"
+          component={ServicePriceScreen}
+        />
+        <Stack.Screen
+          name="RequestDetailScreen"
+          component={RequestDetailScreen}
         />
       </Stack.Navigator>
     );
@@ -166,52 +219,57 @@ function App() {
     </>
   ) : (
     <>
-      <NavigationContainer ref={navigationRef}>
-        <Tab.Navigator
-          tabBarOptions={{
-            showLabel: false,
-            keyboardHidesTabBar: true,
-            style: {
-              backgroundColor: '#FEC54B',
-            },
-          }}
-          screenOptions={({route}) => ({
-            tabBarShowLabel: false,
-            headerShown: false,
-            tabBarStyle: {
-              height: 50,
-            },
-            tabBarIcon: ({focused, size, color}) => {
-              let icon;
-              if (route.name === 'HomeStackScreen') {
-                icon = focused
-                  ? require('./assets/images/type/home-active.png')
-                  : require('./assets/images/type/home.png');
-              } else if (route.name === 'RequestHistory') {
-                icon = focused
-                  ? require('./assets/images/type/archive-active.png')
-                  : require('./assets/images/type/archive.png');
-              } else if (route.name === 'Notification') {
-                icon = focused
-                  ? require('./assets/images/type/bell-ring-active.png')
-                  : require('./assets/images/type/bell-ring.png');
-              } else if (route.name === 'ProfileStackScreen') {
-                icon = focused
-                  ? require('./assets/images/type/user-profile-active.png')
-                  : require('./assets/images/type/user-profile.png');
-              }
-              return <Image style={{height: 24, width: 24}} source={icon} />;
-            },
-          })}>
-          <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />
-          <Tab.Screen name="RequestHistory" component={RequestHistoryScreen} />
-          <Tab.Screen name="Notification" component={NotificationScreen} />
-          <Tab.Screen
-            name="ProfileStackScreen"
-            component={ProfileStackScreen}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
+      <Provider store={store}>
+        <NavigationContainer ref={navigationRef}>
+          <Tab.Navigator
+            tabBarOptions={{
+              showLabel: false,
+              keyboardHidesTabBar: true,
+              style: {
+                backgroundColor: '#FEC54B',
+              },
+            }}
+            screenOptions={({route}) => ({
+              tabBarShowLabel: false,
+              headerShown: false,
+              tabBarStyle: {
+                height: 50,
+              },
+              tabBarIcon: ({focused, size, color}) => {
+                let icon;
+                if (route.name === 'HomeStackScreen') {
+                  icon = focused
+                    ? require('./assets/images/type/home-active.png')
+                    : require('./assets/images/type/home.png');
+                } else if (route.name === 'RequestHistoryStackScreen') {
+                  icon = focused
+                    ? require('./assets/images/type/archive-active.png')
+                    : require('./assets/images/type/archive.png');
+                } else if (route.name === 'Notification') {
+                  icon = focused
+                    ? require('./assets/images/type/bell-ring-active.png')
+                    : require('./assets/images/type/bell-ring.png');
+                } else if (route.name === 'ProfileStackScreen') {
+                  icon = focused
+                    ? require('./assets/images/type/user-profile-active.png')
+                    : require('./assets/images/type/user-profile.png');
+                }
+                return <Image style={{height: 24, width: 24}} source={icon} />;
+              },
+            })}>
+            <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />
+            <Tab.Screen
+              name="RequestHistoryStackScreen"
+              component={RequestHistoryStackScreen}
+            />
+            <Tab.Screen name="Notification" component={NotificationScreen} />
+            <Tab.Screen
+              name="ProfileStackScreen"
+              component={ProfileStackScreen}
+            />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </Provider>
       <Toast
         config={toastConfig}
         position="bottom"
@@ -224,9 +282,7 @@ function App() {
 export default () => {
   return (
     <AuthProvider>
-      <ProfileProvider>
-        <App />
-      </ProfileProvider>
+      <App />
     </AuthProvider>
   );
 };

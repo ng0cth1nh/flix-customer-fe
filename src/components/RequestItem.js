@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React from 'react';
 import {
   StyleSheet,
@@ -7,20 +8,35 @@ import {
   Dimensions,
   Image,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 const {height} = Dimensions.get('window');
-export default function RequestItem() {
+import {numberWithCommas} from '../utils/util';
+export default function RequestItem({
+  item,
+  handelNavigationToDetailRequest,
+  handelNavigationToListPrice,
+}) {
   return (
-    <View
-      style={[styles.box, {height: 0.25 * height, flexDirection: 'column'}]}>
+    <TouchableOpacity
+      onPress={() => {
+        handelNavigationToDetailRequest(item.requestCode);
+      }}
+      style={[styles.box, {height: 0.28 * height, flexDirection: 'column'}]}>
       <View style={styles.boxHeader}>
-        <Icon name="tools" size={20} />
-        <Text style={styles.tittleText}>Dịch vụ sửa chữa</Text>
-        <Text style={styles.editText}>13:05 - 20/05/2022</Text>
+        <Image
+          source={require('../../assets/images/type/support.png')}
+          style={{
+            height: 18,
+            width: 18,
+          }}
+        />
+        <Text style={styles.tittleText}>{item.requestCode}</Text>
+        <Text style={styles.editText}>
+          {moment(item.date).format('HH:mm - DD/MM/YYYY')}
+        </Text>
       </View>
       <View style={styles.boxBody}>
         <Image
-          source={require('../../assets/images/login_register_bg/bg.png')}
+          source={{uri: item.image}}
           style={{
             height: '70%',
             width: '25%',
@@ -31,7 +47,9 @@ export default function RequestItem() {
         />
         <View style={{flex: 1, justifyContent: 'center'}}>
           <View style={styles.boxBodyContent}>
-            <Text style={[styles.textBold, {fontSize: 24}]}>Lò nướng</Text>
+            <Text style={[styles.textBold, {fontSize: 24}]}>
+              {item.serviceName}
+            </Text>
             <Text style={{fontSize: 16, color: 'black'}}>
               Phí dịch vụ kiểm tra
             </Text>
@@ -41,8 +59,17 @@ export default function RequestItem() {
                 paddingRight: 20,
                 alignItems: 'center',
               }}>
-              <Text style={styles.textBold}>200,000 vnđ</Text>
-              <TouchableOpacity style={styles.viewServiceButton}>
+              <Text style={styles.textBold}>{`${numberWithCommas(
+                item.price,
+              )} vnđ`}</Text>
+              <TouchableOpacity
+                style={styles.viewServiceButton}
+                onPress={() =>
+                  handelNavigationToListPrice({
+                    serviceName: item.serviceName,
+                    serviceId: 1,
+                  })
+                }>
                 <Text style={styles.textBold}>Xem giá dịch vụ</Text>
               </TouchableOpacity>
             </View>
@@ -51,9 +78,11 @@ export default function RequestItem() {
       </View>
       <View style={styles.serviceRow}>
         <Text style={styles.textBold}>TỔNG THANH TOÁN(dự kiến)</Text>
-        <Text style={styles.servicePrice}>200,000 vnđ</Text>
+        <Text style={styles.servicePrice}>{`${numberWithCommas(
+          item.actualPrice,
+        )} vnđ`}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -63,7 +92,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingLeft: 20,
     paddingRight: 20,
-    marginBottom: 10,
+    marginVertical: 10,
   },
   boxHeader: {flexDirection: 'row', flex: 2, alignItems: 'flex-end'},
   tittleText: {

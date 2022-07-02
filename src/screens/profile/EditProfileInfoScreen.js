@@ -22,14 +22,26 @@ import RNPickerSelect from 'react-native-picker-select';
 import moment from 'moment';
 import {Context as ProfileContext} from '../../context/ProfileContext';
 import Toast from 'react-native-toast-message';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  fetchUserInfo,
+  updateUserInfo,
+  updateAvatar,
+} from '../../redux/actions/userAction';
+import useAxios from '../../hooks/useAxios';
 
 const EditProfileInfoScreen = ({navigation}) => {
-  const {
-    state: {avatarUrl, fullName, phone, gender, email, dateOfBirth},
-    updateProfile,
-    getProfile,
-    updateAvatar,
-  } = useContext(ProfileContext);
+  // const {
+  //   state: {avatarUrl, fullName, phone, gender, email, dateOfBirth},
+  //   updateProfile,
+  //   getProfile,
+  //   updateAvatar,
+  // } = useContext(ProfileContext);
+  const customerAPI = useAxios();
+  const dispatch = useDispatch();
+  const {avatarUrl, fullName, phone, gender, email, dateOfBirth} = useSelector(
+    state => state.userInfo,
+  );
 
   const [avatar, setAvatar] = useState(null);
   const [fullNames, setFullNames] = useState(fullName);
@@ -126,12 +138,15 @@ const EditProfileInfoScreen = ({navigation}) => {
       let dateOfBirth = dateOfBirths.replace(/\//g, '-');
       let gender = genders;
       let email = emails;
-      await updateProfile(fullName, dateOfBirth, gender, email);
+      await dispatch(
+        updateUserInfo(customerAPI, fullName, dateOfBirth, gender, email),
+      );
+      // await updateProfile(fullName, dateOfBirth, gender, email);
       Toast.show({
         type: 'customToast',
         text1: 'Cập nhật thông tin thành công',
       });
-      await getProfile();
+      await dispatch(fetchUserInfo(customerAPI));
     } else {
       checkFullNameValid();
       checkEmailValid();
@@ -141,12 +156,12 @@ const EditProfileInfoScreen = ({navigation}) => {
   };
 
   const handleUpdateAvatar = async avatar => {
-    await updateAvatar(avatar);
+    await dispatch(updateAvatar(customerAPI, avatar));
     Toast.show({
       type: 'customToast',
       text1: 'Cập nhật ảnh đại diện thành công',
     });
-    await getProfile();
+    await dispatch(fetchUserInfo(customerAPI));
   };
 
   const selectAvatar = async () => {
@@ -286,6 +301,8 @@ const EditProfileInfoScreen = ({navigation}) => {
                   />
                   <CustomDatePicker
                     isVisible={dateVisible}
+                    mode="date"
+                    minimumDate={false}
                     handleConfirm={handlerDateConfirm}
                     hideDatePicker={hideDatePicker}
                   />

@@ -10,26 +10,33 @@ import {
   StyleSheet,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import {numberWithCommas} from '../utils/util';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 const {height} = Dimensions.get('window');
 import CustomDatePicker from './CustomDatePicker';
 import Button from './SubmitButton';
 import moment from 'moment';
+import Clipboard from '@react-native-community/clipboard';
+import Toast from 'react-native-toast-message';
 
 const RequestForm = function ({
   buttonText,
-  buttonClicked,
+  handlerSubmitButtonClick,
   date,
   setDate,
   description,
-  setDiscription,
+  setDescription,
   editable,
+  service,
+  address,
+  handelClickVoucher,
+  handelClickService,
+  paymentMethod,
+  handelClickChoosePaymentMethod,
   isRequestIdVisible = false,
 }) {
   const [dateVisible, setDateVisible] = useState(false);
+  //const [shouldPay, setShouldPay] = useState(service.price);
   const handlerDateConfirm = selectedDate => {
     setDate(moment(selectedDate));
     setDateVisible(false);
@@ -37,6 +44,15 @@ const RequestForm = function ({
   const hideDatePicker = () => {
     setDateVisible(false);
   };
+
+  const copyToClipboard = () => {
+    Clipboard.setString(service.requestCode);
+    Toast.show({
+      type: 'customToast',
+      text1: 'Đã sao chép vào khay nhớ tạm',
+    });
+  };
+
   return (
     <ScrollView
       style={{marginLeft: 20, marginRight: 20}}
@@ -44,17 +60,27 @@ const RequestForm = function ({
       <View
         style={[styles.box, {height: 0.25 * height, flexDirection: 'column'}]}>
         <View style={styles.boxHeader}>
-          <Icon name="tools" size={20} style={{marginBottom: 3}} />
+          <Image
+            source={require('../../assets/images/type/support.png')}
+            style={{
+              height: 18,
+              width: 18,
+            }}
+          />
           <Text style={styles.tittleText}>Dịch vụ sửa chữa</Text>
           {editable && (
-            <TouchableOpacity style={styles.editTouch}>
+            <TouchableOpacity
+              style={styles.editTouch}
+              onPress={handelClickService}>
               <Text style={styles.editText}>Thay đổi</Text>
             </TouchableOpacity>
           )}
         </View>
         <View style={styles.boxBody}>
           <Image
-            source={require('../../assets/images/login_register_bg/bg.png')}
+            source={{
+              uri: service.imageUrl ? service.imageUrl : service.serviceImage,
+            }}
             style={{
               height: '70%',
               width: '25%',
@@ -65,7 +91,9 @@ const RequestForm = function ({
           />
           <View style={{flex: 1, justifyContent: 'center'}}>
             <View style={styles.boxBodyContent}>
-              <Text style={[styles.textBold, {fontSize: 24}]}>Lò nướng</Text>
+              <Text style={[styles.textBold, {fontSize: 24}]}>
+                {service.serviceName}
+              </Text>
               <Text style={{fontSize: 16, color: 'black'}}>
                 Phí dịch vụ kiểm tra
               </Text>
@@ -75,7 +103,9 @@ const RequestForm = function ({
                   paddingRight: 20,
                   alignItems: 'center',
                 }}>
-                <Text style={styles.textBold}>200,000 vnđ</Text>
+                <Text style={styles.textBold}>
+                  {`${numberWithCommas(service.price)} vnđ`}
+                </Text>
                 <TouchableOpacity style={styles.viewServiceButton}>
                   <Text style={styles.textBold}>Xem giá dịch vụ</Text>
                 </TouchableOpacity>
@@ -90,10 +120,12 @@ const RequestForm = function ({
           {height: 0.2 * height, flexDirection: 'column', marginTop: 10},
         ]}>
         <View style={styles.boxHeader}>
-          <Ionicons
-            name="location-outline"
-            size={20}
-            style={{marginBottom: 3}}
+          <Image
+            source={require('../../assets/images/type/address.png')}
+            style={{
+              height: 20,
+              width: 20,
+            }}
           />
           <Text style={styles.tittleText}>Địa chỉ của bạn</Text>
           {editable && (
@@ -108,10 +140,12 @@ const RequestForm = function ({
               styles.textBold,
               {fontSize: 16, marginBottom: 15, marginTop: 5},
             ]}>
-            Nguyễn Văn A - 0912345678
+            {address !== null
+              ? `${address.customerName} - ${address.phone}`
+              : `${service.customerName} - ${service.customerPhone}`}
           </Text>
           <Text style={{color: 'black'}}>
-            123 Minh Khai, Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội
+            {address !== null ? address.addressName : service.customerAddress}
           </Text>
         </View>
       </View>
@@ -121,28 +155,43 @@ const RequestForm = function ({
           {height: 0.15 * height, flexDirection: 'column', marginTop: 10},
         ]}>
         <View style={styles.boxHeader}>
-          <Ionicons
-            name="md-calendar-sharp"
-            size={20}
-            style={{marginBottom: 3}}
+          <Image
+            source={require('../../assets/images/type/calendar.png')}
+            style={{
+              height: 18,
+              width: 18,
+            }}
           />
-          <Text style={styles.tittleText}>Chọn ngày muốn sửa</Text>
+          <Text style={styles.tittleText}>
+            {editable ? 'Chọn ngày muốn sửa' : 'Ngày muốn sửa'}
+          </Text>
         </View>
         <View style={{flex: 4, marginLeft: 40, marginTop: 10}}>
           <TouchableOpacity
             style={styles.datePicker}
             onPress={() => setDateVisible(true)}>
-            <Text style={styles.textBold}>{date.format('DD/MM/YYYY')}</Text>
-            <Ionicons
-              name="chevron-down-sharp"
-              size={20}
-              style={{marginBottom: 3, color: 'black', marginLeft: 'auto'}}
-            />
-            <CustomDatePicker
-              isVisible={dateVisible}
-              handleConfirm={handlerDateConfirm}
-              hideDatePicker={hideDatePicker}
-            />
+            <Text style={styles.textBold}>
+              {date !== null
+                ? date.format('HH:mm - DD/MM/YYYY')
+                : moment(service.expectFixingDay).format('HH:mm - DD/MM/YYYY')}
+            </Text>
+
+            {editable ? (
+              <>
+                <Ionicons
+                  name="chevron-down-sharp"
+                  size={20}
+                  style={{marginBottom: 3, color: 'black', marginLeft: 'auto'}}
+                />
+                <CustomDatePicker
+                  isVisible={dateVisible}
+                  mode="datetime"
+                  minimumDate={true}
+                  handleConfirm={handlerDateConfirm}
+                  hideDatePicker={hideDatePicker}
+                />
+              </>
+            ) : null}
           </TouchableOpacity>
         </View>
       </View>
@@ -152,10 +201,12 @@ const RequestForm = function ({
           {height: 0.2 * height, flexDirection: 'column', marginTop: 10},
         ]}>
         <View style={styles.boxHeader}>
-          <Ionicons
-            name="document-text-outline"
-            size={20}
-            style={{marginBottom: 3}}
+          <Image
+            source={require('../../assets/images/type/writing.png')}
+            style={{
+              height: 20,
+              width: 20,
+            }}
           />
           <Text style={styles.tittleText}>Tình trạng</Text>
         </View>
@@ -163,15 +214,16 @@ const RequestForm = function ({
           <TextInput
             multiline
             numberOfLines={2}
-            onChangeText={text => setDiscription(text)}
-            value={description}
+            onChangeText={text => setDescription(text)}
+            value={description ? description : service.requestDescription}
             style={{
               padding: 5,
               backgroundColor: 'white',
               borderRadius: 10,
               height: '80%',
+              color: 'black',
             }}
-            editable
+            editable={editable}
             placeholder="Nhập tình trạng của thiết bị"
           />
         </View>
@@ -190,19 +242,23 @@ const RequestForm = function ({
             alignItems: 'flex-end',
             marginBottom: 15,
           }}>
-          <MaterialCommunityIcons
-            name="ticket-percent-outline"
-            size={20}
-            style={{marginBottom: 3}}
+          <Image
+            source={require('../../assets/images/type/coupon.png')}
+            style={{
+              height: 20,
+              width: 20,
+            }}
           />
           <Text style={styles.tittleText}>Flix voucher</Text>
           {editable && (
-            <TouchableOpacity style={styles.editTouch}>
+            <TouchableOpacity
+              style={styles.editTouch}
+              onPress={handelClickVoucher}>
               <Text style={styles.editText}>Chọn hoặc nhập mã</Text>
             </TouchableOpacity>
           )}
         </View>
-        <Text style={{marginLeft: 40, color: '#12B76A', fontWeight: 'bold'}}>
+        {/* <Text style={{marginLeft: 40, color: '#12B76A', fontWeight: 'bold'}}>
           Giảm 10%
         </Text>
         <View
@@ -216,7 +272,7 @@ const RequestForm = function ({
           <Text style={{color: 'black', fontSize: 16, width: '80%'}}>
             Mã giảm giá áp dụng cho tất cả các shop ở Hà Nội
           </Text>
-        </View>
+        </View> */}
       </View>
       <View
         style={[
@@ -224,10 +280,18 @@ const RequestForm = function ({
           {height: 0.15 * height, flexDirection: 'column', marginTop: 10},
         ]}>
         <View style={styles.boxHeader}>
-          <Ionicons name="wallet-outline" size={20} style={{marginBottom: 3}} />
+          <Image
+            source={require('../../assets/images/type/wallet.png')}
+            style={{
+              height: 22,
+              width: 22,
+            }}
+          />
           <Text style={styles.tittleText}>Phương thức thanh toán</Text>
           {editable && (
-            <TouchableOpacity style={styles.editTouch}>
+            <TouchableOpacity
+              style={styles.editTouch}
+              onPress={handelClickChoosePaymentMethod}>
               <Text style={styles.editText}>Thay đổi</Text>
             </TouchableOpacity>
           )}
@@ -239,7 +303,13 @@ const RequestForm = function ({
             alignItems: 'center',
           }}>
           <RadioButton value="Tiền mặt" status="checked" color="#FFBC00" />
-          <Text style={{color: 'black', fontSize: 16}}>Tiền mặt</Text>
+          <Text style={{color: 'black', fontSize: 16}}>
+            {paymentMethod
+              ? paymentMethod.name
+              : service.paymentMethod === 'CASH'
+              ? 'Tiền mặt'
+              : service.paymentMethod}
+          </Text>
         </View>
       </View>
       {isRequestIdVisible && (
@@ -255,10 +325,11 @@ const RequestForm = function ({
               style={{marginBottom: 3}}
             />
             <Text style={styles.tittleText}>Mã yêu cầu</Text>
-            <Text
-              style={{color: '#FEC54B', marginLeft: 'auto', marginBottom: 3}}>
-              FASG1212342
-            </Text>
+            <TouchableOpacity
+              style={{marginLeft: 'auto', marginBottom: 3}}
+              onPress={copyToClipboard}>
+              <Text style={{color: '#FEC54B'}}>{service.requestCode}</Text>
+            </TouchableOpacity>
           </View>
           <View
             style={{
@@ -269,7 +340,9 @@ const RequestForm = function ({
             <Text style={{color: 'black', fontSize: 16, marginLeft: 40}}>
               Thời gian
             </Text>
-            <Text style={{marginLeft: 'auto'}}>13:05 - 20/05/2022</Text>
+            <Text style={{marginLeft: 'auto'}}>
+              {moment(service.date).format('HH:mm - DD/MM/YYYY')}
+            </Text>
           </View>
         </View>
       )}
@@ -282,20 +355,36 @@ const RequestForm = function ({
         }}>
         <View style={styles.serviceRow}>
           <Text style={styles.serviceName}>Phí dịch vụ kiểm tra</Text>
-          <Text style={styles.servicePrice}>200,000 vnđ</Text>
+          <Text style={styles.servicePrice}>{`${numberWithCommas(
+            service.price,
+          )} vnđ`}</Text>
         </View>
-        <View style={styles.serviceRow}>
-          <Text style={styles.serviceName}>Phí dịch vụ kiểm tra</Text>
-          <Text style={styles.servicePrice}>200,000 vnđ</Text>
-        </View>
+        {service.vatPrice !== null ? (
+          <View style={styles.serviceRow}>
+            <Text style={styles.serviceName}>Thuế VAT(5%)</Text>
+            <Text style={styles.servicePrice}>{`${numberWithCommas(
+              service.vatPrice,
+            )} vnđ`}</Text>
+          </View>
+        ) : null}
+        {/* {service.actualPrice !== null ? (
+          <View style={styles.serviceRow}>
+            <Text style={styles.serviceName}>TỔNG THANH TOÁN(dự kiến)</Text>
+            <Text style={styles.servicePrice}>{`${numberWithCommas(
+              service.actualPrice,
+            )} vnđ`}</Text>
+          </View>
+        ) : null} */}
         <View style={styles.serviceRow}>
           <Text style={styles.textBold}>TỔNG THANH TOÁN(dự kiến)</Text>
-          <Text style={styles.servicePrice}>200,000 vnđ</Text>
+          <Text style={styles.servicePrice}>{`${numberWithCommas(
+            service.actualPrice,
+          )} vnđ`}</Text>
         </View>
       </View>
       <Button
         style={{marginTop: 10, marginBottom: 40}}
-        onPress={buttonClicked}
+        onPress={handlerSubmitButtonClick}
         buttonText={buttonText}
       />
     </ScrollView>
@@ -347,7 +436,7 @@ const styles = StyleSheet.create({
   },
   datePicker: {
     flexDirection: 'row',
-    width: '50%',
+    width: '66%',
     height: 40,
     borderRadius: 10,
     alignItems: 'center',

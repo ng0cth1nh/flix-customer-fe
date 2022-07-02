@@ -18,6 +18,8 @@ import BackButton from '../../components/BackButton';
 import ApiConstants from '../../constants/Api';
 import useAxios from '../../hooks/useAxios';
 import getErrorMessage from '../../utils/getErrorMessage';
+import {useDispatch, useSelector} from 'react-redux';
+import {changePassword} from '../../redux/actions/userAction';
 
 const ChangePasswordScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
@@ -30,6 +32,8 @@ const ChangePasswordScreen = ({navigation}) => {
   const [passwordInputError, setPasswordInputError] = useState(null);
   const [reNewPasswordInputError, setReNewPasswordInputError] = useState(null);
   const customerAPI = useAxios();
+  const dispatch = useDispatch();
+  const {errorMessage} = useSelector(state => state.userInfo);
 
   const checkPasswordValid = () => {
     if (password.trim() === '') {
@@ -88,7 +92,6 @@ const ChangePasswordScreen = ({navigation}) => {
             },
           },
         );
-        console.log(response.data);
         if (response.status === 200) {
           Toast.show({
             type: 'customToast',
@@ -96,7 +99,8 @@ const ChangePasswordScreen = ({navigation}) => {
           });
         }
       } catch (err) {
-        console.log(getErrorMessage(err));
+        //console.log('status: ' + err.response.status);
+        // console.log('ERRo' + err.data.response);
         setPasswordInputError(getErrorMessage(err));
       }
     }

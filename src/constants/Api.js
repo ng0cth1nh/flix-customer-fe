@@ -16,6 +16,11 @@ const ApiConstants = {
   UPDATE_PROFILE_AVATAR_API: '/user/avatar',
   CHANGE_PASSWORD_API: '/user/changePassword',
   GET_ADDRESS_LIST_API: '/customer/address/list',
+  GET_MAIN_ADDRESS_API: '/customer/address/main',
+  POST_REQUEST_API: '/customer/request/repair',
+  GET_REQUEST_HISTORY_LIST_API: '/customer/request/histories',
+  GET_REQUEST_DETAIL_API: '/customer/request/detail',
+  CANCEL_REQUEST_API: '/customer/request/cancel',
 };
 
 //http://localhost:8000

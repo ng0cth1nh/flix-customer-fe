@@ -12,22 +12,26 @@ const {height, width} = Dimensions.get('window');
 import {Context as AuthContext} from '../../context/AuthContext';
 import {Context as ProfileContext} from '../../context/ProfileContext';
 import CustomModal from '../../components/CustomModal';
-
+import {useSelector, useDispatch} from 'react-redux';
+import {fetchUserInfo} from '../../redux/actions/userAction';
+import useAxios from '../../hooks/useAxios';
 const ProfileScreen = ({navigation}) => {
   const {logout} = useContext(AuthContext);
-  const {
-    state: {avatarUrl, fullName},
-    getProfile,
-  } = useContext(ProfileContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const customerAPI = useAxios();
 
   const showModal = () => {
     setModalVisible(true);
   };
 
+  const {avatarUrl, fullName} = useSelector(state => state.userInfo);
+
+  console.log(avatarUrl, fullName);
+
   useEffect(() => {
     (async () => {
-      await getProfile();
+      dispatch(fetchUserInfo(customerAPI));
     })();
   }, []);
 

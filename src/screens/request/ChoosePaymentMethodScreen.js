@@ -10,19 +10,17 @@ import {
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-
 import BackButton from '../../components/BackButton';
 import Button from '../../components/SubmitButton';
-import Toast from 'react-native-toast-message';
 
-const ChoosePaymentMethodScreen = ({navigation}) => {
+const ChoosePaymentMethodScreen = ({navigation, route}) => {
+  const {paymentMethod, setPaymentMethod} = route.params;
+  const [checked, setChecked] = useState(paymentMethod);
   const buttonClicked = () => {
-    Toast.show({
-      type: 'customToast',
-      text1: 'This is an info message',
-    });
+    setPaymentMethod(checked);
+    navigation.goBack();
   };
-  const [checked, setChecked] = useState('first');
+
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
@@ -39,11 +37,11 @@ const ChoosePaymentMethodScreen = ({navigation}) => {
           }}>
           <View style={styles.box}>
             <RadioButton
-              value="first"
-              status={checked === 'first' ? 'checked' : 'unchecked'}
+              value="V"
+              status={checked.id === 'V' ? 'checked' : 'unchecked'}
               color="#FFBC00"
               onPress={() => {
-                setChecked('first');
+                setChecked({id: 'V', name: 'VNPAY'});
               }}
             />
             <Image
@@ -54,11 +52,11 @@ const ChoosePaymentMethodScreen = ({navigation}) => {
           </View>
           <View style={styles.box}>
             <RadioButton
-              value="second"
-              status={checked === 'second' ? 'checked' : 'unchecked'}
+              value="C"
+              status={checked.id === 'C' ? 'checked' : 'unchecked'}
               color="#FFBC00"
               onPress={() => {
-                setChecked('second');
+                setChecked({id: 'C', name: 'Tiền mặt'});
               }}
             />
             <Image

@@ -12,17 +12,7 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
 import useFetchData from '../../hooks/useFetchData';
-
-function numberWithCommas(inputNumber) {
-  let formattedNumber = Number(inputNumber)
-    .toFixed(2)
-    .replace(/\d(?=(\d{3})+\.)/g, '$&,');
-  let splitArray = formattedNumber.split('.');
-  if (splitArray.length > 1) {
-    formattedNumber = splitArray[0];
-  }
-  return formattedNumber;
-}
+import {numberWithCommas} from '../../utils/util';
 
 const ServicePriceScreen = ({route, navigation}) => {
   const {serviceName, serviceId} = route.params;

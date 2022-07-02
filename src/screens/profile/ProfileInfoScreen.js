@@ -12,13 +12,13 @@ import {
 import React, {useState, useRef, useContext, useEffect} from 'react';
 const {height, width} = Dimensions.get('window');
 import BackButton from '../../components/BackButton';
-import {Context as ProfileContext} from '../../context/ProfileContext';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
+import {useSelector} from 'react-redux';
 
 const ProfileInfoScreen = ({navigation}) => {
-  const {
-    state: {avatarUrl, fullName, phone, gender, email, dateOfBirth},
-  } = useContext(ProfileContext);
+  const {avatarUrl, fullName, phone, gender, email, dateOfBirth} = useSelector(
+    state => state.userInfo,
+  );
 
   return (
     <View style={{backgroundColor: '#FEC54B', flex: 1}}>

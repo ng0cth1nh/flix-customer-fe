@@ -6,20 +6,16 @@ import {
   StyleSheet,
   StatusBar,
   Dimensions,
-  ScrollView,
-  TouchableOpacity,
-  Image,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-
 const {width} = Dimensions.get('window');
-import ScreenA from '../request_history/ScreenA';
-import ScreenB from '../request_history/ScreenB';
-import ScreenC from '../request_history/ScreenC';
-import ScreenD from '../request_history/ScreenD';
-import ScreenE from '../request_history/ScreenE';
-import ScreenF from '../request_history/ScreenF';
+import PendingScreen from '../request_history/PendingScreen';
+import ApprovedScreen from '../request_history/ApprovedScreen';
+import CancelledScreen from '../request_history/CancelledScreen';
+import DoneScreen from '../request_history/DoneScreen';
+import FixingScreen from '../request_history/FixingScreen';
+import PaymentWaitingScreen from '../request_history/PaymentWaitingScreen';
 
 const TopTabs = createMaterialTopTabNavigator();
 function RequestHistory() {
@@ -47,12 +43,12 @@ function RequestHistory() {
           );
         },
       })}>
-      <TopTabs.Screen name="Chờ xác nhận" component={ScreenA} />
-      <TopTabs.Screen name="Đã xác nhận" component={ScreenB} />
-      <TopTabs.Screen name="ScreenC" component={ScreenC} />
-      <TopTabs.Screen name="ScreenD" component={ScreenD} />
-      <TopTabs.Screen name="ScreenE" component={ScreenE} />
-      <TopTabs.Screen name="ScreenF" component={ScreenF} />
+      <TopTabs.Screen name="Chờ xác nhận" component={PendingScreen} />
+      <TopTabs.Screen name="Đã xác nhận" component={ApprovedScreen} />
+      <TopTabs.Screen name="Đang sửa" component={FixingScreen} />
+      <TopTabs.Screen name="Chờ thanh toán" component={PaymentWaitingScreen} />
+      <TopTabs.Screen name="Đã hoàn thành" component={DoneScreen} />
+      <TopTabs.Screen name="Đã hủy" component={CancelledScreen} />
     </TopTabs.Navigator>
   );
 }
