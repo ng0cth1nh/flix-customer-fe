@@ -6,6 +6,9 @@ import constants from '../constants/Api';
 import axios from 'axios';
 import qs from 'qs';
 import getErrorMessage from '../utils/getErrorMessage';
+import jwt_decode from 'jwt-decode';
+import dayjs from 'dayjs';
+
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'add_error':
@@ -33,7 +36,14 @@ const TryLocalLogin = dispatch =>
   useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     if (token) {
-      dispatch({type: 'login', payload: token});
+      // dispatch({type: 'login', payload: token});
+      const user = jwt_decode(token);
+      const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
+      if (!isExpired) {
+        dispatch({type: 'login', payload: token});
+      } else {
+        await refreshToken();
+      }
     }
   }, [dispatch]);
 
