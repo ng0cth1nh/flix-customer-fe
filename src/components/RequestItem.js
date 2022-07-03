@@ -46,43 +46,43 @@ export default function RequestItem({
         <Image
           source={{uri: item.image}}
           style={{
-            height: height * 0.14,
+            height: height * 0.12,
             width: height * 0.111,
             borderRadius: 10,
-            marginLeft: 10,
+            alignSelf: 'center',
+            marginHorizontal: '2%',
           }}
         />
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <View style={styles.boxBodyContent}>
-            <Text style={[styles.textBold, {fontSize: 24}]}>
-              {item.serviceName}
-            </Text>
-            <Text style={{fontSize: 16, color: 'black', marginVertical: 6}}>
-              Phí dịch vụ kiểm tra
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                paddingRight: 20,
-                alignItems: 'center',
-              }}>
-              <Text style={styles.textBold}>{`${numberWithCommas(
-                item.price,
-              )} vnđ`}</Text>
-              <TouchableOpacity
-                style={styles.viewServiceButton}
-                onPress={() =>
-                  handelNavigationToListPrice({
-                    serviceName: item.serviceName,
-                    serviceId: 1,
-                  })
-                }>
-                <Text style={styles.textBold}>Xem giá dịch vụ</Text>
-              </TouchableOpacity>
-            </View>
+        <View style={styles.boxBodyContent}>
+          <Text style={[styles.textBold, {fontSize: 24}]}>
+            {item.serviceName}
+          </Text>
+          <Text style={{fontSize: 16, color: 'black', marginVertical: 6}}>
+            Phí dịch vụ kiểm tra
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Text style={styles.textBold}>{`${numberWithCommas(
+              item.price,
+            )} vnđ`}</Text>
+            <TouchableOpacity
+              style={styles.viewServiceButton}
+              onPress={() =>
+                handelNavigationToListPrice({
+                  serviceName: item.serviceName,
+                  serviceId: 1,
+                })
+              }>
+              <Text style={styles.textBold}>Xem giá dịch vụ</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
+
       <View style={styles.serviceRow}>
         <Text style={styles.textBold}>TỔNG THANH TOÁN (dự kiến)</Text>
         <Text style={styles.servicePrice}>{`${numberWithCommas(
@@ -99,12 +99,14 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingHorizontal: '4%',
     marginVertical: 12,
+    flexDirection: 'row',
+    height: height * 0.152,
   },
   boxHeader: {
     flexDirection: 'row',
     flex: 2,
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   tittleText: {
     fontWeight: 'bold',
@@ -120,12 +122,13 @@ const styles = StyleSheet.create({
   boxBody: {
     flex: 8,
     flexDirection: 'row',
-    marginVertical: 6,
+    marginVertical: 1,
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#CACACA',
   },
   boxBodyContent: {
+    flex: 1,
     marginLeft: 10,
     height: '70%',
     width: '100%',
@@ -140,8 +143,10 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   textBold: {
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: 'black',
+    fontSize: 14,
+    marginRight: 8,
   },
   serviceRow: {
     flexDirection: 'row',

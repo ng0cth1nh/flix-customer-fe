@@ -14,12 +14,7 @@ import useAxios from '../../hooks/useAxios';
 const PaymentWaitingScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  // const {paymentWaitingRequests, loading} = useSelector(
-  //   state => state.requestInfo,
-  // );
-
   const [refreshControl, setRefreshControl] = useState(false);
-
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
 

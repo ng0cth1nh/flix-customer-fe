@@ -57,11 +57,7 @@ const RequestForm = function ({
     <ScrollView
       style={{marginHorizontal: '4%'}}
       showsVerticalScrollIndicator={false}>
-      <View
-        style={[
-          styles.box,
-          {height: 0.25 * height, flexDirection: 'column', marginTop: 12},
-        ]}>
+      <View style={[styles.box, {flexDirection: 'column', marginTop: 12}]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/support.png')}
@@ -85,39 +81,40 @@ const RequestForm = function ({
               uri: service.imageUrl ? service.imageUrl : service.serviceImage,
             }}
             style={{
-              height: height * 0.14,
+              height: height * 0.12,
               width: height * 0.111,
               borderRadius: 10,
-              marginLeft: 10,
+              alignSelf: 'center',
+              marginHorizontal: '1%',
             }}
           />
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            <View style={styles.boxBodyContent}>
-              <Text style={[styles.textBold, {fontSize: 24}]}>
-                {service.serviceName}
+          <View style={styles.boxBodyContent}>
+            <Text style={[styles.textBold, {fontSize: 24}]}>
+              {service.serviceName}
+            </Text>
+            <Text style={{fontSize: 16, color: 'black', marginVertical: 6}}>
+              Phí dịch vụ kiểm tra
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              <Text style={styles.textBold}>
+                {`${numberWithCommas(service.price)} vnđ`}
               </Text>
-              <Text style={{fontSize: 16, color: 'black', marginVertical: 6}}>
-                Phí dịch vụ kiểm tra
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingRight: 20,
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.textBold}>
-                  {`${numberWithCommas(service.price)} vnđ`}
+              <TouchableOpacity style={styles.viewServiceButton}>
+                <Text style={[styles.textBold, {textAlign: 'center'}]}>
+                  Xem giá dịch vụ
                 </Text>
-                <TouchableOpacity style={styles.viewServiceButton}>
-                  <Text style={styles.textBold}>Xem giá dịch vụ</Text>
-                </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       </View>
-      <View
-        style={[styles.box, {height: 0.2 * height, flexDirection: 'column'}]}>
+
+      <View style={[styles.box, {flexDirection: 'column'}]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/address.png')}
@@ -217,7 +214,7 @@ const RequestForm = function ({
           />
         </View>
       </View>
-      <View style={[styles.box, {height: 50}]}>
+      <View style={[styles.box]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/coupon.png')}
@@ -291,10 +288,7 @@ const RequestForm = function ({
           style={[
             styles.box,
             {
-              height: 0.12 * height,
               flexDirection: 'column',
-              marginTop: 10,
-              paddingTop: 10,
             },
           ]}>
           <View style={styles.boxHeader}>
@@ -380,16 +374,17 @@ const RequestForm = function ({
 };
 const styles = StyleSheet.create({
   box: {
+    height: 'auto',
     backgroundColor: '#F0F0F0',
     borderRadius: 18,
-    paddingHorizontal: '5%',
+    paddingHorizontal: '4%',
+    paddingVertical: 14,
     marginVertical: 6,
   },
   boxHeader: {
     flexDirection: 'row',
     flex: 2,
     alignItems: 'center',
-    paddingTop: 10,
   },
   tittleText: {
     fontWeight: 'bold',
@@ -410,14 +405,15 @@ const styles = StyleSheet.create({
   boxBody: {
     flex: 8,
     flexDirection: 'row',
-    marginVertical: 6,
+    marginVertical: 1,
     paddingBottom: 16,
   },
   boxBodyContent: {
-    marginLeft: 20,
+    flex: 1,
+    marginLeft: 10,
     height: '70%',
     width: '100%',
-    paddingBottom: 5,
+    alignSelf: 'center',
     justifyContent: 'space-between',
   },
   viewServiceButton: {
@@ -428,8 +424,10 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   textBold: {
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: 'black',
+    fontSize: 14,
+    marginRight: 8,
   },
   datePicker: {
     flexDirection: 'row',

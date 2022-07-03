@@ -68,13 +68,9 @@ const FeedbackScreen = ({navigation}) => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{
-            marginLeft: 20,
-            marginRight: 20,
+            marginHorizontal: '4%',
             height: 0.78 * height,
-            borderBottomWidth: 1,
-            borderBottomColor: '#CACACA',
             flexDirection: 'column',
-            marginVertical: '5%',
           }}>
           <View style={styles.inputField}>
             <View style={{flexDirection: 'row'}}>
@@ -269,8 +265,7 @@ const styles = StyleSheet.create({
   box: {
     backgroundColor: '#F0F0F0',
     borderRadius: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingHorizontal: 10,
   },
   boxHeader: {
     flexDirection: 'row',
@@ -303,12 +298,12 @@ const styles = StyleSheet.create({
     color: 'black',
     marginBottom: 5,
   },
-  inputField: {marginBottom: 12},
+  inputField: {marginVertical: 6},
   inputLabel: {
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
-    fontSize: 18,
+    fontSize: 16,
   },
   valueSpace: {
     height: 50,
@@ -319,10 +314,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#FFFFFF',
     borderColor: '#E8E8E8',
-    borderWidth: 2,
+    borderWidth: 1,
   },
   valueText: {
-    fontSize: 20,
+    fontSize: 16,
     color: 'black',
     flex: 15,
   },

@@ -7,7 +7,6 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
-  StatusBar,
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
@@ -15,8 +14,7 @@ import moment from 'moment';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
 import useFetchData from '../../hooks/useFetchData';
-import {numberWithCommas, RequestStatus} from '../../utils/util';
-import BackButton from '../../components/BackButton';
+import {RequestStatus} from '../../utils/util';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';
 import CustomModal from '../../components/CustomModal';
@@ -36,27 +34,16 @@ import TopHeaderComponent from '../../components/TopHeaderComponent';
 const RequestDetailScreen = ({route, navigation}) => {
   const {requestCode} = route.params;
   const [date, setDate] = useState(moment());
-  //const [data, setData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const isLoading = useSelector(selectIsLoading);
-  //  const errorMessage = useSelector(selectErrorMessage);
-
   const [reason, setReason] = useState({index: 0, reason: CancelReasons[0]});
   const [contentOtherReason, setContentOtherReason] = useState('');
-  // const buttonClicked = () => {
-  //   setPaymentMethod(checked);
-  //   navigation.goBack();
-  // };
   const [description, setDiscription] = useState('');
   function handlerButtonClick() {
     console.log(date);
   }
-
-  // const {errorMessage, isLoading} = useSelector(state => state.requestInfo);
-
   const customerAPI = useAxios();
   const dispatch = useDispatch();
-
   const showModal = () => {
     setModalVisible(true);
   };
@@ -70,7 +57,6 @@ const RequestDetailScreen = ({route, navigation}) => {
 
   const handlerCancelButtonClick = async () => {
     try {
-      // setReason({index: -1, reason: contentOtherReason});
       setModalVisible(false);
       await dispatch(setIsLoading());
       await dispatch(
