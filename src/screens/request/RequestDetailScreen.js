@@ -69,6 +69,7 @@ const RequestDetailScreen = ({route, navigation}) => {
 
   const handlerCancelButtonClick = async () => {
     try {
+      setModalVisible(false);
       await dispatch(setIsLoading());
       await dispatch(
         cancelRequest({
@@ -76,7 +77,6 @@ const RequestDetailScreen = ({route, navigation}) => {
           body: {requestCode, reason: reason.reason},
         }),
       ).unwrap();
-      setModalVisible(false);
       Toast.show({
         type: 'customToast',
         text1: 'Hủy yêu cầu thành công',

@@ -383,7 +383,7 @@ const EditProfileInfoScreen = ({navigation}) => {
             </View>
           </View>
           <Button
-            style={{marginBottom: 20, height: height * 0.05}}
+            style={{marginBottom: 20, height: height * 0.062}}
             onPress={handleUpdateProfile}
             buttonText="Lưu lại"
           />
