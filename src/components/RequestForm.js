@@ -359,14 +359,16 @@ const RequestForm = function ({
             service.price,
           )} vnđ`}</Text>
         </View>
-        {service.vatPrice !== null ? (
-          <View style={styles.serviceRow}>
-            <Text style={styles.serviceName}>Thuế VAT(5%)</Text>
-            <Text style={styles.servicePrice}>{`${numberWithCommas(
-              service.vatPrice,
-            )} vnđ`}</Text>
-          </View>
-        ) : null}
+
+        <View style={styles.serviceRow}>
+          <Text style={styles.serviceName}>Thuế VAT(5%)</Text>
+          <Text style={styles.servicePrice}>
+            {isNaN(service.vatPrice)
+              ? `${numberWithCommas(service.price * 0.05)} vnđ`
+              : `${numberWithCommas(service.vatPrice)} vnđ`}
+          </Text>
+        </View>
+
         {/* {service.actualPrice !== null ? (
           <View style={styles.serviceRow}>
             <Text style={styles.serviceName}>TỔNG THANH TOÁN(dự kiến)</Text>
@@ -377,9 +379,11 @@ const RequestForm = function ({
         ) : null} */}
         <View style={styles.serviceRow}>
           <Text style={styles.textBold}>TỔNG THANH TOÁN(dự kiến)</Text>
-          <Text style={styles.servicePrice}>{`${numberWithCommas(
-            service.actualPrice,
-          )} vnđ`}</Text>
+          <Text style={styles.servicePrice}>
+            {isNaN(service.actualPrice)
+              ? `${numberWithCommas(service.price * 1.05)} vnđ`
+              : `${numberWithCommas(service.actualPrice)} vnđ`}
+          </Text>
         </View>
       </View>
       <Button
