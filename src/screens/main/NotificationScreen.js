@@ -16,6 +16,7 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 import React, {useState, useEffect} from 'react';
 const {width, height} = Dimensions.get('window');
 import CustomModal from '../../components/CustomModal';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 
 const NOTIFICATIONS = [
   {
@@ -88,7 +89,7 @@ const NotificationScreen = () => {
           flexDirection: 'row',
           height: 96,
           backgroundColor: item.isRead ? 'white' : '#F0F0F0',
-          borderBottomColor: '#7C7C7C',
+          borderBottomColor: '#F0F0F0',
           borderBottomWidth: 1,
         }}>
         <Image
@@ -156,9 +157,13 @@ const NotificationScreen = () => {
         {backgroundColor: 'white', flex: 1},
         modalVisible ? {opacity: 0.3} : {},
       ]}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <TopHeaderComponent
+        navigation={null}
+        title="Thông báo"
+        isBackButton={false}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
-        <Text style={styles.headerText}>Thông báo</Text>
         <FlatList
           showsVerticalScrollIndicator={false}
           data={notifications}

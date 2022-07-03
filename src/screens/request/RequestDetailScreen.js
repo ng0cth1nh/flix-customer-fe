@@ -31,6 +31,7 @@ import {
   selectIsLoading,
 } from '../../features/request/requestSlice';
 import ProgressLoader from 'rn-progress-loader';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 
 const RequestDetailScreen = ({route, navigation}) => {
   const {requestCode} = route.params;
@@ -69,12 +70,13 @@ const RequestDetailScreen = ({route, navigation}) => {
 
   const handlerCancelButtonClick = async () => {
     try {
+      // setReason({index: -1, reason: contentOtherReason});
       setModalVisible(false);
       await dispatch(setIsLoading());
       await dispatch(
         cancelRequest({
           customerAPI,
-          body: {requestCode, reason: reason.reason},
+          body: {requestCode, reason: contentOtherReason},
         }),
       ).unwrap();
       Toast.show({
@@ -98,24 +100,13 @@ const RequestDetailScreen = ({route, navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <BackButton onPressHandler={navigation.goBack} color="black" />
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Yêu cầu sửa chữa"
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            borderBottomWidth: 1,
-            borderBottomColor: '#CACACA',
-            marginBottom: 10,
-            paddingRight: 20,
-          }}>
-          <View style={{flex: 1, marginLeft: 20}}>
-            <Text style={styles.headerText}>Yêu cầu sửa chữa</Text>
-          </View>
-        </View>
         {isError ? <NotFound /> : null}
         {loading ? (
           <ActivityIndicator

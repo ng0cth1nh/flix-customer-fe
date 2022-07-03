@@ -1,19 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  RefreshControl,
-  FlatList,
-  ActivityIndicator,
-  View,
-} from 'react-native';
+import {RefreshControl, FlatList, ActivityIndicator, View} from 'react-native';
 import RequestItem from '../../components/RequestItem';
-import ApiConstants from '../../constants/Api';
-import NotFound from '../../components/NotFound';
 import Empty from '../../components/Empty';
-import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
-
 import useAxios from '../../hooks/useAxios';
 import {
   fetchRequests,
@@ -25,7 +15,6 @@ import {
 const PendingScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  // const {pendingRequests, loading} = useSelector(state => state.requestInfo);
   const [refreshControl, setRefreshControl] = useState(false);
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
@@ -74,7 +63,7 @@ const PendingScreen = ({navigation}) => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={requests.pending}
-          style={{marginHorizontal: 20}}
+          style={{marginHorizontal: '4%'}}
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={Empty}
           refreshControl={
@@ -90,11 +79,12 @@ const PendingScreen = ({navigation}) => {
               colors={['#FEC54B']}
             />
           }
-          renderItem={({item}) => (
+          renderItem={({item, index}) => (
             <RequestItem
               handelNavigationToListPrice={handelNavigationToListPrice}
               handelNavigationToDetailRequest={handelNavigationToDetailRequest}
               item={item}
+              index={index}
             />
           )}
         />

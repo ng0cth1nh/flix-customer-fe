@@ -92,11 +92,12 @@ const CancelledScreen = ({navigation}) => {
               colors={['#FEC54B']}
             />
           }
-          renderItem={({item}) => (
+          renderItem={({item, index}) => (
             <RequestItem
               handelNavigationToListPrice={handelNavigationToListPrice}
               handelNavigationToDetailRequest={handelNavigationToDetailRequest}
               item={item}
+              index={index}
             />
           )}
         />

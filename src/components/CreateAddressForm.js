@@ -16,6 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const {height} = Dimensions.get('window');
 import Button from './SubmitButton';
 import BackButton from './BackButton';
+import TopHeaderComponent from './TopHeaderComponent';
 
 const CreateAddressForm = ({
   navigation,
@@ -27,19 +28,17 @@ const CreateAddressForm = ({
 }) => {
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <View>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <BackButton onPressHandler={navigation.goBack} color="black" />
-        <Text style={styles.headerText}>
-          {isAddAddress ? 'Thêm địa chỉ' : 'Sửa địa chỉ'}
-        </Text>
-      </View>
+      <TopHeaderComponent
+        navigation={navigation}
+        title={isAddAddress ? 'Thêm địa chỉ' : 'Sửa địa chỉ'}
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{
-            paddingLeft: 20,
-            paddingRight: 20,
+            paddingHorizontal: '4%',
           }}>
           <View
             style={{

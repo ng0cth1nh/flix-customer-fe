@@ -1,21 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-  View,
-} from 'react-native';
+import {FlatList, RefreshControl, ActivityIndicator, View} from 'react-native';
 import RequestItem from '../../components/RequestItem';
-import ApiConstants from '../../constants/Api';
-import NotFound from '../../components/NotFound';
 import Empty from '../../components/Empty';
-import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
 import {
   fetchRequests,
-  selectErrorMessage,
   selectRequests,
   selectIsLoading,
 } from '../../features/request/requestSlice';
@@ -25,13 +15,11 @@ import useAxios from '../../hooks/useAxios';
 const DoneScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-  const errorMessage = useSelector(selectErrorMessage);
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
   useEffect(() => {
     (async () => {
-      // await dispatch(setLoading());
       await dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
     })();
   }, []);
@@ -87,11 +75,12 @@ const DoneScreen = ({navigation}) => {
               colors={['#FEC54B']}
             />
           }
-          renderItem={({item}) => (
+          renderItem={({item, index}) => (
             <RequestItem
               handelNavigationToListPrice={handelNavigationToListPrice}
               handelNavigationToDetailRequest={handelNavigationToDetailRequest}
               item={item}
+              index={index}
             />
           )}
         />

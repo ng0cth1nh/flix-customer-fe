@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import BackButton from '../../components/BackButton';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
@@ -25,11 +25,14 @@ const ServicePriceScreen = ({route, navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <BackButton onPressHandler={navigation.goBack} color="black" />
+      <TopHeaderComponent
+        navigation={navigation}
+        title={serviceName}
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <View style={{flex: 1}}>
-        <Text style={styles.headerText}>{serviceName}</Text>
-        <View style={{flex: 1, marginHorizontal: '5%'}}>
+        <View style={{flex: 1, marginHorizontal: '4%'}}>
           {isError ? <NotFound /> : null}
           {data !== null ? (
             <View

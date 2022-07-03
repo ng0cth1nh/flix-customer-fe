@@ -158,7 +158,7 @@ const CategoryListScreen = ({navigation}) => {
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{paddingHorizontal: '5%'}}>
+          style={{paddingHorizontal: '4%'}}>
           <View
             style={{
               flexDirection: 'row',

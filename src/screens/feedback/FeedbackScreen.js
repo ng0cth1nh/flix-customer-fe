@@ -15,7 +15,7 @@ import {
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 const {height, width} = Dimensions.get('window');
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 import RNPickerSelect from 'react-native-picker-select';
 
 import Toast from 'react-native-toast-message';
@@ -58,11 +58,12 @@ const FeedbackScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <View>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <BackButton onPressHandler={navigation.goBack} color="black" />
-        <Text style={styles.headerText}>Gửi yêu cầu hỗ trợ</Text>
-      </View>
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Gửi yêu cầu hỗ trợ"
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
         <ScrollView
           showsVerticalScrollIndicator={false}

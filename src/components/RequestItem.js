@@ -12,6 +12,7 @@ const {height} = Dimensions.get('window');
 import {numberWithCommas} from '../utils/util';
 export default function RequestItem({
   item,
+  index,
   handelNavigationToDetailRequest,
   handelNavigationToListPrice,
 }) {
@@ -20,13 +21,20 @@ export default function RequestItem({
       onPress={() => {
         handelNavigationToDetailRequest(item.requestCode);
       }}
-      style={[styles.box, {height: 0.28 * height, flexDirection: 'column'}]}>
+      style={[
+        styles.box,
+        {
+          height: 'auto',
+          flexDirection: 'column',
+          marginTop: index === 0 ? 12 : 0,
+        },
+      ]}>
       <View style={styles.boxHeader}>
         <Image
           source={require('../../assets/images/type/support.png')}
           style={{
-            height: 18,
-            width: 18,
+            height: 20,
+            width: 20,
           }}
         />
         <Text style={styles.tittleText}>{item.requestCode}</Text>
@@ -38,11 +46,10 @@ export default function RequestItem({
         <Image
           source={{uri: item.image}}
           style={{
-            height: '70%',
-            width: '25%',
-            alignSelf: 'center',
+            height: height * 0.14,
+            width: height * 0.111,
             borderRadius: 10,
-            marginLeft: 15,
+            marginLeft: 10,
           }}
         />
         <View style={{flex: 1, justifyContent: 'center'}}>
@@ -50,7 +57,7 @@ export default function RequestItem({
             <Text style={[styles.textBold, {fontSize: 24}]}>
               {item.serviceName}
             </Text>
-            <Text style={{fontSize: 16, color: 'black'}}>
+            <Text style={{fontSize: 16, color: 'black', marginVertical: 6}}>
               Phí dịch vụ kiểm tra
             </Text>
             <View
@@ -77,7 +84,7 @@ export default function RequestItem({
         </View>
       </View>
       <View style={styles.serviceRow}>
-        <Text style={styles.textBold}>TỔNG THANH TOÁN(dự kiến)</Text>
+        <Text style={styles.textBold}>TỔNG THANH TOÁN (dự kiến)</Text>
         <Text style={styles.servicePrice}>{`${numberWithCommas(
           item.actualPrice,
         )} vnđ`}</Text>
@@ -89,41 +96,46 @@ export default function RequestItem({
 const styles = StyleSheet.create({
   box: {
     backgroundColor: '#F0F0F0',
-    borderRadius: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
-    marginVertical: 10,
+    borderRadius: 18,
+    paddingHorizontal: '4%',
+    marginVertical: 12,
   },
-  boxHeader: {flexDirection: 'row', flex: 2, alignItems: 'flex-end'},
+  boxHeader: {
+    flexDirection: 'row',
+    flex: 2,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
   tittleText: {
     fontWeight: 'bold',
     fontSize: 18,
     color: 'black',
-    marginLeft: 15,
+    marginLeft: 10,
   },
   editText: {
     marginLeft: 'auto',
+    fontSize: 11,
   },
 
   boxBody: {
     flex: 8,
     flexDirection: 'row',
+    marginVertical: 6,
+    paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#CACACA',
   },
   boxBodyContent: {
-    marginLeft: 20,
+    marginLeft: 10,
     height: '70%',
     width: '100%',
     paddingBottom: 5,
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingTop: 3,
-    paddingBottom: 3,
-    paddingLeft: 10,
-    paddingRight: 10,
-    borderRadius: 15,
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    borderRadius: 10,
     backgroundColor: '#FEC54B',
     marginLeft: 'auto',
   },
@@ -133,11 +145,11 @@ const styles = StyleSheet.create({
   },
   serviceRow: {
     flexDirection: 'row',
-    marginBottom: 10,
-    marginTop: 5,
+    marginVertical: 10,
   },
   servicePrice: {
     marginLeft: 'auto',
     color: '#E67F1E',
+    fontWeight: '600',
   },
 });

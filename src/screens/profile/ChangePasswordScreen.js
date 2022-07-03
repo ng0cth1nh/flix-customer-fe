@@ -14,7 +14,7 @@ const {height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import SubmitButton from '../../components/SubmitButton';
-import BackButton from '../../components/BackButton';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 import ApiConstants from '../../constants/Api';
 import useAxios from '../../hooks/useAxios';
 import getErrorMessage from '../../utils/getErrorMessage';
@@ -104,11 +104,12 @@ const ChangePasswordScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <View>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <BackButton onPressHandler={navigation.goBack} color="black" />
-        <Text style={styles.headerText}>Đổi mật khẩu</Text>
-      </View>
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Đổi mật khẩu"
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
         <View
           style={[
@@ -116,7 +117,7 @@ const ChangePasswordScreen = ({navigation}) => {
             {
               height: height * 0.6,
               flexDirection: 'column',
-              marginVertical: '5%',
+              marginVertical: '4%',
             },
           ]}>
           <View style={styles.inputField}>
@@ -260,8 +261,7 @@ const styles = StyleSheet.create({
   },
   box: {
     borderRadius: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingHorizontal: '4%',
   },
   boxHeader: {
     flexDirection: 'row',

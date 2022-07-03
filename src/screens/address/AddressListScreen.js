@@ -19,6 +19,7 @@ import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
 import useFetchData from '../../hooks/useFetchData';
 import SubmitButton from '../../components/SubmitButton';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 import BackButton from '../../components/BackButton';
 
 const AddressListScreen = ({navigation}) => {
@@ -30,21 +31,20 @@ const AddressListScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <View>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <BackButton onPressHandler={navigation.goBack} color="black" />
-        <Text style={styles.headerText}>Địa chỉ của bạn</Text>
-      </View>
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Địa chỉ của bạn"
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
         {isError ? <NotFound /> : null}
-
         {data !== null ? (
           <FlatList
             showsVerticalScrollIndicator={false}
             data={data.addresses}
             style={{
-              marginLeft: 20,
-              marginRight: 20,
+              marginHorizontal: '4%',
               height: 0.78 * height,
               borderBottomWidth: 1,
               borderBottomColor: '#CACACA',
@@ -58,6 +58,8 @@ const AddressListScreen = ({navigation}) => {
                     height: 'auto',
                     flexDirection: 'row',
                     alignItems: 'center',
+                    marginVertical: 12,
+                    marginTop: index === 0 ? 12 : 0,
                   },
                 ]}>
                 <RadioButton

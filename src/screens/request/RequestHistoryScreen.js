@@ -9,13 +9,14 @@ import {
 } from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 import PendingScreen from '../request_history/PendingScreen';
 import ApprovedScreen from '../request_history/ApprovedScreen';
 import CancelledScreen from '../request_history/CancelledScreen';
 import DoneScreen from '../request_history/DoneScreen';
 import FixingScreen from '../request_history/FixingScreen';
 import PaymentWaitingScreen from '../request_history/PaymentWaitingScreen';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 
 const TopTabs = createMaterialTopTabNavigator();
 function RequestHistory() {
@@ -23,7 +24,7 @@ function RequestHistory() {
     <TopTabs.Navigator
       tabBarOptions={{
         scrollEnabled: true,
-        tabStyle: {width: 0.28 * width},
+        tabStyle: {width: 0.3 * width},
         indicatorStyle: {
           backgroundColor: '#FEC54B',
         },
@@ -56,26 +57,19 @@ const RequestHistoryScreen = ({navigation}) => {
   const [reqStatus, setReqStatus] = useState(0);
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Lịch sử đặt lịch"
+        isBackButton={false}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
-        <Text style={styles.headerText}>Lịch sử đặt lịch</Text>
         <RequestHistory />
       </SafeAreaView>
     </View>
   );
 };
 const styles = StyleSheet.create({
-  headerText: {
-    fontWeight: 'bold',
-    fontSize: 24,
-    textAlign: 'center',
-    color: 'black',
-    marginTop: getStatusBarHeight(),
-    paddingBottom: 15,
-    borderBottomWidth: 0.7,
-    borderBottomColor: '#CACACA',
-    width: '100%',
-  },
   label: {
     fontSize: 12,
     textTransform: 'none',

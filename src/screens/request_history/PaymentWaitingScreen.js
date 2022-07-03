@@ -1,25 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  FlatList,
-  ActivityIndicator,
-  RefreshControl,
-  View,
-} from 'react-native';
+import {FlatList, ActivityIndicator, RefreshControl, View} from 'react-native';
 import RequestItem from '../../components/RequestItem';
-import ApiConstants from '../../constants/Api';
-import NotFound from '../../components/NotFound';
 import Empty from '../../components/Empty';
-import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import {useSelector, useDispatch} from 'react-redux';
 import {
   fetchRequests,
-  selectErrorMessage,
   selectRequests,
   selectIsLoading,
 } from '../../features/request/requestSlice';
-
 import useAxios from '../../hooks/useAxios';
 
 const PaymentWaitingScreen = ({navigation}) => {
@@ -36,7 +25,6 @@ const PaymentWaitingScreen = ({navigation}) => {
 
   useEffect(() => {
     (async () => {
-      // await dispatch(setLoading());
       await dispatch(
         fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
       );
@@ -97,11 +85,12 @@ const PaymentWaitingScreen = ({navigation}) => {
               colors={['#FEC54B']}
             />
           }
-          renderItem={({item}) => (
+          renderItem={({item, index}) => (
             <RequestItem
               handelNavigationToListPrice={handelNavigationToListPrice}
               handelNavigationToDetailRequest={handelNavigationToDetailRequest}
               item={item}
+              index={index}
             />
           )}
         />

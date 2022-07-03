@@ -213,7 +213,7 @@ export default function RegisterScreen({navigation}) {
             <ImageBackground
               source={
                 avatar === null
-                  ? require('../../../assets/images/login_register_bg/default_avatar.png')
+                  ? require('../../../assets/images/login_register_bg/default_avatar.jpg')
                   : {uri: avatar.path}
               }
               imageStyle={{borderRadius: width * 0.5}}

@@ -1,17 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  StatusBar,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  View,
-} from 'react-native';
+import React from 'react';
+import {FlatList, StyleSheet, ActivityIndicator, View} from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import BackButton from '../../components/BackButton';
 import ServiceComponent from '../../components/ServiceComponent';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 import useFetchData from '../../hooks/useFetchData';
 
 const ServiceListScreen = ({route, navigation}) => {
@@ -26,9 +19,12 @@ const ServiceListScreen = ({route, navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <BackButton onPressHandler={navigation.goBack} color="black" />
-      <Text style={styles.headerText}>{categoryName}</Text>
+      <TopHeaderComponent
+        navigation={navigation}
+        title={categoryName}
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <View
         style={{
           flex: 1,
@@ -54,10 +50,11 @@ const ServiceListScreen = ({route, navigation}) => {
             showsVerticalScrollIndicator={false}
             data={data.services}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => (
+            renderItem={({item, index}) => (
               <ServiceComponent
                 key={item.serviceId}
                 data={item}
+                index={index}
                 onPressPriceHandler={() =>
                   navigation.push('ServicePriceScreen', {
                     serviceId: item.serviceId,

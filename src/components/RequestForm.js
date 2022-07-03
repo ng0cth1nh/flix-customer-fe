@@ -55,10 +55,13 @@ const RequestForm = function ({
 
   return (
     <ScrollView
-      style={{marginLeft: 20, marginRight: 20}}
+      style={{marginHorizontal: '4%'}}
       showsVerticalScrollIndicator={false}>
       <View
-        style={[styles.box, {height: 0.25 * height, flexDirection: 'column'}]}>
+        style={[
+          styles.box,
+          {height: 0.25 * height, flexDirection: 'column', marginTop: 12},
+        ]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/support.png')}
@@ -82,11 +85,10 @@ const RequestForm = function ({
               uri: service.imageUrl ? service.imageUrl : service.serviceImage,
             }}
             style={{
-              height: '70%',
-              width: '25%',
-              alignSelf: 'center',
+              height: height * 0.14,
+              width: height * 0.111,
               borderRadius: 10,
-              marginLeft: 15,
+              marginLeft: 10,
             }}
           />
           <View style={{flex: 1, justifyContent: 'center'}}>
@@ -94,7 +96,7 @@ const RequestForm = function ({
               <Text style={[styles.textBold, {fontSize: 24}]}>
                 {service.serviceName}
               </Text>
-              <Text style={{fontSize: 16, color: 'black'}}>
+              <Text style={{fontSize: 16, color: 'black', marginVertical: 6}}>
                 Phí dịch vụ kiểm tra
               </Text>
               <View
@@ -115,16 +117,13 @@ const RequestForm = function ({
         </View>
       </View>
       <View
-        style={[
-          styles.box,
-          {height: 0.2 * height, flexDirection: 'column', marginTop: 10},
-        ]}>
+        style={[styles.box, {height: 0.2 * height, flexDirection: 'column'}]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/address.png')}
             style={{
-              height: 20,
-              width: 20,
+              height: 22,
+              width: 22,
             }}
           />
           <Text style={styles.tittleText}>Địa chỉ của bạn</Text>
@@ -134,12 +133,8 @@ const RequestForm = function ({
             </TouchableOpacity>
           )}
         </View>
-        <View style={{flex: 5, marginLeft: 40}}>
-          <Text
-            style={[
-              styles.textBold,
-              {fontSize: 16, marginBottom: 15, marginTop: 5},
-            ]}>
+        <View style={{flex: 5, marginLeft: 30}}>
+          <Text style={[styles.textBold, {fontSize: 14, marginVertical: 10}]}>
             {address !== null
               ? `${address.customerName} - ${address.phone}`
               : `${service.customerName} - ${service.customerPhone}`}
@@ -150,10 +145,7 @@ const RequestForm = function ({
         </View>
       </View>
       <View
-        style={[
-          styles.box,
-          {height: 0.15 * height, flexDirection: 'column', marginTop: 10},
-        ]}>
+        style={[styles.box, {height: 0.15 * height, flexDirection: 'column'}]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/calendar.png')}
@@ -166,7 +158,7 @@ const RequestForm = function ({
             {editable ? 'Chọn ngày muốn sửa' : 'Ngày muốn sửa'}
           </Text>
         </View>
-        <View style={{flex: 4, marginLeft: 40, marginTop: 10}}>
+        <View style={{flex: 4, marginLeft: 40}}>
           <TouchableOpacity
             style={styles.datePicker}
             onPress={() => setDateVisible(true)}>
@@ -196,10 +188,7 @@ const RequestForm = function ({
         </View>
       </View>
       <View
-        style={[
-          styles.box,
-          {height: 0.2 * height, flexDirection: 'column', marginTop: 10},
-        ]}>
+        style={[styles.box, {height: 0.2 * height, flexDirection: 'column'}]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/writing.png')}
@@ -228,20 +217,8 @@ const RequestForm = function ({
           />
         </View>
       </View>
-      <View
-        style={[
-          styles.box,
-          {
-            marginTop: 10,
-          },
-        ]}>
-        <View
-          style={{
-            flexDirection: 'row',
-            height: 40,
-            alignItems: 'flex-end',
-            marginBottom: 15,
-          }}>
+      <View style={[styles.box, {height: 50}]}>
+        <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/coupon.png')}
             style={{
@@ -275,10 +252,7 @@ const RequestForm = function ({
         </View> */}
       </View>
       <View
-        style={[
-          styles.box,
-          {height: 0.15 * height, flexDirection: 'column', marginTop: 10},
-        ]}>
+        style={[styles.box, {height: 0.15 * height, flexDirection: 'column'}]}>
         <View style={styles.boxHeader}>
           <Image
             source={require('../../assets/images/type/wallet.png')}
@@ -316,19 +290,29 @@ const RequestForm = function ({
         <View
           style={[
             styles.box,
-            {height: 0.1 * height, flexDirection: 'column', marginTop: 10},
+            {
+              height: 0.12 * height,
+              flexDirection: 'column',
+              marginTop: 10,
+              paddingTop: 10,
+            },
           ]}>
           <View style={styles.boxHeader}>
-            <Ionicons
-              name="information-circle-outline"
-              size={20}
-              style={{marginBottom: 3}}
+            <Image
+              source={require('../../assets/images/type/info.png')}
+              style={{
+                height: 22,
+                width: 22,
+              }}
             />
             <Text style={styles.tittleText}>Mã yêu cầu</Text>
             <TouchableOpacity
               style={{marginLeft: 'auto', marginBottom: 3}}
               onPress={copyToClipboard}>
-              <Text style={{color: '#FEC54B'}}>{service.requestCode}</Text>
+              <Text
+                style={{color: '#FEC54B', fontSize: 16, fontWeight: 'bold'}}>
+                {service.requestCode}
+              </Text>
             </TouchableOpacity>
           </View>
           <View
@@ -387,7 +371,7 @@ const RequestForm = function ({
         </View>
       </View>
       <Button
-        style={{marginTop: 10, marginBottom: 40}}
+        style={{marginVertical: 20}}
         onPress={handlerSubmitButtonClick}
         buttonText={buttonText}
       />
@@ -397,16 +381,21 @@ const RequestForm = function ({
 const styles = StyleSheet.create({
   box: {
     backgroundColor: '#F0F0F0',
-    borderRadius: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
+    borderRadius: 18,
+    paddingHorizontal: '5%',
+    marginVertical: 6,
   },
-  boxHeader: {flexDirection: 'row', flex: 2, alignItems: 'flex-end'},
+  boxHeader: {
+    flexDirection: 'row',
+    flex: 2,
+    alignItems: 'center',
+    paddingTop: 10,
+  },
   tittleText: {
     fontWeight: 'bold',
     fontSize: 18,
     color: 'black',
-    marginLeft: 20,
+    marginLeft: 10,
     marginBottom: 3,
   },
   editTouch: {
@@ -416,8 +405,14 @@ const styles = StyleSheet.create({
     color: '#FEC54B',
     textDecorationLine: 'underline',
     fontWeight: 'bold',
+    fontSize: 12,
   },
-  boxBody: {flex: 8, flexDirection: 'row'},
+  boxBody: {
+    flex: 8,
+    flexDirection: 'row',
+    marginVertical: 6,
+    paddingBottom: 16,
+  },
   boxBodyContent: {
     marginLeft: 20,
     height: '70%',
@@ -426,11 +421,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingTop: 3,
-    paddingBottom: 3,
-    paddingLeft: 10,
-    paddingRight: 10,
-    borderRadius: 15,
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    borderRadius: 10,
     backgroundColor: '#FEC54B',
     marginLeft: 'auto',
   },
@@ -440,9 +433,10 @@ const styles = StyleSheet.create({
   },
   datePicker: {
     flexDirection: 'row',
-    width: '66%',
+    width: '80%',
     height: 40,
     borderRadius: 10,
+    marginTop: 10,
     alignItems: 'center',
     textAlign: 'center',
     backgroundColor: 'white',
@@ -458,6 +452,7 @@ const styles = StyleSheet.create({
   servicePrice: {
     marginLeft: 'auto',
     color: '#E67F1E',
+    fontWeight: '600',
   },
 });
 
