@@ -17,6 +17,7 @@ import Carousel from 'react-native-snap-carousel';
 import BannerSlider from '../../components/BannerSlider';
 import ForwardButton from '../../components/ForwardButton';
 import MajorComponent from '../../components/MajorComponent';
+import SearchForm from '../../components/SearchForm';
 const ENTRIES = [
   {
     title: 'Ưu đãi hôm nay',
@@ -77,19 +78,11 @@ const HomeScreen = ({navigation}) => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}>
-          <View style={styles.searchForm}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Tìm kiếm dịch vụ"
-              onChangeText={text => setSearch(text)}
-              defaultValue={search}
-            />
-            <Icon
-              name="search"
-              size={24}
-              style={{paddingTop: 12, alignItems: 'center'}}
-            />
-          </View>
+          <SearchForm
+            search={search}
+            setSearch={setSearch}
+            placeholder="Tìm kiếm dịch vụ"
+          />
           <View>
             <Carousel
               ref={carouselRef}

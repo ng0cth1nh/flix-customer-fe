@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Text,
   View,
@@ -6,9 +6,6 @@ import {
   StyleSheet,
   StatusBar,
   Dimensions,
-  ScrollView,
-  TouchableOpacity,
-  Image,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
@@ -57,7 +54,6 @@ function RequestHistory() {
   );
 }
 const RequestHistoryScreen = ({navigation}) => {
-  const [reqStatus, setReqStatus] = useState(0);
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />

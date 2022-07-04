@@ -25,6 +25,7 @@ import AddressListScreen from './src/screens/address/AddressListScreen';
 import EditAddressScreen from './src/screens/address/EditAddressScreen';
 
 import HomeScreen from './src/screens/main/HomeScreen';
+import SearchScreen from './src/screens/main/SearchScreen';
 import NotificationScreen from './src/screens/main/NotificationScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
 import CategoryListScreen from './src/screens/main/CategoryListScreen';
@@ -83,6 +84,10 @@ function App() {
     return (
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen
+          name="SearchScreen"
+          component={SearchScreen}
+        />
         <Stack.Screen
           name="CategoryListScreen"
           component={CategoryListScreen}
