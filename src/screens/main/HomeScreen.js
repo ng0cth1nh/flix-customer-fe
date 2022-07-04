@@ -125,8 +125,8 @@ const HomeScreen = ({navigation}) => {
                   data={data}
                   onPressHandler={() =>
                     navigation.push('ServiceListScreen', {
-                      majorId: data.id,
-                      majorName: data.title,
+                      categoryId: data.id,
+                      categoryName: data.title,
                     })
                   }
                 />
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   container: {
-    paddingHorizontal: '5%',
+    paddingHorizontal: '4%',
     paddingTop: 16,
     backgroundColor: 'white',
     height: '100%',

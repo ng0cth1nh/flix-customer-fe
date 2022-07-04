@@ -11,6 +11,7 @@ const {width, height} = Dimensions.get('window');
 
 const ServiceComponent = ({
   data,
+  index,
   onPressPriceHandler,
   onPressRequestHandler,
 }) => {
@@ -20,9 +21,10 @@ const ServiceComponent = ({
         flexDirection: 'row',
         backgroundColor: '#F0F0F0',
         borderRadius: 10,
-        marginBottom: 12,
+        marginVertical: 12,
+        marginTop: index === 0 ? 12 : 0,
         height: height * 0.152,
-        marginHorizontal: '5%',
+        marginHorizontal: '4%',
       }}>
       <Image source={{uri: data.imageUrl}} style={styles.image} />
       <View style={{alignSelf: 'center'}}>
@@ -32,8 +34,11 @@ const ServiceComponent = ({
         <View
           style={{
             flexDirection: 'row',
+            justifyContent: 'space-between',
           }}>
-          <TouchableOpacity style={styles.button} onPress={onPressPriceHandler}>
+          <TouchableOpacity
+            style={[styles.button, {marginRight: 10}]}
+            onPress={onPressPriceHandler}>
             <Text style={styles.textBold}>Xem giá dịch vụ</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -50,11 +55,10 @@ const ServiceComponent = ({
 const styles = StyleSheet.create({
   button: {
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 6,
     borderRadius: 10,
     backgroundColor: '#FEC54B',
     marginTop: 20,
-    marginRight: 20,
   },
   textBold: {
     fontWeight: 'bold',
@@ -65,7 +69,7 @@ const styles = StyleSheet.create({
     width: height * 0.111,
     borderRadius: 10,
     alignSelf: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: '4%',
   },
 });
 

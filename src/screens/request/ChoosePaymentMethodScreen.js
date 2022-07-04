@@ -6,29 +6,33 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
+  Dimensions,
   Image,
 } from 'react-native';
+const {width, height} = Dimensions.get('window');
 import {RadioButton} from 'react-native-paper';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-
 import BackButton from '../../components/BackButton';
 import Button from '../../components/SubmitButton';
-import Toast from 'react-native-toast-message';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 
-const ChoosePaymentMethodScreen = ({navigation}) => {
+const ChoosePaymentMethodScreen = ({navigation, route}) => {
+  const {paymentMethod, setPaymentMethod} = route.params;
+  const [checked, setChecked] = useState(paymentMethod);
   const buttonClicked = () => {
-    Toast.show({
-      type: 'customToast',
-      text1: 'This is an info message',
-    });
+    setPaymentMethod(checked);
+    navigation.goBack();
   };
-  const [checked, setChecked] = useState('first');
+
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Phương thức thanh toán"
+        isBackButton={true}
+        statusBarColor="white"
+      />
       <SafeAreaView style={{flex: 1}}>
-        <Text style={styles.headerText}>Phương thức thanh toán</Text>
         <ScrollView
           style={{
             paddingHorizontal: 20,
@@ -39,11 +43,11 @@ const ChoosePaymentMethodScreen = ({navigation}) => {
           }}>
           <View style={styles.box}>
             <RadioButton
-              value="first"
-              status={checked === 'first' ? 'checked' : 'unchecked'}
+              value="V"
+              status={checked.id === 'V' ? 'checked' : 'unchecked'}
               color="#FFBC00"
               onPress={() => {
-                setChecked('first');
+                setChecked({id: 'V', name: 'VNPAY'});
               }}
             />
             <Image
@@ -54,11 +58,11 @@ const ChoosePaymentMethodScreen = ({navigation}) => {
           </View>
           <View style={styles.box}>
             <RadioButton
-              value="second"
-              status={checked === 'second' ? 'checked' : 'unchecked'}
+              value="C"
+              status={checked.id === 'C' ? 'checked' : 'unchecked'}
               color="#FFBC00"
               onPress={() => {
-                setChecked('second');
+                setChecked({id: 'C', name: 'Tiền mặt'});
               }}
             />
             <Image
@@ -71,17 +75,14 @@ const ChoosePaymentMethodScreen = ({navigation}) => {
         <View>
           <Button
             style={{
-              marginTop: 10,
-              marginBottom: 30,
-              width: '85%',
-              alignSelf: 'center',
+              marginVertical: 20,
+              marginHorizontal: '5%',
             }}
             onPress={buttonClicked}
             buttonText="ĐỒNG Ý"
           />
         </View>
       </SafeAreaView>
-      <BackButton onPressHandler={navigation.goBack} color="black" />
     </View>
   );
 };
@@ -93,10 +94,7 @@ const styles = StyleSheet.create({
     color: 'black',
     marginTop: getStatusBarHeight(),
     paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#CACACA',
     width: '100%',
-    marginBottom: 10,
   },
   box: {
     backgroundColor: '#F0F0F0',
@@ -109,8 +107,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    height: '85%',
-    aspectRatio: 1,
+    height: 40,
+    width: 40,
     marginLeft: 10,
     marginRight: 20,
   },

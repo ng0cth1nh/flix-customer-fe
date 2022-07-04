@@ -158,7 +158,7 @@ const CategoryListScreen = ({navigation}) => {
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{paddingHorizontal: '5%'}}>
+          style={{paddingHorizontal: '4%'}}>
           <View
             style={{
               flexDirection: 'row',
@@ -172,8 +172,8 @@ const CategoryListScreen = ({navigation}) => {
                   data={data}
                   onPressHandler={() =>
                     navigation.push('ServiceListScreen', {
-                      majorId: data.id,
-                      majorName: data.title,
+                      categoryId: data.id,
+                      categoryName: data.title,
                     })
                   }
                 />

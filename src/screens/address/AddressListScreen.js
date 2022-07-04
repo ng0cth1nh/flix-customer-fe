@@ -6,102 +6,119 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
+  FlatList,
   Dimensions,
+  ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 const {height} = Dimensions.get('window');
 import {RadioButton} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
-
+import ApiConstants from '../../constants/Api';
+import NotFound from '../../components/NotFound';
+import useFetchData from '../../hooks/useFetchData';
 import SubmitButton from '../../components/SubmitButton';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 import BackButton from '../../components/BackButton';
 
-const AddressListScreen = ({navigation, cityId, setCityId, isAddAddress}) => {
+const AddressListScreen = ({navigation}) => {
   const [checked, setChecked] = useState('first');
-  const showToast = () => {
-    console.log('show toast');
-    Toast.show({
-      type: 'success',
-      text1: 'Flix',
-      text2: 'Thay đổi địa chỉ mặc định thành công!',
-    });
-  };
+
+  const {loading, data, isError} = useFetchData(
+    ApiConstants.GET_ADDRESS_LIST_API,
+  );
+
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <SafeAreaView>
-        <ScrollView
-          style={{
-            marginLeft: 20,
-            marginRight: 20,
-            height: 0.83 * height,
-            borderBottomWidth: 1,
-            borderBottomColor: '#CACACA',
-          }}>
-          <Text style={styles.headerText}>Địa chỉ của bạn</Text>
-          <View
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Địa chỉ của bạn"
+        isBackButton={true}
+        statusBarColor="white"
+      />
+      <SafeAreaView style={{flex: 1}}>
+        {isError ? <NotFound /> : null}
+        {data !== null ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={data.addresses}
             style={{
-              paddingBottom: 10,
-            }}>
-            <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
-              <View style={styles.boxHeader}>
-                <Text style={styles.tittleText}>Nguyễn Văn A</Text>
-                <TouchableOpacity style={styles.editTouch}>
-                  <Text style={styles.editText}>Thay đổi</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.addressInfo}>
+              marginHorizontal: '4%',
+              height: 0.78 * height,
+              borderBottomWidth: 1,
+              borderBottomColor: '#CACACA',
+            }}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item, index}) => (
+              <View
+                style={[
+                  styles.box,
+                  {
+                    height: 'auto',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginVertical: 12,
+                    marginTop: index === 0 ? 12 : 0,
+                  },
+                ]}>
                 <RadioButton
                   value="first"
-                  status={checked === 'first' ? 'checked' : 'unchecked'}
+                  status={item.mainAddress ? 'checked' : 'unchecked'}
                   color="#FFBC00"
                   onPress={() => {
                     setChecked('first');
-                    showToast();
+                    // showToast();
                   }}
                 />
-                <View>
-                  <Text style={styles.textBold}>0912345678</Text>
-                  <Text>
-                    123 Minh Khai, Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội
+                <View
+                  style={{flex: 1, marginHorizontal: 6, marginVertical: 10}}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.tittleText}>{item.customerName}</Text>
+                    <TouchableOpacity
+                      style={styles.editTouch}
+                      onPress={() => navigation.push('EditAddressScreen')}>
+                      <Text style={styles.editText}>Thay đổi</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.textBold}>{item.phone}</Text>
+                  <Text style={{flexWrap: 'wrap', color: 'black'}}>
+                    {item.addressName}
                   </Text>
                 </View>
               </View>
-            </View>
-            <View style={[styles.box, {height: 'auto', marginTop: 10}]}>
-              <View style={styles.boxHeader}>
-                <Text style={styles.tittleText}>Nguyễn Văn B</Text>
-                <TouchableOpacity style={styles.editTouch}>
-                  <Text style={styles.editText}>Thay đổi</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.addressInfo}>
-                <RadioButton
-                  value="second"
-                  status={checked === 'second' ? 'checked' : 'unchecked'}
-                  color="#FFBC00"
-                  onPress={() => setChecked('second')}
-                />
-                <View>
-                  <Text style={styles.textBold}>0912345678</Text>
-                  <Text>
-                    123 Minh Khai, Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-        <SubmitButton
-          style={{marginTop: 10, width: '90%', alignSelf: 'center'}}
-          onPress={() => {
-            console.log('handle clicked');
-          }}
-          buttonText="THÊM ĐỊA CHỈ"
-        />
+            )}
+          />
+        ) : null}
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color="#FEC54B"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          />
+        ) : (
+          <SubmitButton
+            style={{
+              marginTop: 15,
+              marginBottom: 15,
+              width: '90%',
+              alignSelf: 'center',
+            }}
+            onPress={() => {
+              navigation.push('AddAddressScreen');
+            }}
+            buttonText="THÊM ĐỊA CHỈ"
+          />
+        )}
       </SafeAreaView>
-      <BackButton onPressHandler={navigation.goBack} color="black" />
     </View>
   );
 };
@@ -120,21 +137,19 @@ const styles = StyleSheet.create({
   },
   box: {
     backgroundColor: '#F0F0F0',
-    borderRadius: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
+    borderRadius: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   boxHeader: {
-    flexDirection: 'row',
     height: 35,
     alignItems: 'flex-end',
     marginBottom: 5,
   },
   tittleText: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 20,
     color: 'black',
-    marginLeft: 40,
   },
   editTouch: {
     marginLeft: 'auto',
@@ -148,12 +163,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 5,
-    marginBottom: 10,
   },
   textBold: {
     fontWeight: 'bold',
     color: 'black',
-    marginBottom: 5,
+    marginVertical: 4,
   },
 });
 

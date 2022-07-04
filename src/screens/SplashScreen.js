@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: '40%',
+    width: '26%',
     aspectRatio: 1,
   },
   imageLogo: {
@@ -58,8 +58,8 @@ const styles = StyleSheet.create({
   },
 
   headerText: {
-    width: '80%',
-    fontSize: 24,
+    width: '90%',
+    fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 10,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     width: '60%',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     textAlign: 'center',
     color: 'black',

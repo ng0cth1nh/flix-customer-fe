@@ -1,111 +1,75 @@
-import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  FlatList,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React from 'react';
+import {FlatList, StyleSheet, ActivityIndicator, View} from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import BackButton from '../../components/BackButton';
 import ServiceComponent from '../../components/ServiceComponent';
-
-const SERVICES = [
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 10,
-    serviceName: 'Lò nướng',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 11,
-    serviceName: 'Lò vi sóng',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 12,
-    serviceName: 'Lò vi ba',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 13,
-    serviceName: 'Bếp từ',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-  {
-    imageUrl:
-      'https://i.postimg.cc/L85TSmzM/engin-akyurt-y-CYVV8-k-QNM-unsplash.jpg',
-    price: 200000,
-    serviceId: 14,
-    serviceName: 'Bếp hồng ngoại',
-  },
-];
+import ApiConstants from '../../constants/Api';
+import NotFound from '../../components/NotFound';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
+import useFetchData from '../../hooks/useFetchData';
 
 const ServiceListScreen = ({route, navigation}) => {
-  const {majorName, majorId} = route.params;
-  const [services, setServices] = useState([]);
+  const {categoryName, categoryId} = route.params;
 
-  useEffect(() => {
-    setServices(SERVICES);
-  }, []);
+  const {loading, data, isError} = useFetchData(
+    ApiConstants.GET_SERVICES_BY_CATEGORY_API,
+    {
+      params: {categoryId: categoryId},
+    },
+  );
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <BackButton onPressHandler={navigation.goBack} color="black" />
-      <View style={{flex: 1}}>
-        <Text style={styles.headerText}>{majorName}</Text>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={services}
-          keyExtractor={item => item.id}
-          renderItem={({item, index}) => (
-            <ServiceComponent
-              key={index}
-              data={item}
-              onPressPriceHandler={() =>
-                navigation.push('ServicePriceScreen', {
-                  serviceId: item.serviceId,
-                  serviceName: item.serviceName,
-                })
-              }
-              onPressRequestHandler={() =>
-                navigation.push('RequestScreen', {
-                  serviceId: item.serviceId,
-                })
-              }
-            />
-          )}
-        />
+      <TopHeaderComponent
+        navigation={navigation}
+        title={categoryName}
+        isBackButton={true}
+        statusBarColor="white"
+      />
+      <View
+        style={{
+          flex: 1,
+        }}>
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color="#FEC54B"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          />
+        ) : null}
+        {isError ? <NotFound /> : null}
+        {data !== null ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={data.services}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item, index}) => (
+              <ServiceComponent
+                key={item.serviceId}
+                data={item}
+                index={index}
+                onPressPriceHandler={() =>
+                  navigation.push('ServicePriceScreen', {
+                    serviceId: item.serviceId,
+                    serviceName: item.serviceName,
+                  })
+                }
+                onPressRequestHandler={() =>
+                  navigation.push('RequestScreen', {
+                    service: item,
+                  })
+                }
+              />
+            )}
+          />
+        ) : null}
       </View>
     </View>
   );
