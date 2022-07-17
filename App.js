@@ -35,6 +35,8 @@ import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
 import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 import PickVoucherCodeScreen from './src/screens/voucher/PickVoucherCodeScreen';
+import ChatListScreen from './src/screens/chat/ChatListScreen';
+import ChatScreen from './src/screens/chat/ChatScreen';
 import {Provider} from 'react-redux';
 import {
   requestUserPermission,
@@ -110,10 +112,7 @@ function App() {
     return (
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen
-          name="SearchScreen"
-          component={SearchScreen}
-        />
+        <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen
           name="CategoryListScreen"
           component={CategoryListScreen}
@@ -184,6 +183,7 @@ function App() {
     <>
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="ChatScreen" component={ChatScreen} />
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}

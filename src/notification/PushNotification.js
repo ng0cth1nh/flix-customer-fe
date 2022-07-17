@@ -1,5 +1,6 @@
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PushNotification from 'react-native-push-notification';
 
 export async function requestUserPermission() {
   const authStatus = await messaging().requestPermission();
@@ -13,8 +14,7 @@ export async function requestUserPermission() {
   }
 }
 async function getFcmToken() {
-  let fcmToken = await AsyncStorage.getItem('fcmtoken');
-  console.log(fcmToken);
+  let fcmToken = null;
   if (!fcmToken) {
     try {
       fcmToken = await messaging().getToken();
@@ -51,5 +51,11 @@ export const notificationListener = () => {
     });
   messaging().onMessage(async remoteMessage => {
     console.log('notification on foreround', remoteMessage);
+    PushNotification.localNotification({
+      message: remoteMessage.notification.body,
+      title: remoteMessage.notification.title,
+      bigPictureUrl: remoteMessage.notification.android.imageUrl,
+      smallIcon: remoteMessage.notification.android.imageUrl,
+    });
   });
 };

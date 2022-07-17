@@ -8,6 +8,9 @@ export const numberWithCommas = inputNumber => {
   }
   return formattedNumber;
 };
+export const getFileNameFromPath = path => {
+  return path.replace(/^.*[\\\/]/, '');
+};
 
 export const RequestStatus = {
   PENDING: 'PENDING',
