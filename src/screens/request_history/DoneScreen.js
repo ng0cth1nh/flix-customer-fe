@@ -8,6 +8,7 @@ import {
   fetchRequests,
   selectRequests,
   selectIsLoading,
+  setIsLoading,
 } from '../../features/request/requestSlice';
 
 import useAxios from '../../hooks/useAxios';
@@ -18,25 +19,28 @@ const DoneScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
-  useEffect(() => {
-    (async () => {
-      await dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     await dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
+  //   })();
+  // }, []);
 
-  const handelNavigationToListPrice = service => {
-    navigation.push('ServicePriceScreen', {
-      serviceName: service.serviceName,
-      serviceId: 1,
+  const handleGetInvoiceButton = async service => {
+    navigation.push('InvoiceScreen', {
+      service,
+      isShowConfirm: false,
     });
   };
 
-  const handelNavigationToDetailRequest = requestCode => {
+  const handleNavigationToDetailRequest = requestCode => {
     navigation.push('RequestDetailScreen', {
       requestCode,
+      isFetchFixedService: true,
+      isShowSubmitButton: false,
+      submitButtonText: 'Hủy yêu cầu',
+      typeSubmitButtonClick: 'CANCEL_REQUEST',
     });
   };
-
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       {isLoading ? (
@@ -66,21 +70,61 @@ const DoneScreen = ({navigation}) => {
             <RefreshControl
               refreshing={refreshControl}
               onRefresh={async () => {
-                setRefreshControl(true);
-                await dispatch(
-                  fetchRequests({customerAPI, status: RequestStatus.DONE}),
-                );
-                setRefreshControl(false);
+                try {
+                  setRefreshControl(true);
+                  await dispatch(
+                    fetchRequests({customerAPI, status: RequestStatus.DONE}),
+                  );
+                  await setIsLoading(true);
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PAYMENT_WAITING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.APPROVED,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PENDING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.FIXING,
+                    }),
+                  );
+
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.CANCELLED,
+                    }),
+                  );
+                } catch (err) {
+                  console.log(err);
+                } finally {
+                  setRefreshControl(false);
+                }
               }}
               colors={['#FEC54B']}
             />
           }
           renderItem={({item, index}) => (
             <RequestItem
-              handelNavigationToListPrice={handelNavigationToListPrice}
-              handelNavigationToDetailRequest={handelNavigationToDetailRequest}
+              handleButtonPress={handleGetInvoiceButton}
+              handleNavigationToDetailRequest={handleNavigationToDetailRequest}
               item={item}
               index={index}
+              textButton="Xem hóa đơn"
+              text="Phí dịch vụ kiểm tra"
+              isFixed={true}
             />
           )}
         />

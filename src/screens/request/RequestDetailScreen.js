@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
@@ -27,35 +27,108 @@ import {
   cancelRequest,
   setIsLoading,
   selectIsLoading,
+  fetchFixedService,
+  fetchRequestDetail,
 } from '../../features/request/requestSlice';
 import ProgressLoader from 'rn-progress-loader';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 
 const RequestDetailScreen = ({route, navigation}) => {
-  const {requestCode} = route.params;
-  const [date, setDate] = useState(moment());
+  const {
+    requestCode,
+    isFetchFixedService,
+    isShowSubmitButton,
+    typeSubmitButtonClick,
+    submitButtonText,
+    navigateFromScreen = null,
+  } = route.params;
+
   const [modalVisible, setModalVisible] = useState(false);
   const isLoading = useSelector(selectIsLoading);
   const [reason, setReason] = useState({index: 0, reason: CancelReasons[0]});
   const [contentOtherReason, setContentOtherReason] = useState('');
-  const [description, setDiscription] = useState('');
-  function handlerButtonClick() {
-    console.log(date);
-  }
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [fixedService, setFixedService] = useState(null);
+  const [isError, setIsError] = useState(false);
+
   const customerAPI = useAxios();
   const dispatch = useDispatch();
   const showModal = () => {
     setModalVisible(true);
   };
 
-  const {loading, data, isError} = useFetchData(
-    ApiConstants.GET_REQUEST_DETAIL_API,
-    {
-      params: {requestCode},
-    },
-  );
+  const loadData = async () => {
+    try {
+      await setLoading(true);
+      if (isFetchFixedService) {
+        let fixedService = await dispatch(
+          fetchFixedService({
+            customerAPI,
+            requestCode,
+          }),
+        ).unwrap();
+        setFixedService(fixedService);
+      }
+      let data = await dispatch(
+        fetchRequestDetail({
+          customerAPI,
+          requestCode,
+        }),
+      ).unwrap();
+      setData(data);
+    } catch (err) {
+      setIsError(true);
+    } finally {
+      await setLoading(false);
+    }
+  };
 
-  const handlerCancelButtonClick = async () => {
+  useEffect(() => {
+    (async () => {
+      await loadData();
+    })();
+  }, []);
+
+  const handleCancelButtonClick = async () => {
+    try {
+      setModalVisible(false);
+      await dispatch(setIsLoading());
+      await dispatch(
+        cancelRequest({
+          customerAPI,
+          body: {requestCode, reason: contentOtherReason},
+        }),
+      ).unwrap();
+      Toast.show({
+        type: 'customToast',
+        text1: 'Hủy yêu cầu thành công',
+      });
+      navigateFromScreen === 'FIXING'
+        ? dispatch(
+            fetchRequests({customerAPI, status: RequestStatus.FIXING}),
+          ).unwrap()
+          ? navigateFromScreen === 'APPROVED'
+          : dispatch(
+              fetchRequests({customerAPI, status: RequestStatus.APPROVED}),
+            ).unwrap()
+        : dispatch(
+            fetchRequests({customerAPI, status: RequestStatus.PENDING}),
+          ).unwrap();
+
+      navigation.goBack();
+      dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.CANCELLED}),
+      ).unwrap();
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
+  };
+
+  const handleApproveInvoiceButtonClick = async () => {
     try {
       setModalVisible(false);
       await dispatch(setIsLoading());
@@ -118,25 +191,33 @@ const RequestDetailScreen = ({route, navigation}) => {
         />
         {data !== null ? (
           <RequestForm
-            buttonText="Hủy yêu cầu"
             address={null}
             date={null}
-            service={data}
+            data={data}
             editable={false}
             paymentMethod={null}
+            fixedService={fixedService}
             isRequestIdVisible={true}
-            handlerSubmitButtonClick={showModal}
+            isShowSubmitButton={isShowSubmitButton}
+            submitButtonText={submitButtonText}
+            handleSubmitButtonClick={
+              typeSubmitButtonClick === 'APPROVE_INVOICE'
+                ? handleApproveInvoiceButtonClick
+                : showModal
+            }
+            isFetchFixedService={isFetchFixedService}
           />
         ) : null}
         <CustomModal
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
-          modalRatio={0.8}>
+          modalRatio={0.76}>
           <Text style={styles.modalText}>Chọn lý do hủy</Text>
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={{
               flex: 1,
+              width: '100%',
             }}>
             {CancelReasons.map((item, index) => {
               return (
@@ -147,6 +228,9 @@ const RequestDetailScreen = ({route, navigation}) => {
                   style={styles.box}
                   key={index}>
                   <RadioButton
+                    onPress={() => {
+                      setReason({index, reason: CancelReasons[index]});
+                    }}
                     value={item}
                     status={index === reason.index ? 'checked' : 'unchecked'}
                     color="#FFBC00"
@@ -161,6 +245,9 @@ const RequestDetailScreen = ({route, navigation}) => {
               }}
               style={styles.box}>
               <RadioButton
+                onPress={() => {
+                  setReason({index: -1, reason: contentOtherReason});
+                }}
                 status={reason.index === -1 ? 'checked' : 'unchecked'}
                 color="#FFBC00"
               />
@@ -190,13 +277,13 @@ const RequestDetailScreen = ({route, navigation}) => {
             }}>
             <TouchableOpacity
               style={[styles.button, styles.buttonOpen]}
-              onPress={handlerCancelButtonClick}>
+              onPress={handleCancelButtonClick}>
               <Text style={styles.textStyle}>ĐỒNG Ý</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, styles.buttonClose]}
               onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={styles.textStyle}>THOÁT</Text>
+              <Text style={styles.textStyle}>ĐÓNG</Text>
             </TouchableOpacity>
           </View>
         </CustomModal>
@@ -236,7 +323,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: 20,
+    fontSize: 16,
     color: 'black',
   },
   modalText: {

@@ -13,7 +13,7 @@ export default function BackButton({color, onPressHandler}) {
         marginLeft: 20,
       }}
       onPress={onPressHandler}>
-      <Icon name="arrow-back" color={color} size={35} />
+      <Icon name="ios-arrow-back-outline" color={color} size={34} />
     </TouchableOpacity>
   );
 }

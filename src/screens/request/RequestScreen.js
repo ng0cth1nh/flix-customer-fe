@@ -1,18 +1,8 @@
 import React, {useState} from 'react';
-import {
-  Text,
-  View,
-  SafeAreaView,
-  ActivityIndicator,
-  StyleSheet,
-  Dimensions,
-  StatusBar,
-} from 'react-native';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
+import {View, SafeAreaView, ActivityIndicator} from 'react-native';
 import moment from 'moment';
 import ApiConstants from '../../constants/Api';
 import useFetchData from '../../hooks/useFetchData';
-import BackButton from '../../components/BackButton';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
@@ -25,7 +15,6 @@ import {
 } from '../../features/request/requestSlice';
 import {RequestStatus} from '../../utils/util';
 import ProgressLoader from 'rn-progress-loader';
-const {width, height} = Dimensions.get('window');
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 
 const RequestScreen = ({navigation, route}) => {
@@ -41,24 +30,24 @@ const RequestScreen = ({navigation, route}) => {
   const customerAPI = useAxios();
   const dispatch = useDispatch();
 
-  const handelClickVoucher = () => {
+  const handleClickVoucher = () => {
     navigation.push('PickVoucherCodeScreen');
   };
 
-  const handelClickService = () => {
+  const handleClickService = () => {
     navigation.goBack();
   };
 
-  const handelClickChoosePaymentMethod = () => {
+  const handleClickChoosePaymentMethod = () => {
     navigation.push('ChoosePaymentMethodScreen', {
       paymentMethod,
       setPaymentMethod,
     });
   };
 
-  const handlerSubmitButtonClick = async () => {
+  const handleSubmitButtonClick = async () => {
     const body = {
-      serviceId: service.serviceId,
+      serviceId: service.id,
       addressId: data.addressId,
       expectFixingDay: date.format('yyyy-MM-DD HH:mm:ss'),
       description,
@@ -75,8 +64,8 @@ const RequestScreen = ({navigation, route}) => {
       dispatch(
         fetchRequests({customerAPI, status: RequestStatus.PENDING}),
       ).unwrap();
-      navigation.navigate('RequestHistoryStackScreen', {
-        screen: 'RequestHistoryScreen',
+      navigation.navigate('RequestHistoryScreen', {
+        screen: 'PendingScreen',
       });
     } catch (err) {
       Toast.show({
@@ -121,19 +110,21 @@ const RequestScreen = ({navigation, route}) => {
         />
         {data !== null ? (
           <RequestForm
-            buttonText="ĐẶT LỊCH"
             date={date}
             setDate={setDate}
             description={description}
             setDescription={setDescription}
-            service={service}
+            data={service}
             address={data}
             paymentMethod={paymentMethod}
-            handelClickVoucher={handelClickVoucher}
-            handelClickService={handelClickService}
-            handelClickChoosePaymentMethod={handelClickChoosePaymentMethod}
-            handlerSubmitButtonClick={handlerSubmitButtonClick}
+            handleClickVoucher={handleClickVoucher}
+            handleClickService={handleClickService}
+            handleClickChoosePaymentMethod={handleClickChoosePaymentMethod}
+            handleSubmitButtonClick={handleSubmitButtonClick}
+            isShowSubmitButton={true}
+            submitButtonText="ĐẶT LỊCH"
             editable={true}
+            isFetchFixedService={false}
           />
         ) : null}
       </SafeAreaView>

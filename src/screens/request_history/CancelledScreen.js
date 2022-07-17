@@ -18,6 +18,7 @@ import {
   selectErrorMessage,
   selectRequests,
   selectIsLoading,
+  setIsLoading,
 } from '../../features/request/requestSlice';
 
 import useAxios from '../../hooks/useAxios';
@@ -29,25 +30,29 @@ const CancelledScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
-  useEffect(() => {
-    (async () => {
-      // await dispatch(setLoading());
-      await dispatch(
-        fetchRequests({customerAPI, status: RequestStatus.CANCELLED}),
-      );
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     // await dispatch(setLoading());
+  //     await dispatch(
+  //       fetchRequests({customerAPI, status: RequestStatus.CANCELLED}),
+  //     );
+  //   })();
+  // }, []);
 
-  const handelNavigationToListPrice = service => {
+  const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,
       serviceId: 1,
     });
   };
 
-  const handelNavigationToDetailRequest = requestCode => {
+  const handleNavigationToDetailRequest = requestCode => {
     navigation.push('RequestDetailScreen', {
       requestCode,
+      isFetchFixedService: true,
+      isShowSubmitButton: false,
+      submitButtonText: 'Hủy yêu cầu',
+      typeSubmitButtonClick: 'CANCEL_REQUEST',
     });
   };
 
@@ -80,24 +85,61 @@ const CancelledScreen = ({navigation}) => {
             <RefreshControl
               refreshing={refreshControl}
               onRefresh={async () => {
-                setRefreshControl(true);
-                await dispatch(
-                  fetchRequests({
-                    customerAPI,
-                    status: RequestStatus.CANCELLED,
-                  }),
-                );
-                setRefreshControl(false);
+                try {
+                  setRefreshControl(true);
+                  await dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.CANCELLED,
+                    }),
+                  );
+                  await setIsLoading(true);
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.FIXING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.APPROVED,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PENDING,
+                    }),
+                  );
+
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PAYMENT_WAITING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({customerAPI, status: RequestStatus.DONE}),
+                  );
+                } catch (err) {
+                  console.log(err);
+                } finally {
+                  setRefreshControl(false);
+                }
               }}
               colors={['#FEC54B']}
             />
           }
           renderItem={({item, index}) => (
             <RequestItem
-              handelNavigationToListPrice={handelNavigationToListPrice}
-              handelNavigationToDetailRequest={handelNavigationToDetailRequest}
+              handleButtonPress={handleNavigationToListPrice}
+              handleNavigationToDetailRequest={handleNavigationToDetailRequest}
               item={item}
               index={index}
+              textButton="Xem giá dịch vụ"
+              text="Phí dịch vụ kiểm tra"
+              isFixed={false}
             />
           )}
         />

@@ -26,7 +26,7 @@ const ServiceComponent = ({
         height: height * 0.152,
         marginHorizontal: '4%',
       }}>
-      <Image source={{uri: data.imageUrl}} style={styles.image} />
+      <Image source={{uri: data.image}} style={styles.image} />
       <View style={{alignSelf: 'center'}}>
         <Text style={{fontWeight: 'bold', fontSize: 20, color: 'black'}}>
           {data.serviceName}
@@ -55,7 +55,7 @@ const ServiceComponent = ({
 const styles = StyleSheet.create({
   button: {
     paddingVertical: 5,
-    paddingHorizontal: 6,
+    paddingHorizontal: 10,
     borderRadius: 10,
     backgroundColor: '#FEC54B',
     marginTop: 20,

@@ -13,13 +13,15 @@ import {numberWithCommas} from '../utils/util';
 export default function RequestItem({
   item,
   index,
-  handelNavigationToDetailRequest,
-  handelNavigationToListPrice,
+  handleNavigationToDetailRequest,
+  handleButtonPress,
+  textButton,
+  isFixed,
 }) {
   return (
     <TouchableOpacity
       onPress={() => {
-        handelNavigationToDetailRequest(item.requestCode);
+        handleNavigationToDetailRequest(item.requestCode);
       }}
       style={[
         styles.box,
@@ -71,20 +73,19 @@ export default function RequestItem({
             )} vnđ`}</Text>
             <TouchableOpacity
               style={styles.viewServiceButton}
-              onPress={() =>
-                handelNavigationToListPrice({
-                  serviceName: item.serviceName,
-                  serviceId: 1,
-                })
-              }>
-              <Text style={styles.textBold}>Xem giá dịch vụ</Text>
+              onPress={() => {
+                handleButtonPress(item);
+              }}>
+              <Text style={styles.textBold}>{textButton}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
       <View style={styles.serviceRow}>
-        <Text style={styles.textBold}>TỔNG THANH TOÁN (dự kiến)</Text>
+        <Text style={styles.textBold}>
+          TỔNG THANH TOÁN{!isFixed ? ' (dự kiến)' : ''}
+        </Text>
         <Text style={styles.servicePrice}>{`${numberWithCommas(
           item.actualPrice,
         )} vnđ`}</Text>
@@ -136,17 +137,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    width: 'auto',
     borderRadius: 10,
     backgroundColor: '#FEC54B',
-    marginLeft: 'auto',
+    paddingHorizontal: 6,
   },
   textBold: {
     fontWeight: '600',
     color: 'black',
-    fontSize: 14,
-    marginRight: 8,
+    fontSize: 13,
   },
   serviceRow: {
     flexDirection: 'row',
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   servicePrice: {
     marginLeft: 'auto',
-    color: '#E67F1E',
+    color: 'black',
     fontWeight: '600',
   },
 });
