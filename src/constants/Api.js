@@ -21,6 +21,9 @@ const ApiConstants = {
   GET_REQUEST_HISTORY_LIST_API: '/customer/request/histories',
   GET_REQUEST_DETAIL_API: '/customer/request/detail',
   CANCEL_REQUEST_API: '/customer/request/cancel',
+  GET_FIXED_SERVICE_OF_REQUEST_API: '/confirmedUser/request/fixedService',
+  GET_INVOICE_API: '/confirmedUser/request/invoice',
+  CONFIRM_INVOICE_API: '/customer/vnpay/payment/url',
 };
 
 //http://localhost:8000

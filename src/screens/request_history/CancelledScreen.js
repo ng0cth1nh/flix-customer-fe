@@ -38,16 +38,20 @@ const CancelledScreen = ({navigation}) => {
     })();
   }, []);
 
-  const handelNavigationToListPrice = service => {
+  const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,
       serviceId: 1,
     });
   };
 
-  const handelNavigationToDetailRequest = requestCode => {
+  const handleNavigationToDetailRequest = requestCode => {
     navigation.push('RequestDetailScreen', {
       requestCode,
+      isFetchFixedService: true,
+      isShowSubmitButton: false,
+      submitButtonText: 'Hủy yêu cầu',
+      typeSubmitButtonClick: 'CANCEL_REQUEST',
     });
   };
 
@@ -94,10 +98,12 @@ const CancelledScreen = ({navigation}) => {
           }
           renderItem={({item, index}) => (
             <RequestItem
-              handelNavigationToListPrice={handelNavigationToListPrice}
-              handelNavigationToDetailRequest={handelNavigationToDetailRequest}
+              handleButtonPress={handleNavigationToListPrice}
+              handleNavigationToDetailRequest={handleNavigationToDetailRequest}
               item={item}
               index={index}
+              textButton="Xem giá dịch vụ"
+              text="Phí dịch vụ kiểm tra"
             />
           )}
         />

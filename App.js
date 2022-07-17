@@ -2,7 +2,10 @@ import 'react-native-gesture-handler';
 import React, {useEffect, useState, useContext} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Image, View, Text, Dimensions} from 'react-native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from '@react-navigation/stack';
 import {navigationRef} from './src/RootNavigation';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
@@ -35,13 +38,15 @@ import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 import PickVoucherCodeScreen from './src/screens/voucher/PickVoucherCodeScreen';
 import {Provider} from 'react-redux';
+import InvoiceScreen from './src/screens/request/InvoiceScreen';
+import ChooseBankScreen from './src/screens/request/ChooseBankScreen';
 import {
   requestUserPermission,
   notificationListener,
 } from './src/notification/PushNotification';
 import {store} from './src/features/store';
-
 const {width} = Dimensions.get('window');
+
 const toastConfig = {
   customToast: ({text1}) => (
     <View
@@ -107,7 +112,13 @@ function App() {
 
   function HomeStackScreen() {
     return (
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        }}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen
           name="CategoryListScreen"
@@ -127,17 +138,19 @@ function App() {
           name="ChoosePaymentMethodScreen"
           component={ChoosePaymentMethodScreen}
         />
-        {/* <Stack.Screen
-          name="RequestHistoryScreen"
-          component={RequestHistoryScreen}
-        /> */}
       </Stack.Navigator>
     );
   }
 
   function ProfileStackScreen() {
     return (
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        }}>
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="ProfileInfoScreen" component={ProfileInfoScreen} />
         <Stack.Screen
@@ -158,7 +171,13 @@ function App() {
 
   function RequestHistoryStackScreen() {
     return (
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        }}>
         <Stack.Screen
           name="RequestHistoryScreen"
           component={RequestHistoryScreen}
@@ -171,6 +190,8 @@ function App() {
           name="RequestDetailScreen"
           component={RequestDetailScreen}
         />
+        <Stack.Screen name="InvoiceScreen" component={InvoiceScreen} />
+        <Stack.Screen name="ChooseBankScreen" component={ChooseBankScreen} />
       </Stack.Navigator>
     );
   }
@@ -178,7 +199,13 @@ function App() {
   return !state.token ? (
     <>
       <NavigationContainer ref={navigationRef}>
-        <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            gestureEnabled: true,
+            gestureDirection: 'horizontal',
+            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          }}>
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}

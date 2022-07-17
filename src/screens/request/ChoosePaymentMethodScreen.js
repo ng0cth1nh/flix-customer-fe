@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 const {width, height} = Dimensions.get('window');
 import {RadioButton} from 'react-native-paper';
@@ -41,7 +42,11 @@ const ChoosePaymentMethodScreen = ({navigation, route}) => {
             borderBottomWidth: 1,
             borderBottomColor: '#CACACA',
           }}>
-          <View style={styles.box}>
+          <TouchableOpacity
+            style={styles.box}
+            onPress={() => {
+              setChecked({id: 'V', name: 'VNPAY'});
+            }}>
             <RadioButton
               value="V"
               status={checked.id === 'V' ? 'checked' : 'unchecked'}
@@ -55,8 +60,12 @@ const ChoosePaymentMethodScreen = ({navigation, route}) => {
               style={styles.image}
             />
             <Text style={styles.text}>VNPAY</Text>
-          </View>
-          <View style={styles.box}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.box}
+            onPress={() => {
+              setChecked({id: 'C', name: 'Tiền mặt'});
+            }}>
             <RadioButton
               value="C"
               status={checked.id === 'C' ? 'checked' : 'unchecked'}
@@ -70,7 +79,7 @@ const ChoosePaymentMethodScreen = ({navigation, route}) => {
               style={styles.image}
             />
             <Text style={styles.text}>Tiền mặt</Text>
-          </View>
+          </TouchableOpacity>
         </ScrollView>
         <View>
           <Button
