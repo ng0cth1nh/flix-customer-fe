@@ -41,24 +41,24 @@ const RequestScreen = ({navigation, route}) => {
   const customerAPI = useAxios();
   const dispatch = useDispatch();
 
-  const handelClickVoucher = () => {
+  const handleClickVoucher = () => {
     navigation.push('PickVoucherCodeScreen');
   };
 
-  const handelClickService = () => {
+  const handleClickService = () => {
     navigation.goBack();
   };
 
-  const handelClickChoosePaymentMethod = () => {
+  const handleClickChoosePaymentMethod = () => {
     navigation.push('ChoosePaymentMethodScreen', {
       paymentMethod,
       setPaymentMethod,
     });
   };
 
-  const handlerSubmitButtonClick = async () => {
+  const handleSubmitButtonClick = async () => {
     const body = {
-      serviceId: service.serviceId,
+      serviceId: service.id,
       addressId: data.addressId,
       expectFixingDay: date.format('yyyy-MM-DD HH:mm:ss'),
       description,
@@ -121,19 +121,21 @@ const RequestScreen = ({navigation, route}) => {
         />
         {data !== null ? (
           <RequestForm
-            buttonText="ĐẶT LỊCH"
             date={date}
             setDate={setDate}
             description={description}
             setDescription={setDescription}
-            service={service}
+            data={service}
             address={data}
             paymentMethod={paymentMethod}
-            handelClickVoucher={handelClickVoucher}
-            handelClickService={handelClickService}
-            handelClickChoosePaymentMethod={handelClickChoosePaymentMethod}
-            handlerSubmitButtonClick={handlerSubmitButtonClick}
+            handleClickVoucher={handleClickVoucher}
+            handleClickService={handleClickService}
+            handleClickChoosePaymentMethod={handleClickChoosePaymentMethod}
+            handleSubmitButtonClick={handleSubmitButtonClick}
+            isShowSubmitButton={true}
+            submitButtonText="ĐẶT LỊCH"
             editable={true}
+            isFetchFixedService={false}
           />
         ) : null}
       </SafeAreaView>

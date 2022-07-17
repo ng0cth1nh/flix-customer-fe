@@ -13,13 +13,15 @@ import {numberWithCommas} from '../utils/util';
 export default function RequestItem({
   item,
   index,
-  handelNavigationToDetailRequest,
-  handelNavigationToListPrice,
+  handleNavigationToDetailRequest,
+  handleButtonPress,
+  textButton,
+  text,
 }) {
   return (
     <TouchableOpacity
       onPress={() => {
-        handelNavigationToDetailRequest(item.requestCode);
+        handleNavigationToDetailRequest(item.requestCode);
       }}
       style={[
         styles.box,
@@ -71,13 +73,10 @@ export default function RequestItem({
             )} vnđ`}</Text>
             <TouchableOpacity
               style={styles.viewServiceButton}
-              onPress={() =>
-                handelNavigationToListPrice({
-                  serviceName: item.serviceName,
-                  serviceId: 1,
-                })
-              }>
-              <Text style={styles.textBold}>Xem giá dịch vụ</Text>
+              onPress={() => {
+                handleButtonPress(item);
+              }}>
+              <Text style={styles.textBold}>{textButton}</Text>
             </TouchableOpacity>
           </View>
         </View>

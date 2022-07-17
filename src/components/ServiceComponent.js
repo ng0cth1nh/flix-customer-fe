@@ -26,7 +26,7 @@ const ServiceComponent = ({
         height: height * 0.152,
         marginHorizontal: '4%',
       }}>
-      <Image source={{uri: data.imageUrl}} style={styles.image} />
+      <Image source={{uri: data.image}} style={styles.image} />
       <View style={{alignSelf: 'center'}}>
         <Text style={{fontWeight: 'bold', fontSize: 20, color: 'black'}}>
           {data.serviceName}

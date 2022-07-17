@@ -72,6 +72,61 @@ export const cancelRequest = createAsyncThunk(
   },
 );
 
+export const confirmInvoice = createAsyncThunk(
+  'request/confirmInvoice',
+  async ({customerAPI, body}, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.post(
+        ApiConstants.CONFIRM_INVOICE_API,
+        JSON.stringify(body),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const fetchFixedService = createAsyncThunk(
+  'request/fetchFixedService',
+  async ({customerAPI, requestCode}, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.get(
+        ApiConstants.GET_FIXED_SERVICE_OF_REQUEST_API,
+        {
+          params: {requestCode},
+        },
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const fetchRequestDetail = createAsyncThunk(
+  'request/fetchRequestDetail',
+  async ({customerAPI, requestCode}, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.get(
+        ApiConstants.GET_REQUEST_DETAIL_API,
+        {
+          params: {requestCode},
+        },
+      );
+
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
 export const requestSlice = createSlice({
   name: 'request',
   initialState,
@@ -127,6 +182,30 @@ export const requestSlice = createSlice({
       state.errorMessage = action.payload;
     });
 
+    builder.addCase(fetchFixedService.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(fetchFixedService.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+
+    builder.addCase(confirmInvoice.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(confirmInvoice.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+
+    builder.addCase(fetchRequestDetail.fulfilled, (state, action) => {
+      state.errorMessage = null;
+    });
+    builder.addCase(fetchRequestDetail.rejected, (state, action) => {
+      state.errorMessage = action.payload;
+    });
     // builder.addCase(cancelRequest.pending, state => {
     //   state.isLoading = true;
     // });

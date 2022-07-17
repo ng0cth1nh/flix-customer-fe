@@ -19,7 +19,9 @@ import {
   onValue,
   push,
 } from '../../../firebase/firebase';
-import React, {useEffect, useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState, useContext} from 'react';
+import {Context as AuthContext} from '../../context/AuthContext';
 import ImagePicker from 'react-native-image-crop-picker';
 const {height, width} = Dimensions.get('window');
 import {getStatusBarHeight} from 'react-native-status-bar-height';
@@ -71,7 +73,10 @@ let data = [
     isRead: false,
   },
 ];
-const ChatScreen = ({navigation}) => {
+const ChatScreen = ({route, navigation}) => {
+  const {state} = useContext(AuthContext);
+  console.log(state.userId);
+  // const targetId = route.params.targetId;
   const [textMessage, setTextMessage] = useState('');
   const [fileSelect, setFileSelect] = useState(null);
   let thisUser = 2;
@@ -204,13 +209,13 @@ const ChatScreen = ({navigation}) => {
     //   [data[0].senderId]: false,
     //   [data[0].receiverId]: true,
     // });
-    const postListRef = firebaseDatabaseRef(firebaseDatabase, 'members');
-    const newPostRef = push(postListRef);
-    firebaseSet(newPostRef, {
-      one: 'one',
-      two: 'two',
-    });
-    console.log(newPostRef.key);
+    // const postListRef = firebaseDatabaseRef(firebaseDatabase, 'members');
+    // const newPostRef = push(postListRef);
+    // firebaseSet(newPostRef, {
+    //   one: 'one',
+    //   two: 'two',
+    // });
+    // console.log(newPostRef.key);
   }, []);
   const renderItem = ({item}) => {
     let messTime = moment(item.timestamp);

@@ -24,19 +24,22 @@ const DoneScreen = ({navigation}) => {
     })();
   }, []);
 
-  const handelNavigationToListPrice = service => {
-    navigation.push('ServicePriceScreen', {
-      serviceName: service.serviceName,
-      serviceId: 1,
+  const handleGetInvoiceButton = async service => {
+    navigation.push('InvoiceScreen', {
+      service,
+      isShowConfirm: false,
     });
   };
 
-  const handelNavigationToDetailRequest = requestCode => {
+  const handleNavigationToDetailRequest = requestCode => {
     navigation.push('RequestDetailScreen', {
       requestCode,
+      isFetchFixedService: true,
+      isShowSubmitButton: false,
+      submitButtonText: 'Hủy yêu cầu',
+      typeSubmitButtonClick: 'CANCEL_REQUEST',
     });
   };
-
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       {isLoading ? (
@@ -77,10 +80,12 @@ const DoneScreen = ({navigation}) => {
           }
           renderItem={({item, index}) => (
             <RequestItem
-              handelNavigationToListPrice={handelNavigationToListPrice}
-              handelNavigationToDetailRequest={handelNavigationToDetailRequest}
+              handleButtonPress={handleGetInvoiceButton}
+              handleNavigationToDetailRequest={handleNavigationToDetailRequest}
               item={item}
               index={index}
+              textButton="Xem hóa đơn"
+              text="Phí dịch vụ kiểm tra"
             />
           )}
         />
