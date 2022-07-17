@@ -94,7 +94,7 @@ const RequestForm = function ({
                     {data.repairerAddress}
                   </Text>
                   <TouchableOpacity
-                    style={[styles.viewServiceButton, {width: '60%'}]}>
+                    style={[styles.viewServiceButton, {width: '40%'}]}>
                     <Text style={[styles.textBold, {textAlign: 'center'}]}>
                       Nhắn tin
                     </Text>
@@ -462,16 +462,19 @@ const RequestForm = function ({
               <Image
                 source={require('../../assets/images/type/info.png')}
                 style={{
-                  height: 22,
-                  width: 22,
+                  height: 20,
+                  width: 20,
                 }}
               />
               <Text style={styles.tittleText}>Mã yêu cầu</Text>
               <TouchableOpacity
-                style={{marginLeft: 'auto', marginBottom: 3}}
+                style={[
+                  {marginLeft: 'auto', marginBottom: 3},
+                  styles.viewServiceButton,
+                ]}
                 onPress={copyToClipboard}>
                 <Text
-                  style={{color: '#FEC54B', fontSize: 16, fontWeight: 'bold'}}>
+                  style={{color: 'black', fontSize: 14, fontWeight: 'bold'}}>
                   {data.requestCode}
                 </Text>
               </TouchableOpacity>
@@ -482,10 +485,10 @@ const RequestForm = function ({
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <Text style={{color: 'black', fontSize: 16, marginLeft: 40}}>
-                Thời gian
+              <Text style={{color: 'black', fontSize: 14, marginLeft: 40}}>
+                Thời gian tạo
               </Text>
-              <Text style={{marginLeft: 'auto'}}>
+              <Text style={{marginLeft: 'auto', fontSize: 12}}>
                 {moment(data.date).format('HH:mm - DD/MM/YYYY')}
               </Text>
             </View>
@@ -560,7 +563,9 @@ const RequestForm = function ({
             </Text>
           </View>
           <View style={styles.serviceRow}>
-            <Text style={styles.textBold}>TỔNG THANH TOÁN (dự kiến)</Text>
+            <Text style={styles.textBold}>
+              TỔNG THANH TOÁN{fixedService ? '' : ' (dự kiến)'}
+            </Text>
             <Text style={styles.servicePrice}>
               {isNaN(data.actualPrice)
                 ? `${numberWithCommas(data.price * 1.05)} vnđ`
@@ -627,16 +632,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    width: 'auto',
     borderRadius: 10,
     backgroundColor: '#FEC54B',
+    paddingHorizontal: 6,
   },
   textBold: {
     fontWeight: '600',
     color: 'black',
     fontSize: 14,
-    marginRight: 8,
   },
   datePicker: {
     flexDirection: 'row',

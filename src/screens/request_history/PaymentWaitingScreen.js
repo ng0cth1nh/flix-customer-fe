@@ -8,6 +8,7 @@ import {
   fetchRequests,
   selectRequests,
   selectIsLoading,
+  setIsLoading,
 } from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 
@@ -18,13 +19,13 @@ const PaymentWaitingScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
 
-  useEffect(() => {
-    (async () => {
-      await dispatch(
-        fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
-      );
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     await dispatch(
+  //       fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
+  //     );
+  //   })();
+  // }, []);
 
   const handleGetInvoiceButton = async service => {
     navigation.push('InvoiceScreen', {
@@ -72,14 +73,48 @@ const PaymentWaitingScreen = ({navigation}) => {
             <RefreshControl
               refreshing={refreshControl}
               onRefresh={async () => {
-                setRefreshControl(true);
-                await dispatch(
-                  fetchRequests({
-                    customerAPI,
-                    status: RequestStatus.PAYMENT_WAITING,
-                  }),
-                );
-                setRefreshControl(false);
+                try {
+                  setRefreshControl(true);
+                  await dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PAYMENT_WAITING,
+                    }),
+                  );
+                  await setIsLoading(true);
+                  dispatch(
+                    fetchRequests({customerAPI, status: RequestStatus.DONE}),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.APPROVED,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PENDING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.FIXING,
+                    }),
+                  );
+
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.CANCELLED,
+                    }),
+                  );
+                } catch (err) {
+                  console.log(err);
+                } finally {
+                  setRefreshControl(false);
+                }
               }}
               colors={['#FEC54B']}
             />
@@ -92,6 +127,7 @@ const PaymentWaitingScreen = ({navigation}) => {
               index={index}
               textButton="Xem hóa đơn"
               text="Phí dịch vụ kiểm tra"
+              isFixed={true}
             />
           )}
         />

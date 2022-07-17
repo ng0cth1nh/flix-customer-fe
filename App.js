@@ -39,12 +39,12 @@ import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 import PickVoucherCodeScreen from './src/screens/voucher/PickVoucherCodeScreen';
 import {Provider} from 'react-redux';
 import InvoiceScreen from './src/screens/request/InvoiceScreen';
-import ChooseBankScreen from './src/screens/request/ChooseBankScreen';
 import {
   requestUserPermission,
   notificationListener,
 } from './src/notification/PushNotification';
 import {store} from './src/features/store';
+import linking from './global/Linking';
 const {width} = Dimensions.get('window');
 
 const toastConfig = {
@@ -191,7 +191,6 @@ function App() {
           component={RequestDetailScreen}
         />
         <Stack.Screen name="InvoiceScreen" component={InvoiceScreen} />
-        <Stack.Screen name="ChooseBankScreen" component={ChooseBankScreen} />
       </Stack.Navigator>
     );
   }
@@ -248,7 +247,7 @@ function App() {
   ) : (
     <>
       <Provider store={store}>
-        <NavigationContainer ref={navigationRef}>
+        <NavigationContainer ref={navigationRef} linking={linking}>
           <Tab.Navigator
             tabBarOptions={{
               showLabel: false,

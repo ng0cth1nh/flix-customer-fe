@@ -16,7 +16,7 @@ export default function RequestItem({
   handleNavigationToDetailRequest,
   handleButtonPress,
   textButton,
-  text,
+  isFixed,
 }) {
   return (
     <TouchableOpacity
@@ -83,7 +83,9 @@ export default function RequestItem({
       </View>
 
       <View style={styles.serviceRow}>
-        <Text style={styles.textBold}>TỔNG THANH TOÁN (dự kiến)</Text>
+        <Text style={styles.textBold}>
+          TỔNG THANH TOÁN{!isFixed ? ' (dự kiến)' : ''}
+        </Text>
         <Text style={styles.servicePrice}>{`${numberWithCommas(
           item.actualPrice,
         )} vnđ`}</Text>
@@ -135,17 +137,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    width: 'auto',
     borderRadius: 10,
     backgroundColor: '#FEC54B',
-    marginLeft: 'auto',
+    paddingHorizontal: 6,
   },
   textBold: {
     fontWeight: '600',
     color: 'black',
-    fontSize: 14,
-    marginRight: 8,
+    fontSize: 13,
   },
   serviceRow: {
     flexDirection: 'row',
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
   },
   servicePrice: {
     marginLeft: 'auto',
-    color: '#E67F1E',
+    color: 'black',
     fontWeight: '600',
   },
 });

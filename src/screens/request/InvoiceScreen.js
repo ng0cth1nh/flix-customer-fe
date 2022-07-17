@@ -10,6 +10,7 @@ import {
   Dimensions,
   FlatList,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import moment from 'moment';
 import {RadioButton} from 'react-native-paper';
@@ -23,6 +24,7 @@ import {
   selectIsLoading,
   fetchFixedService,
   confirmPayment,
+  confirmInvoice,
 } from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
@@ -31,7 +33,6 @@ import NotFound from '../../components/NotFound';
 import useFetchData from '../../hooks/useFetchData';
 import ProgressLoader from 'rn-progress-loader';
 import {useSelector, useDispatch} from 'react-redux';
-import {RequestStatus} from '../../utils/util';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import {numberWithCommas} from '../../utils/util';
 
@@ -42,13 +43,32 @@ const InvoiceScreen = ({route, navigation}) => {
   const customerAPI = useAxios();
   const [fixedService, setFixedService] = useState(null);
   const dispatch = useDispatch();
-  const renderServiceItem = ({item}) => {
+  const renderServiceItem = ({item, index}) => {
     return (
-      <View style={[styles.serviceRow, {paddingHorizontal: 10}]}>
-        <Text style={styles.serviceName}>{item.name}</Text>
-        <Text style={[styles.textBold, {marginLeft: 'auto', fontSize: 12}]}>
-          {`${numberWithCommas(item.price)} vnđ`}
+      <View
+        key={index.toString()}
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          width: '96%',
+          alignSelf: 'center',
+          marginVertical: 6,
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            color: 'black',
+            flex: 12,
+          }}>
+          {item.name}
         </Text>
+        <Text
+          style={{
+            color: 'black',
+            fontWeight: 'bold',
+            flex: 5,
+            textAlign: 'right',
+          }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
       </View>
     );
   };
@@ -80,35 +100,26 @@ const InvoiceScreen = ({route, navigation}) => {
   }, []);
 
   const handleConfirmPayment = async () => {
-    // try {
-    //   await dispatch(setIsLoading());
-    //   await dispatch(
-    //     confirmPayment({
-    //       customerAPI,
-    //       body: {requestCode: service.requestCode},
-    //     }),
-    //   ).unwrap();
-    //   Toast.show({
-    //     type: 'customToast',
-    //     text1: 'Xác nhận thanh toán thành công',
-    //   });
-    //   dispatch(
-    //     fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
-    //   ).unwrap();
-    //   navigation.goBack();
-    //   dispatch(
-    //     fetchRequests({customerAPI, status: RequestStatus.DONE}),
-    //   ).unwrap();
-    // } catch (err) {
-    //   Toast.show({
-    //     type: 'customErrorToast',
-    //     text1: err,
-    //   });
-    // }
-    navigation.push('ChooseBankScreen', {
-      requestCode: data.requestCode,
-      orderInfo: `${data.customerName} - ${data.customerPhone} thanh toan ${data.actualPrice} cho ${data.requestCode}`,
-    });
+    try {
+      await dispatch(setIsLoading());
+      let response = await dispatch(
+        confirmInvoice({
+          customerAPI,
+          body: {
+            requestCode: data.requestCode,
+            orderInfo: `${data.customerName} - ${data.customerPhone} thanh toan ${data.actualPrice} cho ${data.requestCode}`,
+            bankCode: 'NCB',
+          },
+        }),
+      ).unwrap();
+      console.log('response.data: ' + response.data);
+      await Linking.openURL(response.data);
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
   };
 
   const {loading, data, isError} = useFetchData(ApiConstants.GET_INVOICE_API, {
@@ -269,7 +280,10 @@ const InvoiceScreen = ({route, navigation}) => {
                 <>
                   {fixedService.subServices !== null &&
                   fixedService.subServices.length !== 0 ? (
-                    <View style={{marginTop: 15}}>
+                    <View
+                      style={{
+                        marginTop: 16,
+                      }}>
                       <Text style={[styles.textBold, {fontSize: 18}]}>
                         Dịch vụ đã sửa chi tiết
                       </Text>
@@ -278,7 +292,15 @@ const InvoiceScreen = ({route, navigation}) => {
                         renderItem={renderServiceItem}
                         keyExtractor={item => item.id}
                       />
-                      <View style={[styles.serviceRow, {marginLeft: 10}]}>
+                      <View
+                        style={[
+                          styles.serviceRow,
+                          {
+                            width: '96%',
+                            alignSelf: 'center',
+                            justifyContent: 'space-around',
+                          },
+                        ]}>
                         <Text style={styles.textBold}>Tổng</Text>
                         <Text style={styles.servicePrice}>{`${numberWithCommas(
                           data.totalSubServicePrice,
@@ -288,7 +310,7 @@ const InvoiceScreen = ({route, navigation}) => {
                   ) : null}
                   {fixedService.accessories !== null &&
                   fixedService.accessories.length !== 0 ? (
-                    <View style={{marginTop: 15}}>
+                    <View style={{marginTop: 16}}>
                       <Text style={[styles.textBold, {fontSize: 18}]}>
                         Linh kiện đã thay
                       </Text>
@@ -297,7 +319,15 @@ const InvoiceScreen = ({route, navigation}) => {
                         renderItem={renderServiceItem}
                         keyExtractor={item => item.id}
                       />
-                      <View style={[styles.serviceRow, {marginLeft: 10}]}>
+                      <View
+                        style={[
+                          styles.serviceRow,
+                          {
+                            width: '96%',
+                            alignSelf: 'center',
+                            justifyContent: 'space-around',
+                          },
+                        ]}>
                         <Text style={styles.textBold}>Tổng</Text>
                         <Text style={styles.servicePrice}>{`${numberWithCommas(
                           data.totalAccessoryPrice,
@@ -307,7 +337,7 @@ const InvoiceScreen = ({route, navigation}) => {
                   ) : null}
                   {fixedService.extraServices !== null &&
                   fixedService.extraServices.length !== 0 ? (
-                    <View style={{marginTop: 15}}>
+                    <View style={{marginTop: 16}}>
                       <Text style={[styles.textBold, {fontSize: 18}]}>
                         Dịch vụ bên ngoài
                       </Text>
@@ -316,7 +346,15 @@ const InvoiceScreen = ({route, navigation}) => {
                         renderItem={renderServiceItem}
                         keyExtractor={item => item.id}
                       />
-                      <View style={[styles.serviceRow, {marginLeft: 10}]}>
+                      <View
+                        style={[
+                          styles.serviceRow,
+                          {
+                            width: '96%',
+                            alignSelf: 'center',
+                            justifyContent: 'space-around',
+                          },
+                        ]}>
                         <Text style={styles.textBold}>Tổng</Text>
                         <Text style={styles.servicePrice}>{`${numberWithCommas(
                           data.totalExtraServicePrice,
@@ -433,10 +471,10 @@ const InvoiceScreen = ({route, navigation}) => {
                   alignItems: 'center',
                   marginBottom: 5,
                 }}>
-                <Text style={{color: 'black', fontSize: 16, marginLeft: 40}}>
+                <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
                   Thời gian tạo
                 </Text>
-                <Text style={{marginLeft: 'auto'}}>
+                <Text style={{marginLeft: 'auto', fontSize: 12}}>
                   {moment(data.createdAt).format('HH:mm - DD/MM/YYYY')}
                 </Text>
               </View>
@@ -445,10 +483,10 @@ const InvoiceScreen = ({route, navigation}) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}>
-                <Text style={{color: 'black', fontSize: 16, marginLeft: 40}}>
+                <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
                   Thời gian xác nhận
                 </Text>
-                <Text style={{marginLeft: 'auto'}}>
+                <Text style={{marginLeft: 'auto', fontSize: 12}}>
                   {moment(data.approvedTime).format('HH:mm - DD/MM/YYYY')}
                 </Text>
               </View>
@@ -617,7 +655,7 @@ const styles = StyleSheet.create({
   },
   servicePrice: {
     marginLeft: 'auto',
-    color: '#E67F1E',
+    color: 'black',
     fontWeight: '600',
   },
 });
