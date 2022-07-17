@@ -453,14 +453,13 @@ const InvoiceScreen = ({route, navigation}) => {
                 />
                 <Text style={styles.tittleText}>Mã yêu cầu</Text>
                 <TouchableOpacity
-                  style={{marginLeft: 'auto', marginBottom: 3}}
+                  style={[
+                    {marginLeft: 'auto', marginBottom: 3},
+                    styles.viewServiceButton,
+                  ]}
                   onPress={copyToClipboard}>
                   <Text
-                    style={{
-                      color: '#FEC54B',
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                    }}>
+                    style={{color: 'black', fontSize: 14, fontWeight: 'bold'}}>
                     {data.requestCode}
                   </Text>
                 </TouchableOpacity>
@@ -493,7 +492,7 @@ const InvoiceScreen = ({route, navigation}) => {
             </View>
             <View
               style={{
-                paddingHorizontal: 10,
+                marginHorizontal: 10,
                 paddingBottom: 10,
                 borderBottomWidth: 1,
                 borderBottomColor: '#CACACA',
@@ -627,14 +626,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    width: 'auto',
     borderRadius: 10,
     backgroundColor: '#FEC54B',
+    paddingHorizontal: 6,
   },
   textBold: {
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: 'black',
+    fontSize: 14,
   },
   datePicker: {
     flexDirection: 'row',
@@ -648,6 +649,7 @@ const styles = StyleSheet.create({
   },
   serviceRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 8,
   },
   serviceName: {
