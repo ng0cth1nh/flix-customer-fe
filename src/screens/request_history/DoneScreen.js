@@ -27,8 +27,10 @@ const DoneScreen = ({navigation}) => {
 
   const handleGetInvoiceButton = async service => {
     navigation.push('InvoiceScreen', {
-      service,
+      requestCode: service.requestCode,
       isShowConfirm: false,
+      vnp_TxnRef: null,
+      vnp_ResponseCode: null,
     });
   };
 

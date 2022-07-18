@@ -29,7 +29,7 @@ const PaymentWaitingScreen = ({navigation}) => {
 
   const handleGetInvoiceButton = async service => {
     navigation.push('InvoiceScreen', {
-      service,
+      requestCode: service.requestCode,
       isShowConfirm: true,
     });
   };

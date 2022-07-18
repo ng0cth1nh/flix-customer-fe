@@ -485,7 +485,7 @@ const RequestForm = function ({
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <Text style={{color: 'black', fontSize: 14, marginLeft: 40}}>
+              <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
                 Thời gian tạo
               </Text>
               <Text style={{marginLeft: 'auto', fontSize: 12}}>

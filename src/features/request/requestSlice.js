@@ -92,6 +92,25 @@ export const confirmInvoice = createAsyncThunk(
   },
 );
 
+export const rateRepairer = createAsyncThunk(
+  'request/rateRepairer',
+  async ({customerAPI, body}, {rejectWithValue}) => {
+    try {
+      await customerAPI.post(
+        ApiConstants.CREATE_COMMENT_API,
+        JSON.stringify(body),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
 export const fetchFixedService = createAsyncThunk(
   'request/fetchFixedService',
   async ({customerAPI, requestCode}, {rejectWithValue}) => {
@@ -196,6 +215,15 @@ export const requestSlice = createSlice({
       state.errorMessage = null;
     });
     builder.addCase(confirmInvoice.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+
+    builder.addCase(rateRepairer.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(rateRepairer.rejected, (state, action) => {
       state.isLoading = false;
       state.errorMessage = action.payload;
     });

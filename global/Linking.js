@@ -2,10 +2,8 @@ const config = {
   screens: {
     RequestHistoryStackScreen: {
       screens: {
-        RequestHistoryScreen: {
-          screens: {
-            DoneScreen: 'done',
-          },
+        InvoiceScreen: {
+          path: 'invoice',
         },
       },
     },

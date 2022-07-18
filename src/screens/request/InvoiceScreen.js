@@ -23,7 +23,6 @@ import {
   setIsLoading,
   selectIsLoading,
   fetchFixedService,
-  confirmPayment,
   confirmInvoice,
 } from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
@@ -35,9 +34,15 @@ import ProgressLoader from 'rn-progress-loader';
 import {useSelector, useDispatch} from 'react-redux';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import {numberWithCommas} from '../../utils/util';
-
+import {VnPayCode} from '../../constants/Error';
+import {RequestStatus} from '../../utils/util';
 const InvoiceScreen = ({route, navigation}) => {
-  const {service, isShowConfirm} = route.params;
+  const {isShowConfirm, vnp_ResponseCode, requestCode, vnp_TxnRef} =
+    route.params;
+  console.log('requestCode: ', requestCode);
+  console.log('vnp_TxnRef: ', vnp_TxnRef);
+  console.log('vnp_ResponseCode: ', vnp_ResponseCode);
+
   const isLoading = useSelector(selectIsLoading);
   const [isLoad, setIsLoad] = useState(false);
   const customerAPI = useAxios();
@@ -87,7 +92,7 @@ const InvoiceScreen = ({route, navigation}) => {
         let data = await dispatch(
           fetchFixedService({
             customerAPI,
-            requestCode: service.requestCode,
+            requestCode: requestCode ? requestCode : vnp_TxnRef,
           }),
         ).unwrap();
         setFixedService(data);
@@ -97,6 +102,24 @@ const InvoiceScreen = ({route, navigation}) => {
         await setIsLoad(false);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    if (vnp_ResponseCode && vnp_ResponseCode === '00') {
+      Toast.show({
+        type: 'customToast',
+        text1: VnPayCode.get(vnp_ResponseCode),
+      });
+      dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
+      );
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
+    } else if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: VnPayCode.get(vnp_ResponseCode),
+      });
+    }
   }, []);
 
   const handleConfirmPayment = async () => {
@@ -122,8 +145,14 @@ const InvoiceScreen = ({route, navigation}) => {
     }
   };
 
+  const handleRatingRepairer = async () => {
+    navigation.push('CommentScreen', {
+      data,
+    });
+  };
+
   const {loading, data, isError} = useFetchData(ApiConstants.GET_INVOICE_API, {
-    params: {requestCode: service.requestCode},
+    params: {requestCode},
   });
 
   return (
@@ -167,6 +196,56 @@ const InvoiceScreen = ({route, navigation}) => {
                   borderBottomColor: '#CACACA',
                   paddingBottom: 10,
                 }}>
+                <View style={styles.boxHeader}>
+                  <Image
+                    source={require('../../../assets/images/type/info.png')}
+                    style={{
+                      height: 20,
+                      width: 20,
+                    }}
+                  />
+                  <Text style={styles.tittleText}>Mã yêu cầu</Text>
+                  <TouchableOpacity
+                    style={[
+                      {marginLeft: 'auto', marginBottom: 3},
+                      styles.viewServiceButton,
+                    ]}
+                    onPress={copyToClipboard}>
+                    <Text
+                      style={{
+                        color: 'black',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {data.requestCode}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 5,
+                  }}>
+                  <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
+                    Thời gian tạo
+                  </Text>
+                  <Text style={{marginLeft: 'auto', fontSize: 12}}>
+                    {moment(data.createdAt).format('HH:mm - DD/MM/YYYY')}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
+                    Thời gian xác nhận
+                  </Text>
+                  <Text style={{marginLeft: 'auto', fontSize: 12}}>
+                    {moment(data.approvedTime).format('HH:mm - DD/MM/YYYY')}
+                  </Text>
+                </View>
                 <View style={styles.boxHeader}>
                   <Image
                     source={require('../../../assets/images/type/user.png')}
@@ -243,7 +322,7 @@ const InvoiceScreen = ({route, navigation}) => {
                 </View>
                 <View style={styles.boxBody}>
                   <Image
-                    source={{uri: service.image}}
+                    source={{uri: data.serviceImage}}
                     style={{
                       height: height * 0.12,
                       width: height * 0.111,
@@ -254,7 +333,7 @@ const InvoiceScreen = ({route, navigation}) => {
                   />
                   <View style={styles.boxBodyContent}>
                     <Text style={[styles.textBold, {fontSize: 24}]}>
-                      {service.serviceName}
+                      {data.serviceName}
                     </Text>
                     <Text
                       style={{fontSize: 16, color: 'black', marginVertical: 6}}>
@@ -443,52 +522,6 @@ const InvoiceScreen = ({route, navigation}) => {
                     : data.paymentMethod}
                 </Text>
               </View>
-              <View style={styles.boxHeader}>
-                <Image
-                  source={require('../../../assets/images/type/info.png')}
-                  style={{
-                    height: 20,
-                    width: 20,
-                  }}
-                />
-                <Text style={styles.tittleText}>Mã yêu cầu</Text>
-                <TouchableOpacity
-                  style={[
-                    {marginLeft: 'auto', marginBottom: 3},
-                    styles.viewServiceButton,
-                  ]}
-                  onPress={copyToClipboard}>
-                  <Text
-                    style={{color: 'black', fontSize: 14, fontWeight: 'bold'}}>
-                    {data.requestCode}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 5,
-                }}>
-                <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
-                  Thời gian tạo
-                </Text>
-                <Text style={{marginLeft: 'auto', fontSize: 12}}>
-                  {moment(data.createdAt).format('HH:mm - DD/MM/YYYY')}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
-                  Thời gian xác nhận
-                </Text>
-                <Text style={{marginLeft: 'auto', fontSize: 12}}>
-                  {moment(data.approvedTime).format('HH:mm - DD/MM/YYYY')}
-                </Text>
-              </View>
             </View>
             <View
               style={{
@@ -556,7 +589,8 @@ const InvoiceScreen = ({route, navigation}) => {
               </View>
             </View>
           </ScrollView>
-          {isShowConfirm && data.paymentMethod !== 'CASH' ? (
+          {(isShowConfirm && data.paymentMethod !== 'CASH') ||
+          (vnp_ResponseCode && vnp_ResponseCode !== '00') ? (
             <Button
               style={{
                 marginVertical: 8,
@@ -565,6 +599,17 @@ const InvoiceScreen = ({route, navigation}) => {
               }}
               onPress={handleConfirmPayment}
               buttonText="Xác nhận và thanh toán"
+            />
+          ) : null}
+          {!data.isRated && data.status === 'DONE' ? (
+            <Button
+              style={{
+                marginVertical: 8,
+                width: '100%',
+                alignSelf: 'center',
+              }}
+              onPress={handleRatingRepairer}
+              buttonText="Đánh giá thợ"
             />
           ) : null}
         </SafeAreaView>
