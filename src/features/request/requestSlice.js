@@ -128,6 +128,20 @@ export const fetchFixedService = createAsyncThunk(
   },
 );
 
+export const fetchInvoice = createAsyncThunk(
+  'request/fetchInvoice',
+  async ({customerAPI, requestCode}, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.get(ApiConstants.GET_INVOICE_API, {
+        params: {requestCode},
+      });
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
 export const fetchRequestDetail = createAsyncThunk(
   'request/fetchRequestDetail',
   async ({customerAPI, requestCode}, {rejectWithValue}) => {
@@ -202,11 +216,15 @@ export const requestSlice = createSlice({
     });
 
     builder.addCase(fetchFixedService.fulfilled, (state, action) => {
-      state.isLoading = false;
       state.errorMessage = null;
     });
     builder.addCase(fetchFixedService.rejected, (state, action) => {
-      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(fetchInvoice.fulfilled, (state, action) => {
+      state.errorMessage = null;
+    });
+    builder.addCase(fetchInvoice.rejected, (state, action) => {
       state.errorMessage = action.payload;
     });
 

@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {
   Text,
   View,
@@ -24,12 +25,11 @@ import {
   selectIsLoading,
   fetchFixedService,
   confirmInvoice,
+  fetchInvoice,
 } from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
-import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
-import useFetchData from '../../hooks/useFetchData';
 import ProgressLoader from 'rn-progress-loader';
 import {useSelector, useDispatch} from 'react-redux';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
@@ -39,15 +39,16 @@ import {RequestStatus} from '../../utils/util';
 const InvoiceScreen = ({route, navigation}) => {
   const {isShowConfirm, vnp_ResponseCode, requestCode, vnp_TxnRef} =
     route.params;
-  console.log('requestCode: ', requestCode);
-  console.log('vnp_TxnRef: ', vnp_TxnRef);
   console.log('vnp_ResponseCode: ', vnp_ResponseCode);
-
+  console.log('vnp_TxnRef: ', vnp_TxnRef);
   const isLoading = useSelector(selectIsLoading);
   const [isLoad, setIsLoad] = useState(false);
   const customerAPI = useAxios();
   const [fixedService, setFixedService] = useState(null);
   const dispatch = useDispatch();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const renderServiceItem = ({item, index}) => {
     return (
       <View
@@ -85,42 +86,38 @@ const InvoiceScreen = ({route, navigation}) => {
     });
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await setIsLoad(true);
-        let data = await dispatch(
-          fetchFixedService({
-            customerAPI,
-            requestCode: requestCode ? requestCode : vnp_TxnRef,
-          }),
-        ).unwrap();
-        setFixedService(data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        await setIsLoad(false);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (vnp_ResponseCode && vnp_ResponseCode === '00') {
-      Toast.show({
-        type: 'customToast',
-        text1: VnPayCode.get(vnp_ResponseCode),
-      });
-      dispatch(
-        fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
-      );
-      dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
-    } else if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
-      Toast.show({
-        type: 'customErrorToast',
-        text1: VnPayCode.get(vnp_ResponseCode),
-      });
-    }
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        if (vnp_ResponseCode && vnp_TxnRef) {
+          console.log(
+            'FOCUS - vnp_ResponseCode - vnp_TxnRef: ',
+            vnp_ResponseCode,
+            vnp_TxnRef,
+          );
+          if (vnp_ResponseCode && vnp_ResponseCode === '00') {
+            //await loadData();
+            Toast.show({
+              type: 'customToast',
+              text1: VnPayCode.get(vnp_ResponseCode),
+            });
+            dispatch(
+              fetchRequests({
+                customerAPI,
+                status: RequestStatus.PAYMENT_WAITING,
+              }),
+            );
+            dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
+          } else if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
+            Toast.show({
+              type: 'customErrorToast',
+              text1: VnPayCode.get(vnp_ResponseCode),
+            });
+          }
+        }
+      })();
+    }, [vnp_ResponseCode, vnp_TxnRef]),
+  );
 
   const handleConfirmPayment = async () => {
     try {
@@ -151,9 +148,35 @@ const InvoiceScreen = ({route, navigation}) => {
     });
   };
 
-  const {loading, data, isError} = useFetchData(ApiConstants.GET_INVOICE_API, {
-    params: {requestCode},
-  });
+  const loadData = async () => {
+    try {
+      await setLoading(true);
+      let fixedService = await dispatch(
+        fetchFixedService({
+          customerAPI,
+          requestCode: requestCode ? requestCode : vnp_TxnRef,
+        }),
+      ).unwrap();
+      setFixedService(fixedService);
+      let data = await dispatch(
+        fetchInvoice({
+          customerAPI,
+          requestCode: requestCode ? requestCode : vnp_TxnRef,
+        }),
+      ).unwrap();
+      setData(data);
+    } catch (err) {
+      setIsError(true);
+    } finally {
+      await setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      await loadData();
+    })();
+  }, []);
 
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -589,27 +612,33 @@ const InvoiceScreen = ({route, navigation}) => {
               </View>
             </View>
           </ScrollView>
-          {(isShowConfirm && data.paymentMethod !== 'CASH') ||
-          (vnp_ResponseCode && vnp_ResponseCode !== '00') ? (
+          {(data.paymentMethod !== 'CASH' && data.status !== 'DONE') ||
+          (!data.isCustomerCommented && data.status === 'DONE') ||
+          vnp_ResponseCode ? (
             <Button
               style={{
                 marginVertical: 8,
                 width: '100%',
                 alignSelf: 'center',
               }}
-              onPress={handleConfirmPayment}
-              buttonText="Xác nhận và thanh toán"
-            />
-          ) : null}
-          {!data.isRated && data.status === 'DONE' ? (
-            <Button
-              style={{
-                marginVertical: 8,
-                width: '100%',
-                alignSelf: 'center',
-              }}
-              onPress={handleRatingRepairer}
-              buttonText="Đánh giá thợ"
+              onPress={
+                (vnp_ResponseCode && vnp_ResponseCode === '00') ||
+                (!data.isCustomerCommented && data.status === 'DONE')
+                  ? handleRatingRepairer
+                  : (vnp_ResponseCode && vnp_ResponseCode !== '00') ||
+                    (data.paymentMethod !== 'CASH' && data.status !== 'DONE')
+                  ? handleConfirmPayment
+                  : null
+              }
+              buttonText={
+                (vnp_ResponseCode && vnp_ResponseCode === '00') ||
+                (!data.isCustomerCommented && data.status === 'DONE')
+                  ? 'Đánh giá thợ'
+                  : (vnp_ResponseCode && vnp_ResponseCode !== '00') ||
+                    (data.paymentMethod !== 'CASH' && data.status !== 'DONE')
+                  ? 'Xác nhận và thanh toán'
+                  : null
+              }
             />
           ) : null}
         </SafeAreaView>

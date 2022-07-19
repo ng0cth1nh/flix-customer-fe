@@ -31,6 +31,8 @@ const PaymentWaitingScreen = ({navigation}) => {
     navigation.push('InvoiceScreen', {
       requestCode: service.requestCode,
       isShowConfirm: true,
+      vnp_TxnRef: null,
+      vnp_ResponseCode: null,
     });
   };
 

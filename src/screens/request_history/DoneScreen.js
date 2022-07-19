@@ -19,12 +19,6 @@ const DoneScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
-  // useEffect(() => {
-  //   (async () => {
-  //     await dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
-  //   })();
-  // }, []);
-
   const handleGetInvoiceButton = async service => {
     navigation.push('InvoiceScreen', {
       requestCode: service.requestCode,

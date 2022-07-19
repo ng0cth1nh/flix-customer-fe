@@ -10,6 +10,14 @@ const TopHeaderComponent = ({
   isBackButton,
   statusBarColor,
 }) => {
+  const handleGoBack = () => {
+    navigation.canGoBack()
+      ? navigation.goBack()
+      : navigation.navigate('RequestHistoryScreen', {
+          screen: 'DoneScreen',
+        });
+  };
+
   return (
     <View
       style={{
@@ -19,11 +27,7 @@ const TopHeaderComponent = ({
       }}>
       <StatusBar barStyle="dark-content" backgroundColor={statusBarColor} />
       {isBackButton ? (
-        <BackButton
-          onPressHandler={navigation.goBack}
-          color="black"
-          size={18}
-        />
+        <BackButton onPressHandler={handleGoBack} color="black" size={18} />
       ) : null}
       <Text style={styles.headerText}>{title}</Text>
     </View>
