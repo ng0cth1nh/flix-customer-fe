@@ -19,15 +19,6 @@ const PendingScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     await dispatch(setIsLoading());
-  //     await dispatch(
-  //       fetchRequests({customerAPI, status: RequestStatus.PENDING}),
-  //     );
-  //   })();
-  // }, []);
-
   const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,

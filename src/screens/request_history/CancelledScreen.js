@@ -30,14 +30,6 @@ const CancelledScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
-  // useEffect(() => {
-  //   (async () => {
-  //     // await dispatch(setLoading());
-  //     await dispatch(
-  //       fetchRequests({customerAPI, status: RequestStatus.CANCELLED}),
-  //     );
-  //   })();
-  // }, []);
 
   const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
@@ -49,7 +41,7 @@ const CancelledScreen = ({navigation}) => {
   const handleNavigationToDetailRequest = requestCode => {
     navigation.push('RequestDetailScreen', {
       requestCode,
-      isFetchFixedService: true,
+      isFetchFixedService: false,
       isShowSubmitButton: false,
       submitButtonText: 'Hủy yêu cầu',
       typeSubmitButtonClick: 'CANCEL_REQUEST',

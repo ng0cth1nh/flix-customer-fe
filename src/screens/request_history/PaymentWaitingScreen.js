@@ -19,13 +19,7 @@ const PaymentWaitingScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     await dispatch(
-  //       fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
-  //     );
-  //   })();
-  // }, []);
+
 
   const handleGetInvoiceButton = async service => {
     navigation.push('InvoiceScreen', {

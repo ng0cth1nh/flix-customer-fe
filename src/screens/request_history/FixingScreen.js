@@ -19,14 +19,7 @@ const FixingScreen = ({navigation}) => {
   const requests = useSelector(selectRequests);
 
   const [refreshControl, setRefreshControl] = useState(false);
-  // useEffect(() => {
-  //   (async () => {
-  //     await dispatch(
-  //       fetchRequests({customerAPI, status: RequestStatus.FIXING}),
-  //     );
-  //   })();
-  // }, []);
-
+ 
   const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,

@@ -19,13 +19,6 @@ const ApprovedScreen = ({navigation}) => {
   const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     await dispatch(
-  //       fetchRequests({customerAPI, status: RequestStatus.APPROVED}),
-  //     );
-  //   })();
-  // }, []);
 
   const handleNavigationToListPrice = async service => {
     navigation.push('ServicePriceScreen', {
