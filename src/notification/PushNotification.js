@@ -54,8 +54,7 @@ export const notificationListener = () => {
     PushNotification.localNotification({
       message: remoteMessage.notification.body,
       title: remoteMessage.notification.title,
-      bigPictureUrl: remoteMessage.notification.android.imageUrl,
-      smallIcon: remoteMessage.notification.android.imageUrl,
+      largeIconUrl: remoteMessage.notification.android.imageUrl,
     });
   });
 };

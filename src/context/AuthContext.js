@@ -169,6 +169,7 @@ const logout = dispatch => async () => {
   await AsyncStorage.removeItem('token');
   dispatch({type: 'logout'});
 };
+
 export const {Provider, Context} = createDataContext(
   authReducer,
   {

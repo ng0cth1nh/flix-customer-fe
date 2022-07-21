@@ -1,3 +1,10 @@
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+} from 'react';
 import {
   StyleSheet,
   StatusBar,
@@ -9,77 +16,266 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
-import {
-  firebaseDatabase,
-  firebaseSet,
-  firebaseDatabaseRef,
-  child,
-  get,
-  onValue,
-  push,
-} from '../../../firebase/firebase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect, useState, useContext} from 'react';
-import {Context as AuthContext} from '../../context/AuthContext';
-import ImagePicker from 'react-native-image-crop-picker';
-const {height, width} = Dimensions.get('window');
-import {getStatusBarHeight} from 'react-native-status-bar-height';
+import storage from '@react-native-firebase/storage';
 import moment from 'moment';
-import {getFileNameFromPath} from '../../utils/util';
+import uuid from 'react-native-uuid';
+import {useSelector} from 'react-redux';
+import {selectUser} from '../../features/user/userSlice';
+import {getStatusBarHeight} from 'react-native-status-bar-height';
+import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import firestore from '@react-native-firebase/firestore';
+const {height, width} = Dimensions.get('window');
+import {getFileNameFromPath} from '../../utils/util';
+import Loading from '../../components/Loading';
+import {firebase} from '@react-native-firebase/database';
+
+import {Context as AuthContext} from '../../context/AuthContext';
 
 import BackButton from '../../components/BackButton';
-let data = [
-  {
-    id: 1,
-    senderId: 1,
-    receiverId: 2,
-    senderUrl:
-      'https://znews-photo.zingcdn.me/w660/Uploaded/qfssu/2022_07_02/hinh_843.jpg',
-    receiverUrl:
-      'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/7/8/1065932/Hong-Dang-Khong-Len-.jpg',
-    content: 'Tây Ban Nha thế nào em?',
-    type: 'text',
-    timestamp: new Date('October 13, 2014 11:13:00'),
-    isRead: true,
-  },
-  {
-    id: 2,
-    senderId: 2,
-    receiverId: 1,
-    receiverUrl:
-      'https://znews-photo.zingcdn.me/w660/Uploaded/qfssu/2022_07_02/hinh_843.jpg',
-    senderUrl:
-      'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/7/8/1065932/Hong-Dang-Khong-Len-.jpg',
-    content: 'Hải sản đây tươi lắm anh.',
-    type: 'text',
-    timestamp: new Date('October 14, 2014 11:13:00'),
-    isRead: true,
-  },
-  {
-    id: 3,
-    senderId: 2,
-    receiverId: 1,
-    receiverUrl:
-      'https://znews-photo.zingcdn.me/w660/Uploaded/qfssu/2022_07_02/hinh_843.jpg',
-    senderUrl:
-      'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/7/8/1065932/Hong-Dang-Khong-Len-.jpg',
-    content:
-      'https://image.thanhnien.vn/w2048/Uploaded/2022/mftum/2022_07_01/graduation-celebration-2-5821.png',
-    type: 'image',
-    timestamp: new Date('October 14, 2014 11:20:00'),
-    isRead: false,
-  },
-];
 const ChatScreen = ({route, navigation}) => {
+  let storeDate = null;
   const {state} = useContext(AuthContext);
-  console.log(state.userId);
-  // const targetId = route.params.targetId;
+  const user = useSelector(selectUser);
+  const thisUserId = state.userId;
+  const thisUserAvatar = user.avatarUrl;
+  const targetUserAvatar = route.params.targetUserAvatar;
+  const targetUsername = route.params.targetUsername;
+  const [onlineStatus, setOnlineStatus] = useState(null);
+  const [data, setData] = useState([]);
+  const messRef = useRef(null);
+  const targetUserId = route.params.targetUserId;
   const [textMessage, setTextMessage] = useState('');
   const [fileSelect, setFileSelect] = useState(null);
-  let thisUser = 2;
+  const [conversationId, setConversationId] = useState(
+    route.params.conversationId,
+  );
+  const [isloading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('chats')
+      .doc(conversationId)
+      .collection('messages')
+      .orderBy('timestamp', 'asc')
+      .onSnapshot(onResult, onError);
+    const setReadSubcriber = firestore()
+      .collection('conversations')
+      .doc(conversationId)
+      .onSnapshot(documentSnapshot => {
+        if (!documentSnapshot.data()) {
+          return;
+        }
+        if (documentSnapshot.data().senderId !== thisUserId) {
+          firestore()
+            .collection('conversations')
+            .doc(conversationId)
+            .update({
+              isRead: true,
+            })
+            .then(() => {
+              console.log('Conversations updated!');
+            })
+            .catch(error => {
+              console.log('set isRead fail: ' + error);
+            });
+        }
+      });
+    const fetchMessages = async () => {
+      if (!conversationId) {
+        setIsLoading(true);
+        await getConversation();
+        setIsLoading(false);
+      }
+    };
+    fetchMessages();
+
+    return () => {
+      setIsLoading(true);
+      subscriber();
+      setReadSubcriber();
+    };
+  }, [conversationId, getConversation, thisUserId]);
+  //watch user online status
+  useEffect(() => {
+    firebase
+      .app()
+      .database(
+        'https://flix-cb844-default-rtdb.asia-southeast1.firebasedatabase.app/',
+      )
+      .ref(`/online/${targetUserId}`)
+      .on('value', snapshot => {
+        setOnlineStatus(snapshot.val());
+      });
+  }, []);
+  function onResult(querySnapshot) {
+    setIsLoading(false);
+    setData(querySnapshot.docs.map(doc => doc.data()));
+  }
+
+  function onError(error) {
+    setIsLoading(false);
+    console.error(error);
+  }
+  const sendImage = (converId = conversationId) => {
+    let imageRef =
+      'images/' +
+      uuid.v4() +
+      '.' +
+      getFileNameFromPath(fileSelect.path).split('.')[1];
+
+    const uploadUri =
+      Platform.OS === 'ios'
+        ? fileSelect.path.replace('file://', '')
+        : fileSelect.path;
+    const uploadTask = storage().ref(imageRef).putFile(uploadUri);
+    uploadTask.on(
+      'state_changed',
+      snapshot => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case 'paused':
+            console.log('Upload is paused');
+            break;
+          case 'running':
+            console.log('Upload is running');
+            break;
+        }
+      },
+      error => {
+        console.log('upload file fail' + error);
+      },
+      async () => {
+        const url = await storage().ref(imageRef).getDownloadURL();
+        sendMessage('image', url, converId);
+      },
+    );
+  };
+  const sendMessage = (type, content, converId = conversationId) => {
+    let timestamp = Date.now();
+    firestore()
+      .collection('chats')
+      .doc(converId)
+      .collection('messages')
+      .add({
+        senderId: thisUserId,
+        receiverId: targetUserId,
+        type,
+        content,
+        timestamp,
+      })
+      .then(() => {
+        console.log('Send  message success!');
+        updateLatestMessage(converId, content, timestamp, type);
+      });
+  };
+  const getConversation = useCallback(() => {
+    return firestore()
+      .collection('conversations')
+      .where(
+        'memberOne',
+        '==',
+        thisUserId < targetUserId ? thisUserId : targetUserId,
+      )
+      .where(
+        'memberTwo',
+        '==',
+        thisUserId < targetUserId ? targetUserId : thisUserId,
+      )
+      .get()
+      .then(querySnapshot => {
+        if (querySnapshot.size > 0) {
+          querySnapshot.forEach(documentSnapshot => {
+            setConversationId(documentSnapshot.id);
+          });
+          console.log('get conver success');
+          return true;
+        }
+        console.log('get conver failed');
+        return false;
+      })
+      .catch(error => {
+        console.log('get conver failed', error);
+        return false;
+      });
+  }, [targetUserId, thisUserId]);
+  const updateLatestMessage = (
+    converId,
+    content,
+    timestamp,
+    messType = 'text',
+  ) => {
+    firestore()
+      .collection('conversations')
+      .doc(converId)
+      .update({
+        senderId: thisUserId,
+        latestMessage: content,
+        messType,
+        latestTimestamp: timestamp,
+        isRead: false,
+      })
+      .then(() => {
+        console.log('Conversations updated!');
+      });
+  };
+  const createConversation = useCallback(() => {
+    let id = uuid.v4();
+    return firestore()
+      .collection('conversations')
+      .doc(id)
+      .set({
+        memberOne: thisUserId < targetUserId ? thisUserId : targetUserId,
+        memberTwo: thisUserId < targetUserId ? targetUserId : thisUserId,
+        senderId: thisUserId,
+        latestMessage: null,
+        messType: null,
+        latestTimestamp: null,
+        isRead: false,
+      })
+      .then(() => {
+        console.log('create conver success');
+        setConversationId(id);
+        return id;
+      })
+      .catch(error => {
+        console.log('Create conversation error: ' + error);
+        return null;
+      });
+  }, [targetUserId, thisUserId]);
+  const handleSendMessage = async () => {
+    if (!fileSelect && !textMessage) {
+      return;
+    }
+
+    if (!conversationId) {
+      setIsLoading(true);
+      let converId = await createConversation();
+      setIsLoading(false);
+      console.log('create conver id :', converId);
+      if (fileSelect) {
+        sendImage(converId);
+        setFileSelect(null);
+      }
+      if (textMessage) {
+        sendMessage('text', textMessage, converId);
+        setTextMessage('');
+      }
+      return;
+    }
+    if (fileSelect) {
+      sendImage();
+      setFileSelect(null);
+    }
+    if (textMessage) {
+      sendMessage('text', textMessage);
+      setTextMessage('');
+    }
+  };
   const selectFile = () => {
     ImagePicker.openPicker({
       width: 300,
@@ -93,7 +289,7 @@ const ChatScreen = ({route, navigation}) => {
         console.log(err);
       });
   };
-  const renderDate = (thisDate, messTime) => {
+  const renderDate = (thisDate, messDateFormater) => {
     if (thisDate !== storeDate) {
       storeDate = thisDate;
       return (
@@ -104,17 +300,18 @@ const ChatScreen = ({route, navigation}) => {
             marginBottom: 20,
             fontSize: 12,
           }}>
-          {messTime.format('DD/MM/YYYY')}
+          {messDateFormater.format('DD/MM/YYYY')}
         </Text>
       );
     }
   };
-  const renderOtherMessage = (item, messTime) => {
+  const renderOtherMessage = (item, messDateFormater) => {
     return (
       <View style={{flexDirection: 'row', marginTop: 10}}>
         <Image
           source={{
-            uri: item.senderUrl,
+            uri:
+              item.senderId === thisUserId ? thisUserAvatar : targetUserAvatar,
           }}
           style={{
             width: 30,
@@ -149,13 +346,13 @@ const ChatScreen = ({route, navigation}) => {
               color: '#8D8D8D',
               marginTop: 3,
             }}>
-            {messTime.format('h:mm')}
+            {messDateFormater.format('H:mm')}
           </Text>
         </View>
       </View>
     );
   };
-  const renderMyMessage = (item, messTime) => {
+  const renderMyMessage = (item, messDateFormater) => {
     return (
       <View
         style={{
@@ -184,12 +381,13 @@ const ChatScreen = ({route, navigation}) => {
             />
           )}
           <Text style={{fontSize: 12, color: '#8D8D8D', marginTop: 3}}>
-            {messTime.format('h:mm')}
+            {messDateFormater.format('H:mm')}
           </Text>
         </View>
         <Image
           source={{
-            uri: item.senderUrl,
+            uri:
+              item.senderId === thisUserId ? thisUserAvatar : targetUserAvatar,
           }}
           style={{
             width: 30,
@@ -201,31 +399,19 @@ const ChatScreen = ({route, navigation}) => {
       </View>
     );
   };
-  let storeDate = null;
-  useEffect(() => {
-    data = data.sort((a, b) => a.timestamp - b.timestamp);
-    // console.log('firebase database', firebaseDatabase);
-    // firebaseSet(firebaseDatabaseRef(firebaseDatabase, 'members/' + 'one'), {
-    //   [data[0].senderId]: false,
-    //   [data[0].receiverId]: true,
-    // });
-    // const postListRef = firebaseDatabaseRef(firebaseDatabase, 'members');
-    // const newPostRef = push(postListRef);
-    // firebaseSet(newPostRef, {
-    //   one: 'one',
-    //   two: 'two',
-    // });
-    // console.log(newPostRef.key);
-  }, []);
-  const renderItem = ({item}) => {
-    let messTime = moment(item.timestamp);
+
+  const renderItem = ({item, index}) => {
+    if (index === 0) {
+      storeDate = null;
+    }
+    let messDateFormater = moment(new Date(item.timestamp));
     return (
       <View>
-        {renderDate(item.timestamp.getDate(), messTime)}
+        {renderDate(messDateFormater.format('DD/MM/YYYY'), messDateFormater)}
         <View>
-          {item.senderId === thisUser
-            ? renderMyMessage(item, messTime)
-            : renderOtherMessage(item, messTime)}
+          {item.senderId === thisUserId
+            ? renderMyMessage(item, messDateFormater)
+            : renderOtherMessage(item, messDateFormater)}
         </View>
       </View>
     );
@@ -251,7 +437,7 @@ const ChatScreen = ({route, navigation}) => {
           }}>
           <Image
             source={{
-              uri: 'https://znews-photo.zingcdn.me/w660/Uploaded/qfssu/2022_07_02/hinh_843.jpg',
+              uri: targetUserAvatar,
             }}
             style={{
               width: 40,
@@ -266,99 +452,125 @@ const ChatScreen = ({route, navigation}) => {
               justifyContent: 'space-around',
               marginLeft: 15,
             }}>
-            <Text style={{fontWeight: 'bold', color: 'black'}}>
-              Hồ Hoài Anh
+            <Text
+              numberOfLines={1}
+              style={{fontWeight: 'bold', color: 'black'}}>
+              {targetUsername}
             </Text>
-            <Text style={{fontSize: 12, color: '#8D8D8D'}}>Đang hoạt động</Text>
+            <Text style={{fontSize: 12, color: '#8D8D8D'}}>
+              {onlineStatus ? 'Đang hoạt động' : 'Không hoạt động'}
+            </Text>
           </View>
         </View>
       </View>
       <SafeAreaView style={{flex: 1, paddingHorizontal: 10}}>
-        <FlatList
-          data={data}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          scrollEnabled={true}
-        />
-        <View
-          style={{
-            marginBottom: 10,
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-          }}>
-          <View
-            style={{
-              paddingHorizontal: 10,
-              width: '80%',
-              backgroundColor: '#F0F0F0',
-              justifyContent: 'space-between',
-              borderRadius: 10,
-            }}>
-            {fileSelect != null && (
-              <View
+        {isloading ? (
+          <Loading />
+        ) : (
+          <View style={{flex: 1}}>
+            {data.length > 0 ? (
+              <FlatList
+                ref={messRef}
+                onContentSizeChange={() => messRef.current.scrollToEnd()}
+                onLayout={() => messRef.current.scrollToEnd()}
+                data={data}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderItem}
+                scrollEnabled={true}
+              />
+            ) : (
+              <Text
                 style={{
-                  width: 60,
-                  height: 60,
-                  marginVertical: 20,
-                  flexDirection: 'row',
-                }}>
-                <Image
-                  source={{uri: fileSelect.path}}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 15,
-                    resizeMode: 'cover',
-                  }}
-                />
-                <TouchableOpacity
-                  style={styles.closeIcon}
-                  onPress={() => {
-                    console.log('set file');
-                    setFileSelect(null);
-                  }}>
-                  <Ionicons name="close" size={16} />
-                </TouchableOpacity>
-              </View>
+                  flex: 1,
+                  color: 'black',
+                  alignSelf: 'center',
+                  textAlign: 'center',
+                  marginTop: 20,
+                  width: '70%',
+                }}>{`Bạn hiện chưa có tin nhắn với người này. Nhắn tin ngay với ${targetUserId}!`}</Text>
             )}
 
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <TextInput
-                onChangeText={setTextMessage}
-                value={textMessage}
-                placeholder="Nhập tin nhắn"
-                style={{width: '80%'}}
-              />
-              <View style={{width: '20%'}}>
-                <TouchableOpacity
-                  style={{
-                    width: '70%',
-                    marginLeft: 'auto',
-                  }}
-                  disabled={fileSelect}
-                  onPress={selectFile}>
-                  <Icon
-                    name="file-image-o"
-                    size={24}
-                    style={{marginLeft: 'auto', color: 'black'}}
+            <View
+              style={{
+                marginVertical: 10,
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+              }}>
+              <View
+                style={{
+                  paddingHorizontal: 10,
+                  width: '80%',
+                  backgroundColor: '#F0F0F0',
+                  justifyContent: 'space-between',
+                  borderRadius: 10,
+                }}>
+                {fileSelect != null && (
+                  <View
+                    style={{
+                      width: 60,
+                      height: 60,
+                      marginVertical: 20,
+                      flexDirection: 'row',
+                    }}>
+                    <Image
+                      source={{uri: fileSelect.path}}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 15,
+                        resizeMode: 'cover',
+                      }}
+                    />
+                    <TouchableOpacity
+                      style={styles.closeIcon}
+                      onPress={() => {
+                        setFileSelect(null);
+                      }}>
+                      <Ionicons name="close" size={16} />
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <TextInput
+                    onChangeText={setTextMessage}
+                    value={textMessage}
+                    placeholder="Nhập tin nhắn"
+                    style={{width: '80%'}}
                   />
-                </TouchableOpacity>
+                  <View style={{width: '20%'}}>
+                    <TouchableOpacity
+                      style={{
+                        width: '70%',
+                        marginLeft: 'auto',
+                      }}
+                      disabled={fileSelect}
+                      onPress={selectFile}>
+                      <Icon
+                        name="file-image-o"
+                        size={24}
+                        style={{marginLeft: 'auto', color: 'black'}}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
+              <TouchableOpacity
+                style={{
+                  height: 50,
+                  width: '15%',
+                  borderRadius: 10,
+                  backgroundColor: '#FEC54B',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 'auto',
+                }}
+                onPress={handleSendMessage}>
+                <Icon name="send-o" size={24} style={{color: 'black'}} />
+              </TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity
-            style={{
-              height: 45,
-              width: 50,
-              borderRadius: 10,
-              backgroundColor: '#FEC54B',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginLeft: 10,
-            }}>
-            <Icon name="send-o" size={24} style={{color: 'black'}} />
-          </TouchableOpacity>
-        </View>
+        )}
       </SafeAreaView>
     </View>
   );

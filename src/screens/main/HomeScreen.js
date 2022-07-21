@@ -11,6 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 const {width} = Dimensions.get('window');
 import Carousel from 'react-native-snap-carousel';
@@ -162,7 +163,7 @@ const HomeScreen = ({navigation}) => {
                 alignItems: 'center',
                 marginRight: 10,
               }}
-              onPress={console.log('a')}>
+              onPress={console.log('home pressssss')}>
               <Image
                 source={require('../../../assets/images/type/wrench.png')}
                 style={{width: 30, height: 30, marginTop: 20}}

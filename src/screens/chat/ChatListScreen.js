@@ -1,3 +1,4 @@
+import React, {useContext, useEffect, useState} from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -7,68 +8,200 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import {Context as AuthContext} from '../../context/AuthContext';
+import {firebase} from '@react-native-firebase/database';
+
+import ApiConstants from '../../constants/Api';
+import NotFound from '../../components/NotFound';
+import useAxios from '../../hooks/useAxios';
+import Loading from '../../components/Loading';
+import firestore from '@react-native-firebase/firestore';
+import getErrorMessage from '../../utils/getErrorMessage';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
-let listId = [
-  {
-    id: 1,
-    image:
-      'https://znews-photo.zingcdn.me/w660/Uploaded/qfssu/2022_07_02/hinh_843.jpg',
-    username: 'Johnny Depp',
-    lastestMessage: 'Anh đang ở Tây Ban Nha. Lúc nào về a sửa cho...',
-    latestTimestamp: '10:05 - 22/05/2022',
-    isRead: true,
-  },
-  {
-    id: 2,
-    image:
-      'https://znews-photo.zingcdn.me/w660/Uploaded/qfssu/2022_07_02/hinh_843.jpg',
-    username: 'Johnny Depp',
-    lastestMessage: 'Anh đang ở Tây Ban Nha. Lúc nào về a sửa cho...',
-    latestTimestamp: '10:05 - 22/05/2022',
-    isRead: false,
-  },
-  {
-    id: 3,
-    image:
-      'https://znews-photo.zingcdn.me/w660/Uploaded/qfssu/2022_07_02/hinh_843.jpg',
-    username: 'Johnny Depp',
-    lastestMessage: 'Anh đang ở Tây Ban Nha. Lúc nào về a sửa cho...',
-    latestTimestamp: '10:05 - 22/05/2022',
-    isRead: false,
-  },
-];
+import {getUserOnlineStatus} from '../../utils/firebaseUtil';
+import {getDiffTimeBetweenTwoDate} from '../../utils/util';
+
 const ChatListScreen = ({navigation}) => {
-  const renderItem = ({item}) => (
-    <TouchableOpacity
-      onPress={() => console.log('clicked')}
-      style={{
-        flexDirection: 'row',
-        marginTop: 20,
-        paddingHorizontal: 15,
-      }}>
-      <Image
-        source={{uri: item.image}}
-        style={{width: 50, height: 50, borderRadius: 25, resizeMode: 'cover'}}
-      />
-      <View
+  const {state} = useContext(AuthContext);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [listChat, setListChat] = useState([]);
+  const [firebaseLoading, setFireBaseLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const customerAPI = useAxios();
+
+  useEffect(() => {
+    const firstOneSubscriber = firestore()
+      .collection('conversations')
+      .where('memberOne', '==', state.userId)
+      .onSnapshot(onResult, onError);
+    const secondOneSubscriber = firestore()
+      .collection('conversations')
+      .where('memberTwo', '==', state.userId)
+      .onSnapshot(onResult, onError);
+    const watchTime = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+    const onlineRef = firebase
+      .app()
+      .database(
+        'https://flix-cb844-default-rtdb.asia-southeast1.firebasedatabase.app/',
+      )
+      .ref('/online')
+      .on('value', snapshot => {
+        const val = snapshot.val();
+        setListChat(
+          listChat.map(chat => {
+            return {
+              ...chat,
+              onlineStatus: val[chat.id + ''],
+            };
+          }),
+        );
+      });
+    return () => {
+      setFireBaseLoading(true);
+      firstOneSubscriber();
+      secondOneSubscriber();
+      clearInterval(watchTime);
+      firebase
+        .app()
+        .database(
+          'https://flix-cb844-default-rtdb.asia-southeast1.firebasedatabase.app/',
+        )
+        .ref('/online')
+        .off('value', onlineRef);
+    };
+  }, []);
+
+  async function onResult(querySnapshot) {
+    if (querySnapshot.size > 0) {
+      const memberFilter =
+        querySnapshot.docs[0].data().memberOne === state.userId
+          ? 'memberOne'
+          : 'memberTwo';
+      let filterList = listChat.filter(
+        chat => chat[memberFilter] !== state.userId,
+      );
+      const conversationsMap = await Promise.all(
+        querySnapshot.docs.map(async doc => {
+          // get active , get profile here
+          //fullName,phone,avatar,id
+          try {
+            const renderId =
+              doc.data().memberOne === state.userId
+                ? doc.data().memberTwo
+                : doc.data().memberOne;
+            const res = await customerAPI.get(
+              ApiConstants.GET_USER_INFORMATION + '?id=' + renderId,
+            );
+            const userProfile = res.data;
+            const onlineStatus = await getUserOnlineStatus(renderId);
+            return {
+              ...userProfile,
+              ...doc.data(),
+              conversationId: doc.id,
+              onlineStatus,
+            };
+          } catch (error) {
+            setErrorMessage(getErrorMessage(error));
+            console.log(error);
+            return {...doc.data(), conversationId: doc.id};
+          }
+        }),
+      );
+      setListChat(
+        filterList.concat(conversationsMap).sort((a, b) => {
+          b.latestTimestamp - a.latestTimestamp;
+        }),
+      );
+    }
+    setFireBaseLoading(false);
+  }
+
+  function onError(error) {
+    setFireBaseLoading(false);
+    console.error('Loading conversations fail:', error);
+  }
+
+  const renderItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('ChatScreen', {
+            conversationId: item.conversationId,
+            targetUserId: item.id,
+            targetUserAvatar: item.avatar,
+            targetUsername: item.fullName,
+          })
+        }
         style={{
-          flexDirection: 'column',
-          justifyContent: 'space-around',
-          marginLeft: 10,
+          flexDirection: 'row',
+          marginTop: 20,
+          paddingHorizontal: 15,
         }}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={{fontWeight: 'bold', color: 'black'}}>
-            {item.username}
-          </Text>
-          <Text>{item.latestTimestamp}</Text>
+        <View
+          style={{
+            width: 40,
+            height: 40,
+          }}>
+          <Image
+            source={{uri: item.avatar}}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              resizeMode: 'cover',
+            }}
+          />
+          {item.onlineStatus && (
+            <View
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: 5,
+                position: 'absolute',
+                right: -3,
+                bottom: 3,
+                backgroundColor: '#5AD539',
+              }}
+            />
+          )}
         </View>
-        <Text style={!item.isRead ? {color: 'black'} : {color: '#8D8D8D'}}>
-          {item.lastestMessage}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+        <View
+          style={{
+            flexDirection: 'column',
+            justifyContent: 'space-around',
+            marginLeft: 15,
+            flex: 1,
+          }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{fontWeight: 'bold', color: 'black', fontSize: 16}}>
+              {item.fullName}
+            </Text>
+            <Text>
+              {getDiffTimeBetweenTwoDate(
+                new Date(item.latestTimestamp),
+                currentDateTime,
+              )}
+            </Text>
+          </View>
+          <Text
+            numberOfLines={1}
+            style={
+              item.isRead || item.senderId === state.userId
+                ? {color: '#8D8D8D'}
+                : {color: 'black'}
+            }>
+            {item.messType === 'text'
+              ? item.latestMessage
+              : item.senderId === state.userId
+              ? 'Bạn đã gửi một hình ảnh'
+              : item.fullName + ' đã gửi một hình ảnh'}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <TopHeaderComponent
@@ -78,12 +211,17 @@ const ChatListScreen = ({navigation}) => {
         statusBarColor="white"
       />
       <SafeAreaView style={{flex: 1}}>
-        <FlatList
-          keyExtractor={item => item.id}
-          data={listId}
-          scrollEnabled={true}
-          renderItem={renderItem}
-        />
+        {errorMessage ? <NotFound /> : null}
+        {firebaseLoading ? (
+          <Loading />
+        ) : errorMessage ? null : (
+          <FlatList
+            keyExtractor={(item, index) => index.toString()}
+            data={listChat}
+            scrollEnabled={true}
+            renderItem={renderItem}
+          />
+        )}
       </SafeAreaView>
     </View>
   );

@@ -24,6 +24,7 @@ const ApiConstants = {
   GET_FIXED_SERVICE_OF_REQUEST_API: '/confirmedUser/request/fixedService',
   GET_INVOICE_API: '/confirmedUser/request/invoice',
   CONFIRM_INVOICE_API: '/customer/vnpay/payment/url',
+  GET_USER_INFORMATION: '/user/information',
 };
 
 //http://localhost:8000

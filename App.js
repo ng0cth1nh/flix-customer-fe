@@ -12,6 +12,13 @@ import {
   Provider as AuthProvider,
   Context as AuthContext,
 } from './src/context/AuthContext';
+import {
+  fetchProfile,
+  selectErrorMessage,
+  selectUser,
+} from './src/features/user/userSlice';
+import {useSelector, useDispatch} from 'react-redux';
+import {firebase} from '@react-native-firebase/database';
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
@@ -48,7 +55,7 @@ import {
   notificationListener,
 } from './src/notification/PushNotification';
 import {store} from './src/features/store';
-const {width} = Dimensions.get('window');
+import useAxios from './src/hooks/useAxios';
 
 const toastConfig = {
   customToast: ({text1}) => (
@@ -100,6 +107,10 @@ function App() {
   const Tab = createBottomTabNavigator();
 
   const [isLoading, setIsLoading] = useState(true);
+  const errorMessage = useSelector(selectErrorMessage);
+  const dispatch = useDispatch();
+  const customerAPI = useAxios();
+
   let {state, TryLocalLogin, clearErrorMessage} = useContext(AuthContext);
   useEffect(() => {
     TryLocalLogin();
@@ -109,6 +120,44 @@ function App() {
       setIsLoading(false);
     }, 3000);
   }, [TryLocalLogin]);
+  useEffect(() => {
+    if (state.token) {
+      const getUserProfile = async () => {
+        await dispatch(fetchProfile(customerAPI));
+        if (errorMessage) {
+          Toast.show({
+            type: 'customErrorToast',
+            text1: errorMessage,
+          });
+        }
+      };
+      getUserProfile();
+    }
+  }, [state.token]);
+  useEffect(() => {
+    const userId = state.userId;
+    if (userId) {
+      console.log('userId: ', userId);
+      const reference = firebase
+        .app()
+        .database(
+          'https://flix-cb844-default-rtdb.asia-southeast1.firebasedatabase.app/',
+        )
+        .ref(`/online/${userId}`);
+
+      // Set the /users/:userId value to true
+      reference
+        .set(true)
+        .then(() => console.log('Online presence set'))
+        .catch(err => console.log(err));
+
+      // Remove the node whenever the client disconnects
+      reference
+        .onDisconnect()
+        .remove()
+        .then(() => console.log('On disconnect function configured.'));
+    }
+  }, [state.userId]);
   if (isLoading) {
     return <SplashScreen />;
   }
@@ -172,6 +221,20 @@ function App() {
       </Stack.Navigator>
     );
   }
+  const ChatStackScreen = () => {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        }}>
+        <Stack.Screen name="ChatListScreen" component={ChatListScreen} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      </Stack.Navigator>
+    );
+  };
 
   function RequestHistoryStackScreen() {
     return (
@@ -210,7 +273,6 @@ function App() {
             gestureDirection: 'horizontal',
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
           }}>
-          <Stack.Screen name="ChatScreen" component={ChatScreen} />
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}
@@ -252,70 +314,75 @@ function App() {
     </>
   ) : (
     <>
-      <Provider store={store}>
-        <NavigationContainer ref={navigationRef}>
-          <Tab.Navigator
-            tabBarOptions={{
-              showLabel: false,
-              keyboardHidesTabBar: true,
-              style: {
-                backgroundColor: '#FEC54B',
-              },
-            }}
-            screenOptions={({route}) => ({
-              tabBarShowLabel: false,
-              headerShown: false,
-              tabBarStyle: {
-                height: 50,
-              },
-              tabBarIcon: ({focused, size, color}) => {
-                let icon;
-                if (route.name === 'HomeStackScreen') {
-                  icon = focused
-                    ? require('./assets/images/type/home-active.png')
-                    : require('./assets/images/type/home.png');
-                } else if (route.name === 'RequestHistoryStackScreen') {
-                  icon = focused
-                    ? require('./assets/images/type/archive-active.png')
-                    : require('./assets/images/type/archive.png');
-                } else if (route.name === 'Notification') {
-                  icon = focused
-                    ? require('./assets/images/type/bell-ring-active.png')
-                    : require('./assets/images/type/bell-ring.png');
-                } else if (route.name === 'ProfileStackScreen') {
-                  icon = focused
-                    ? require('./assets/images/type/user-profile-active.png')
-                    : require('./assets/images/type/user-profile.png');
-                }
-                return <Image style={{height: 24, width: 24}} source={icon} />;
-              },
-            })}>
-            <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />
-            <Tab.Screen
-              name="RequestHistoryStackScreen"
-              component={RequestHistoryStackScreen}
-            />
-            <Tab.Screen name="Notification" component={NotificationScreen} />
-            <Tab.Screen
-              name="ProfileStackScreen"
-              component={ProfileStackScreen}
-            />
-          </Tab.Navigator>
-        </NavigationContainer>
-        <Toast
-          config={toastConfig}
-          position="bottom"
-          visibilityTime={2000}
-          bottomOffset={90}
-        />
-      </Provider>
+      <NavigationContainer ref={navigationRef}>
+        <Tab.Navigator
+          tabBarOptions={{
+            showLabel: false,
+            keyboardHidesTabBar: true,
+            style: {
+              backgroundColor: '#FEC54B',
+            },
+          }}
+          screenOptions={({route}) => ({
+            tabBarShowLabel: false,
+            headerShown: false,
+            tabBarStyle: {
+              height: 50,
+            },
+            tabBarIcon: ({focused, size, color}) => {
+              let icon;
+              if (route.name === 'HomeStackScreen') {
+                icon = focused
+                  ? require('./assets/images/type/home-active.png')
+                  : require('./assets/images/type/home.png');
+              } else if (route.name === 'RequestHistoryStackScreen') {
+                icon = focused
+                  ? require('./assets/images/type/archive-active.png')
+                  : require('./assets/images/type/archive.png');
+              } else if (route.name === 'Notification') {
+                icon = focused
+                  ? require('./assets/images/type/bell-ring-active.png')
+                  : require('./assets/images/type/bell-ring.png');
+              } else if (route.name === 'ProfileStackScreen') {
+                icon = focused
+                  ? require('./assets/images/type/user-profile-active.png')
+                  : require('./assets/images/type/user-profile.png');
+              } else if (route.name === 'ChatStackScreen') {
+                icon = focused
+                  ? require('./assets/images/type/messenger-active.png')
+                  : require('./assets/images/type/messenger.png');
+              }
+              return <Image style={{height: 24, width: 24}} source={icon} />;
+            },
+          })}>
+          <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />
+          <Tab.Screen
+            name="RequestHistoryStackScreen"
+            component={RequestHistoryStackScreen}
+          />
+          <Tab.Screen name="Notification" component={NotificationScreen} />
+          <Tab.Screen name="ChatStackScreen" component={ChatStackScreen} />
+          <Tab.Screen
+            name="ProfileStackScreen"
+            component={ProfileStackScreen}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+      <Toast
+        config={toastConfig}
+        position="bottom"
+        visibilityTime={2000}
+        bottomOffset={90}
+      />
     </>
   );
 }
 export default () => {
   return (
     <AuthProvider>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </AuthProvider>
   );
 };

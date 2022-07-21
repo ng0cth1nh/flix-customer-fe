@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 const {height} = Dimensions.get('window');
+import Loading from '../../components/Loading';
 import {RadioButton} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import ApiConstants from '../../constants/Api';
@@ -91,19 +92,7 @@ const AddressListScreen = ({navigation}) => {
           />
         ) : null}
         {loading ? (
-          <ActivityIndicator
-            size="small"
-            color="#FEC54B"
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          />
+          <Loading />
         ) : (
           <SubmitButton
             style={{

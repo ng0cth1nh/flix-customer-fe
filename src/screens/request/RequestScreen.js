@@ -27,6 +27,7 @@ import {RequestStatus} from '../../utils/util';
 import ProgressLoader from 'rn-progress-loader';
 const {width, height} = Dimensions.get('window');
 import TopHeaderComponent from '../../components/TopHeaderComponent';
+import Loading from '../../components/Loading';
 
 const RequestScreen = ({navigation, route}) => {
   const {service} = route.params;
@@ -97,21 +98,7 @@ const RequestScreen = ({navigation, route}) => {
         statusBarColor="white"
       />
       <SafeAreaView style={{flex: 1}}>
-        {loading ? (
-          <ActivityIndicator
-            size="small"
-            color="#FEC54B"
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          />
-        ) : null}
+        {loading ? <Loading /> : null}
         <ProgressLoader
           visible={isLoading}
           isModal={true}

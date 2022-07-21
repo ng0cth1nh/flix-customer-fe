@@ -4,6 +4,7 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 import ServiceComponent from '../../components/ServiceComponent';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
+import Loading from '../../components/Loading';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import useFetchData from '../../hooks/useFetchData';
 
@@ -29,21 +30,7 @@ const ServiceListScreen = ({route, navigation}) => {
         style={{
           flex: 1,
         }}>
-        {loading ? (
-          <ActivityIndicator
-            size="small"
-            color="#FEC54B"
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          />
-        ) : null}
+        {loading ? <Loading /> : null}
         {isError ? <NotFound /> : null}
         {data !== null ? (
           <FlatList

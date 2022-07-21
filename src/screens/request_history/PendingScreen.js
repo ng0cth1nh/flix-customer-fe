@@ -11,6 +11,7 @@ import {
   selectRequests,
   selectIsLoading,
 } from '../../features/request/requestSlice';
+import Loading from '../../components/Loading';
 
 const PendingScreen = ({navigation}) => {
   const dispatch = useDispatch();
@@ -48,21 +49,7 @@ const PendingScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      {isLoading ? (
-        <ActivityIndicator
-          size="small"
-          color="#FEC54B"
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        />
-      ) : null}
+      {isLoading ? <Loading /> : null}
       {/* {isError ? <NotFound /> : null} */}
       {requests.pending ? (
         <FlatList

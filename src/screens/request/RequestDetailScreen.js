@@ -32,6 +32,7 @@ import {
 } from '../../features/request/requestSlice';
 import ProgressLoader from 'rn-progress-loader';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
+import Loading from '../../components/Loading';
 
 const RequestDetailScreen = ({route, navigation}) => {
   const {
@@ -167,21 +168,7 @@ const RequestDetailScreen = ({route, navigation}) => {
       />
       <SafeAreaView style={{flex: 1}}>
         {isError ? <NotFound /> : null}
-        {loading ? (
-          <ActivityIndicator
-            size="small"
-            color="#FEC54B"
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          />
-        ) : null}
+        {loading ? <Loading /> : null}
         <ProgressLoader
           visible={isLoading}
           isModal={true}

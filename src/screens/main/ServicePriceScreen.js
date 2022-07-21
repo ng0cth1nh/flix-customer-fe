@@ -13,6 +13,7 @@ import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
 import useFetchData from '../../hooks/useFetchData';
 import {numberWithCommas} from '../../utils/util';
+import Loading from '../../components/Loading';
 
 const ServicePriceScreen = ({route, navigation}) => {
   const {serviceName, serviceId} = route.params;
@@ -66,21 +67,7 @@ const ServicePriceScreen = ({route, navigation}) => {
               </Text>
             </View>
           ) : null}
-          {loading ? (
-            <ActivityIndicator
-              size="small"
-              color="#FEC54B"
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            />
-          ) : null}
+          {loading ? <Loading /> : null}
           {data !== null ? (
             <FlatList
               showsVerticalScrollIndicator={false}
