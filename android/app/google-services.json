@@ -28,14 +28,22 @@
       ],
       "api_key": [
         {
+<<<<<<< HEAD
           "current_key": "AIzaSyAxbApHPOF0Vfuzs8EsbCNYcrPz8Z4ao1M"
+=======
+          "current_key": "AIzaSyDu1PzuT9-SpC-isZ4iDo293Y3JIwLSsE0"
+>>>>>>> ee57b9775d983813eae813321aef63264ee6e3cd
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
+<<<<<<< HEAD
               "client_id": "1004338245468-31e1slmln7c8l8bk1u523kbjgqjfkata.apps.googleusercontent.com",
+=======
+              "client_id": "785559424922-11digr98u8vg85ptffbnnghp2v1sd85v.apps.googleusercontent.com",
+>>>>>>> ee57b9775d983813eae813321aef63264ee6e3cd
               "client_type": 3
             }
           ]

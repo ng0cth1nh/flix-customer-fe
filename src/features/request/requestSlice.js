@@ -92,6 +92,25 @@ export const confirmInvoice = createAsyncThunk(
   },
 );
 
+export const rateRepairer = createAsyncThunk(
+  'request/rateRepairer',
+  async ({customerAPI, body}, {rejectWithValue}) => {
+    try {
+      await customerAPI.post(
+        ApiConstants.CREATE_COMMENT_API,
+        JSON.stringify(body),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
 export const fetchFixedService = createAsyncThunk(
   'request/fetchFixedService',
   async ({customerAPI, requestCode}, {rejectWithValue}) => {
@@ -102,6 +121,20 @@ export const fetchFixedService = createAsyncThunk(
           params: {requestCode},
         },
       );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const fetchInvoice = createAsyncThunk(
+  'request/fetchInvoice',
+  async ({customerAPI, requestCode}, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.get(ApiConstants.GET_INVOICE_API, {
+        params: {requestCode},
+      });
       return response.data;
     } catch (err) {
       return rejectWithValue(getErrorMessage(err));
@@ -183,11 +216,15 @@ export const requestSlice = createSlice({
     });
 
     builder.addCase(fetchFixedService.fulfilled, (state, action) => {
-      state.isLoading = false;
       state.errorMessage = null;
     });
     builder.addCase(fetchFixedService.rejected, (state, action) => {
-      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(fetchInvoice.fulfilled, (state, action) => {
+      state.errorMessage = null;
+    });
+    builder.addCase(fetchInvoice.rejected, (state, action) => {
       state.errorMessage = action.payload;
     });
 
@@ -196,6 +233,15 @@ export const requestSlice = createSlice({
       state.errorMessage = null;
     });
     builder.addCase(confirmInvoice.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+
+    builder.addCase(rateRepairer.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(rateRepairer.rejected, (state, action) => {
       state.isLoading = false;
       state.errorMessage = action.payload;
     });

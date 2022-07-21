@@ -1,18 +1,8 @@
 import React, {useState} from 'react';
-import {
-  Text,
-  View,
-  SafeAreaView,
-  ActivityIndicator,
-  StyleSheet,
-  Dimensions,
-  StatusBar,
-} from 'react-native';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
+import {View, SafeAreaView, ActivityIndicator} from 'react-native';
 import moment from 'moment';
 import ApiConstants from '../../constants/Api';
 import useFetchData from '../../hooks/useFetchData';
-import BackButton from '../../components/BackButton';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
@@ -25,7 +15,6 @@ import {
 } from '../../features/request/requestSlice';
 import {RequestStatus} from '../../utils/util';
 import ProgressLoader from 'rn-progress-loader';
-const {width, height} = Dimensions.get('window');
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import Loading from '../../components/Loading';
 
@@ -76,8 +65,8 @@ const RequestScreen = ({navigation, route}) => {
       dispatch(
         fetchRequests({customerAPI, status: RequestStatus.PENDING}),
       ).unwrap();
-      navigation.navigate('RequestHistoryStackScreen', {
-        screen: 'RequestHistoryScreen',
+      navigation.navigate('RequestHistoryScreen', {
+        screen: 'PendingScreen',
       });
     } catch (err) {
       Toast.show({

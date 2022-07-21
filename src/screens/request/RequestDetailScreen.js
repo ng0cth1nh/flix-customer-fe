@@ -41,32 +41,23 @@ const RequestDetailScreen = ({route, navigation}) => {
     isShowSubmitButton,
     typeSubmitButtonClick,
     submitButtonText,
+    navigateFromScreen = null,
   } = route.params;
-  const [date, setDate] = useState(moment());
+
   const [modalVisible, setModalVisible] = useState(false);
   const isLoading = useSelector(selectIsLoading);
   const [reason, setReason] = useState({index: 0, reason: CancelReasons[0]});
   const [contentOtherReason, setContentOtherReason] = useState('');
-  const [description, setDiscription] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fixedService, setFixedService] = useState(null);
   const [isError, setIsError] = useState(false);
-  function handleButtonClick() {
-    console.log(date);
-  }
+
   const customerAPI = useAxios();
   const dispatch = useDispatch();
   const showModal = () => {
     setModalVisible(true);
   };
-
-  // const {loading, data, isError} = useFetchData(
-  //   ApiConstants.GET_REQUEST_DETAIL_API,
-  //   {
-  //     params: {requestCode},
-  //   },
-  // );
 
   const loadData = async () => {
     try {
@@ -114,9 +105,18 @@ const RequestDetailScreen = ({route, navigation}) => {
         type: 'customToast',
         text1: 'Hủy yêu cầu thành công',
       });
-      dispatch(
-        fetchRequests({customerAPI, status: RequestStatus.PENDING}),
-      ).unwrap();
+      navigateFromScreen === 'FIXING'
+        ? dispatch(
+            fetchRequests({customerAPI, status: RequestStatus.FIXING}),
+          ).unwrap()
+          ? navigateFromScreen === 'APPROVED'
+          : dispatch(
+              fetchRequests({customerAPI, status: RequestStatus.APPROVED}),
+            ).unwrap()
+        : dispatch(
+            fetchRequests({customerAPI, status: RequestStatus.PENDING}),
+          ).unwrap();
+
       navigation.goBack();
       dispatch(
         fetchRequests({customerAPI, status: RequestStatus.CANCELLED}),
@@ -198,7 +198,7 @@ const RequestDetailScreen = ({route, navigation}) => {
         <CustomModal
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
-          modalRatio={0.8}>
+          modalRatio={0.76}>
           <Text style={styles.modalText}>Chọn lý do hủy</Text>
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -270,7 +270,7 @@ const RequestDetailScreen = ({route, navigation}) => {
             <TouchableOpacity
               style={[styles.button, styles.buttonClose]}
               onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={styles.textStyle}>THOÁT</Text>
+              <Text style={styles.textStyle}>ĐÓNG</Text>
             </TouchableOpacity>
           </View>
         </CustomModal>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: 20,
+    fontSize: 16,
     color: 'black',
   },
   modalText: {

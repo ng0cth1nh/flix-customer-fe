@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {
   Text,
   View,
@@ -10,6 +11,7 @@ import {
   Dimensions,
   FlatList,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import moment from 'moment';
 import {RadioButton} from 'react-native-paper';
@@ -22,34 +24,57 @@ import {
   setIsLoading,
   selectIsLoading,
   fetchFixedService,
-  confirmPayment,
+  confirmInvoice,
+  fetchInvoice,
 } from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
-import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
-import useFetchData from '../../hooks/useFetchData';
 import ProgressLoader from 'rn-progress-loader';
 import {useSelector, useDispatch} from 'react-redux';
-import {RequestStatus} from '../../utils/util';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import {numberWithCommas} from '../../utils/util';
 import Loading from '../../components/Loading';
 
+import {VnPayCode} from '../../constants/Error';
+import {RequestStatus} from '../../utils/util';
 const InvoiceScreen = ({route, navigation}) => {
-  const {service, isShowConfirm} = route.params;
+  const {vnp_ResponseCode, requestCode, vnp_TxnRef} = route.params;
+
   const isLoading = useSelector(selectIsLoading);
   const [isLoad, setIsLoad] = useState(false);
   const customerAPI = useAxios();
   const [fixedService, setFixedService] = useState(null);
   const dispatch = useDispatch();
-  const renderServiceItem = ({item}) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const renderServiceItem = ({item, index}) => {
     return (
-      <View style={[styles.serviceRow, {paddingHorizontal: 10}]}>
-        <Text style={styles.serviceName}>{item.name}</Text>
-        <Text style={[styles.textBold, {marginLeft: 'auto', fontSize: 12}]}>
-          {`${numberWithCommas(item.price)} vnđ`}
+      <View
+        key={index.toString()}
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          width: '96%',
+          alignSelf: 'center',
+          marginVertical: 6,
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            color: 'black',
+            flex: 12,
+          }}>
+          {item.name}
         </Text>
+        <Text
+          style={{
+            color: 'black',
+            fontWeight: 'bold',
+            flex: 5,
+            textAlign: 'right',
+          }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
       </View>
     );
   };
@@ -61,60 +86,97 @@ const InvoiceScreen = ({route, navigation}) => {
     });
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await setIsLoad(true);
-        let data = await dispatch(
-          fetchFixedService({
-            customerAPI,
-            requestCode: service.requestCode,
-          }),
-        ).unwrap();
-        setFixedService(data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        await setIsLoad(false);
-      }
-    })();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        if (vnp_ResponseCode && vnp_TxnRef) {
+          console.log(
+            'FOCUS - vnp_ResponseCode - vnp_TxnRef: ',
+            vnp_ResponseCode,
+            vnp_TxnRef,
+          );
+          if (vnp_ResponseCode && vnp_ResponseCode === '00') {
+            //await loadData();
+            Toast.show({
+              type: 'customToast',
+              text1: VnPayCode.get(vnp_ResponseCode),
+            });
+            dispatch(
+              fetchRequests({
+                customerAPI,
+                status: RequestStatus.PAYMENT_WAITING,
+              }),
+            );
+            dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
+          } else if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
+            Toast.show({
+              type: 'customErrorToast',
+              text1: VnPayCode.get(vnp_ResponseCode),
+            });
+          }
+        }
+      })();
+    }, [vnp_ResponseCode, vnp_TxnRef]),
+  );
 
   const handleConfirmPayment = async () => {
-    // try {
-    //   await dispatch(setIsLoading());
-    //   await dispatch(
-    //     confirmPayment({
-    //       customerAPI,
-    //       body: {requestCode: service.requestCode},
-    //     }),
-    //   ).unwrap();
-    //   Toast.show({
-    //     type: 'customToast',
-    //     text1: 'Xác nhận thanh toán thành công',
-    //   });
-    //   dispatch(
-    //     fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
-    //   ).unwrap();
-    //   navigation.goBack();
-    //   dispatch(
-    //     fetchRequests({customerAPI, status: RequestStatus.DONE}),
-    //   ).unwrap();
-    // } catch (err) {
-    //   Toast.show({
-    //     type: 'customErrorToast',
-    //     text1: err,
-    //   });
-    // }
-    navigation.push('ChooseBankScreen', {
-      requestCode: data.requestCode,
-      orderInfo: `${data.customerName} - ${data.customerPhone} thanh toan ${data.actualPrice} cho ${data.requestCode}`,
+    try {
+      await dispatch(setIsLoading());
+      let response = await dispatch(
+        confirmInvoice({
+          customerAPI,
+          body: {
+            requestCode: data.requestCode,
+            orderInfo: `${data.customerName} - ${data.customerPhone} thanh toan ${data.actualPrice} cho ${data.requestCode}`,
+            bankCode: 'NCB',
+          },
+        }),
+      ).unwrap();
+      console.log('response.data: ' + response.data);
+      await Linking.openURL(response.data);
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
+  };
+
+  const handleRatingRepairer = async () => {
+    navigation.push('CommentScreen', {
+      data,
     });
   };
 
-  const {loading, data, isError} = useFetchData(ApiConstants.GET_INVOICE_API, {
-    params: {requestCode: service.requestCode},
-  });
+  const loadData = async () => {
+    try {
+      await setLoading(true);
+      let fixedService = await dispatch(
+        fetchFixedService({
+          customerAPI,
+          requestCode: requestCode ? requestCode : vnp_TxnRef,
+        }),
+      ).unwrap();
+      setFixedService(fixedService);
+      let data = await dispatch(
+        fetchInvoice({
+          customerAPI,
+          requestCode: requestCode ? requestCode : vnp_TxnRef,
+        }),
+      ).unwrap();
+      setData(data);
+    } catch (err) {
+      setIsError(true);
+    } finally {
+      await setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      await loadData();
+    })();
+  }, []);
 
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -143,6 +205,56 @@ const InvoiceScreen = ({route, navigation}) => {
                   borderBottomColor: '#CACACA',
                   paddingBottom: 10,
                 }}>
+                <View style={styles.boxHeader}>
+                  <Image
+                    source={require('../../../assets/images/type/info.png')}
+                    style={{
+                      height: 20,
+                      width: 20,
+                    }}
+                  />
+                  <Text style={styles.tittleText}>Mã yêu cầu</Text>
+                  <TouchableOpacity
+                    style={[
+                      {marginLeft: 'auto', marginBottom: 3},
+                      styles.viewServiceButton,
+                    ]}
+                    onPress={copyToClipboard}>
+                    <Text
+                      style={{
+                        color: 'black',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {data.requestCode}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 5,
+                  }}>
+                  <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
+                    Thời gian tạo
+                  </Text>
+                  <Text style={{marginLeft: 'auto', fontSize: 12}}>
+                    {moment(data.createdAt).format('HH:mm - DD/MM/YYYY')}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
+                    Thời gian xác nhận
+                  </Text>
+                  <Text style={{marginLeft: 'auto', fontSize: 12}}>
+                    {moment(data.approvedTime).format('HH:mm - DD/MM/YYYY')}
+                  </Text>
+                </View>
                 <View style={styles.boxHeader}>
                   <Image
                     source={require('../../../assets/images/type/user.png')}
@@ -219,7 +331,7 @@ const InvoiceScreen = ({route, navigation}) => {
                 </View>
                 <View style={styles.boxBody}>
                   <Image
-                    source={{uri: service.image}}
+                    source={{uri: data.serviceImage}}
                     style={{
                       height: height * 0.12,
                       width: height * 0.111,
@@ -230,7 +342,7 @@ const InvoiceScreen = ({route, navigation}) => {
                   />
                   <View style={styles.boxBodyContent}>
                     <Text style={[styles.textBold, {fontSize: 24}]}>
-                      {service.serviceName}
+                      {data.serviceName}
                     </Text>
                     <Text
                       style={{fontSize: 16, color: 'black', marginVertical: 6}}>
@@ -256,7 +368,10 @@ const InvoiceScreen = ({route, navigation}) => {
                 <>
                   {fixedService.subServices !== null &&
                   fixedService.subServices.length !== 0 ? (
-                    <View style={{marginTop: 15}}>
+                    <View
+                      style={{
+                        marginTop: 16,
+                      }}>
                       <Text style={[styles.textBold, {fontSize: 18}]}>
                         Dịch vụ đã sửa chi tiết
                       </Text>
@@ -265,7 +380,15 @@ const InvoiceScreen = ({route, navigation}) => {
                         renderItem={renderServiceItem}
                         keyExtractor={item => item.id}
                       />
-                      <View style={[styles.serviceRow, {marginLeft: 10}]}>
+                      <View
+                        style={[
+                          styles.serviceRow,
+                          {
+                            width: '96%',
+                            alignSelf: 'center',
+                            justifyContent: 'space-around',
+                          },
+                        ]}>
                         <Text style={styles.textBold}>Tổng</Text>
                         <Text style={styles.servicePrice}>{`${numberWithCommas(
                           data.totalSubServicePrice,
@@ -275,7 +398,7 @@ const InvoiceScreen = ({route, navigation}) => {
                   ) : null}
                   {fixedService.accessories !== null &&
                   fixedService.accessories.length !== 0 ? (
-                    <View style={{marginTop: 15}}>
+                    <View style={{marginTop: 16}}>
                       <Text style={[styles.textBold, {fontSize: 18}]}>
                         Linh kiện đã thay
                       </Text>
@@ -284,7 +407,15 @@ const InvoiceScreen = ({route, navigation}) => {
                         renderItem={renderServiceItem}
                         keyExtractor={item => item.id}
                       />
-                      <View style={[styles.serviceRow, {marginLeft: 10}]}>
+                      <View
+                        style={[
+                          styles.serviceRow,
+                          {
+                            width: '96%',
+                            alignSelf: 'center',
+                            justifyContent: 'space-around',
+                          },
+                        ]}>
                         <Text style={styles.textBold}>Tổng</Text>
                         <Text style={styles.servicePrice}>{`${numberWithCommas(
                           data.totalAccessoryPrice,
@@ -294,7 +425,7 @@ const InvoiceScreen = ({route, navigation}) => {
                   ) : null}
                   {fixedService.extraServices !== null &&
                   fixedService.extraServices.length !== 0 ? (
-                    <View style={{marginTop: 15}}>
+                    <View style={{marginTop: 16}}>
                       <Text style={[styles.textBold, {fontSize: 18}]}>
                         Dịch vụ bên ngoài
                       </Text>
@@ -303,7 +434,15 @@ const InvoiceScreen = ({route, navigation}) => {
                         renderItem={renderServiceItem}
                         keyExtractor={item => item.id}
                       />
-                      <View style={[styles.serviceRow, {marginLeft: 10}]}>
+                      <View
+                        style={[
+                          styles.serviceRow,
+                          {
+                            width: '96%',
+                            alignSelf: 'center',
+                            justifyContent: 'space-around',
+                          },
+                        ]}>
                         <Text style={styles.textBold}>Tổng</Text>
                         <Text style={styles.servicePrice}>{`${numberWithCommas(
                           data.totalExtraServicePrice,
@@ -392,57 +531,10 @@ const InvoiceScreen = ({route, navigation}) => {
                     : data.paymentMethod}
                 </Text>
               </View>
-              <View style={styles.boxHeader}>
-                <Image
-                  source={require('../../../assets/images/type/info.png')}
-                  style={{
-                    height: 20,
-                    width: 20,
-                  }}
-                />
-                <Text style={styles.tittleText}>Mã yêu cầu</Text>
-                <TouchableOpacity
-                  style={{marginLeft: 'auto', marginBottom: 3}}
-                  onPress={copyToClipboard}>
-                  <Text
-                    style={{
-                      color: '#FEC54B',
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                    }}>
-                    {data.requestCode}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 5,
-                }}>
-                <Text style={{color: 'black', fontSize: 16, marginLeft: 40}}>
-                  Thời gian tạo
-                </Text>
-                <Text style={{marginLeft: 'auto'}}>
-                  {moment(data.createdAt).format('HH:mm - DD/MM/YYYY')}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Text style={{color: 'black', fontSize: 16, marginLeft: 40}}>
-                  Thời gian xác nhận
-                </Text>
-                <Text style={{marginLeft: 'auto'}}>
-                  {moment(data.approvedTime).format('HH:mm - DD/MM/YYYY')}
-                </Text>
-              </View>
             </View>
             <View
               style={{
-                paddingHorizontal: 10,
+                marginHorizontal: 10,
                 paddingBottom: 10,
                 borderBottomWidth: 1,
                 borderBottomColor: '#CACACA',
@@ -506,15 +598,33 @@ const InvoiceScreen = ({route, navigation}) => {
               </View>
             </View>
           </ScrollView>
-          {isShowConfirm && data.paymentMethod !== 'CASH' ? (
+          {(data.paymentMethod !== 'CASH' && data.status !== 'DONE') ||
+          (!data.isCustomerCommented && data.status === 'DONE') ||
+          vnp_ResponseCode ? (
             <Button
               style={{
                 marginVertical: 8,
                 width: '100%',
                 alignSelf: 'center',
               }}
-              onPress={handleConfirmPayment}
-              buttonText="Xác nhận và thanh toán"
+              onPress={
+                (vnp_ResponseCode && vnp_ResponseCode === '00') ||
+                (!data.isCustomerCommented && data.status === 'DONE')
+                  ? handleRatingRepairer
+                  : (vnp_ResponseCode && vnp_ResponseCode !== '00') ||
+                    (data.paymentMethod !== 'CASH' && data.status !== 'DONE')
+                  ? handleConfirmPayment
+                  : null
+              }
+              buttonText={
+                (vnp_ResponseCode && vnp_ResponseCode === '00') ||
+                (!data.isCustomerCommented && data.status === 'DONE')
+                  ? 'Đánh giá thợ'
+                  : (vnp_ResponseCode && vnp_ResponseCode !== '00') ||
+                    (data.paymentMethod !== 'CASH' && data.status !== 'DONE')
+                  ? 'Xác nhận và thanh toán'
+                  : null
+              }
             />
           ) : null}
         </SafeAreaView>
@@ -576,18 +686,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    width: 'auto',
     borderRadius: 10,
     backgroundColor: '#FEC54B',
+    paddingHorizontal: 6,
   },
   textBold: {
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: 'black',
+    fontSize: 14,
   },
   datePicker: {
     flexDirection: 'row',
-    width: '80%',
+    width: '60%',
     height: 40,
     borderRadius: 10,
     alignItems: 'center',
@@ -597,6 +709,7 @@ const styles = StyleSheet.create({
   },
   serviceRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 8,
   },
   serviceName: {
@@ -604,7 +717,7 @@ const styles = StyleSheet.create({
   },
   servicePrice: {
     marginLeft: 'auto',
-    color: '#E67F1E',
+    color: 'black',
     fontWeight: '600',
   },
 });

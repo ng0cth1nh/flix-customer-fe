@@ -20,15 +20,6 @@ const PendingScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
 
-  useEffect(() => {
-    (async () => {
-      await dispatch(setIsLoading());
-      await dispatch(
-        fetchRequests({customerAPI, status: RequestStatus.PENDING}),
-      );
-    })();
-  }, []);
-
   const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,
@@ -44,6 +35,7 @@ const PendingScreen = ({navigation}) => {
       submitButtonText: 'Hủy yêu cầu',
       typeSubmitButtonClick: 'CANCEL_REQUEST',
       isShowCancelButton: true,
+      navigateFromScreen: 'PENDING',
     });
   };
 
@@ -62,11 +54,47 @@ const PendingScreen = ({navigation}) => {
             <RefreshControl
               refreshing={refreshControl}
               onRefresh={async () => {
-                setRefreshControl(true);
-                await dispatch(
-                  fetchRequests({customerAPI, status: RequestStatus.PENDING}),
-                );
-                setRefreshControl(false);
+                try {
+                  setRefreshControl(true);
+                  await dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PENDING,
+                    }),
+                  );
+                  await setIsLoading(true);
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.APPROVED,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.FIXING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PAYMENT_WAITING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({customerAPI, status: RequestStatus.DONE}),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.CANCELLED,
+                    }),
+                  );
+                } catch (err) {
+                  console.log(err);
+                } finally {
+                  setRefreshControl(false);
+                }
               }}
               colors={['#FEC54B']}
             />
@@ -79,6 +107,7 @@ const PendingScreen = ({navigation}) => {
               index={index}
               textButton="Xem giá dịch vụ"
               text="Phí dịch vụ kiểm tra"
+              isFixed={false}
             />
           )}
         />

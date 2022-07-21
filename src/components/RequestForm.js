@@ -94,7 +94,7 @@ const RequestForm = function ({
                     {data.repairerAddress}
                   </Text>
                   <TouchableOpacity
-                    style={[styles.viewServiceButton, {width: '60%'}]}>
+                    style={[styles.viewServiceButton, {width: '40%'}]}>
                     <Text style={[styles.textBold, {textAlign: 'center'}]}>
                       Nhắn tin
                     </Text>
@@ -200,7 +200,6 @@ const RequestForm = function ({
                             color: 'black',
                             fontWeight: 'bold',
                             flex: 5,
-
                             textAlign: 'right',
                           }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
                       </View>
@@ -255,11 +254,15 @@ const RequestForm = function ({
                           alignSelf: 'center',
                           marginVertical: 6,
                         }}>
-                        <Text style={{color: 'black'}}>{item.name}</Text>
+                        <Text style={{color: 'black', flex: 12}}>
+                          {item.name}
+                        </Text>
                         <Text
                           style={{
                             color: 'black',
                             fontWeight: 'bold',
+                            flex: 5,
+                            textAlign: 'right',
                           }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
                       </View>
                     );
@@ -315,35 +318,43 @@ const RequestForm = function ({
             </Text>
           </View>
           <View style={{flex: 4, marginLeft: 40}}>
-            <TouchableOpacity
-              style={styles.datePicker}
-              onPress={() => setDateVisible(true)}>
-              <Text style={styles.textBold}>
-                {date !== null
-                  ? date.format('HH:mm - DD/MM/YYYY')
-                  : moment(data.expectFixingDay).format('HH:mm - DD/MM/YYYY')}
-              </Text>
-              {editable ? (
-                <>
-                  <Ionicons
-                    name="chevron-down-sharp"
-                    size={20}
-                    style={{
-                      marginBottom: 3,
-                      color: 'black',
-                      marginLeft: 'auto',
-                    }}
-                  />
-                  <CustomDatePicker
-                    isVisible={dateVisible}
-                    mode="datetime"
-                    minimumDate={true}
-                    handleConfirm={handleDateConfirm}
-                    hideDatePicker={hideDatePicker}
-                  />
-                </>
-              ) : null}
-            </TouchableOpacity>
+            {editable ? (
+              <TouchableOpacity
+                style={styles.datePicker}
+                onPress={() => setDateVisible(true)}>
+                <Text style={styles.textBold}>
+                  {date !== null
+                    ? date.format('HH:mm - DD/MM/YYYY')
+                    : moment(data.expectFixingDay).format('HH:mm - DD/MM/YYYY')}
+                </Text>
+                <Ionicons
+                  name="chevron-down-sharp"
+                  size={20}
+                  style={{
+                    marginBottom: 3,
+                    color: 'black',
+                    marginLeft: 'auto',
+                  }}
+                />
+                <CustomDatePicker
+                  isVisible={dateVisible}
+                  mode="datetime"
+                  minimumDate={true}
+                  handleConfirm={handleDateConfirm}
+                  hideDatePicker={hideDatePicker}
+                />
+              </TouchableOpacity>
+            ) : (
+              <View
+                style={styles.datePicker}
+                onPress={() => setDateVisible(true)}>
+                <Text style={styles.textBold}>
+                  {date !== null
+                    ? date.format('HH:mm - DD/MM/YYYY')
+                    : moment(data.expectFixingDay).format('HH:mm - DD/MM/YYYY')}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
         <View
@@ -370,6 +381,7 @@ const RequestForm = function ({
                 borderRadius: 10,
                 height: '80%',
                 color: 'black',
+                paddingLeft: 16,
               }}
               editable={editable}
               placeholder="Nhập tình trạng của thiết bị"
@@ -462,16 +474,19 @@ const RequestForm = function ({
               <Image
                 source={require('../../assets/images/type/info.png')}
                 style={{
-                  height: 22,
-                  width: 22,
+                  height: 20,
+                  width: 20,
                 }}
               />
               <Text style={styles.tittleText}>Mã yêu cầu</Text>
               <TouchableOpacity
-                style={{marginLeft: 'auto', marginBottom: 3}}
+                style={[
+                  {marginLeft: 'auto', marginBottom: 3},
+                  styles.viewServiceButton,
+                ]}
                 onPress={copyToClipboard}>
                 <Text
-                  style={{color: '#FEC54B', fontSize: 16, fontWeight: 'bold'}}>
+                  style={{color: 'black', fontSize: 14, fontWeight: 'bold'}}>
                   {data.requestCode}
                 </Text>
               </TouchableOpacity>
@@ -482,10 +497,10 @@ const RequestForm = function ({
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <Text style={{color: 'black', fontSize: 16, marginLeft: 40}}>
-                Thời gian
+              <Text style={{color: 'black', fontSize: 14, marginLeft: 20}}>
+                Thời gian tạo
               </Text>
-              <Text style={{marginLeft: 'auto'}}>
+              <Text style={{marginLeft: 'auto', fontSize: 12}}>
                 {moment(data.date).format('HH:mm - DD/MM/YYYY')}
               </Text>
             </View>
@@ -560,7 +575,9 @@ const RequestForm = function ({
             </Text>
           </View>
           <View style={styles.serviceRow}>
-            <Text style={styles.textBold}>TỔNG THANH TOÁN (dự kiến)</Text>
+            <Text style={styles.textBold}>
+              TỔNG THANH TOÁN{fixedService ? '' : ' (dự kiến)'}
+            </Text>
             <Text style={styles.servicePrice}>
               {isNaN(data.actualPrice)
                 ? `${numberWithCommas(data.price * 1.05)} vnđ`
@@ -627,27 +644,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   viewServiceButton: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    width: 'auto',
     borderRadius: 10,
     backgroundColor: '#FEC54B',
+    paddingHorizontal: 6,
   },
   textBold: {
     fontWeight: '600',
     color: 'black',
     fontSize: 14,
-    marginRight: 8,
   },
   datePicker: {
     flexDirection: 'row',
-    width: '80%',
+    width: '60%',
     height: 40,
     borderRadius: 10,
     marginTop: 10,
     alignItems: 'center',
     textAlign: 'center',
     backgroundColor: 'white',
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
   },
   serviceRow: {
     flexDirection: 'row',

@@ -1,3 +1,4 @@
+import './src/utils/ignoreWarnings';
 import 'react-native-gesture-handler';
 import React, {useEffect, useState, useContext} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
@@ -44,18 +45,19 @@ import Toast from 'react-native-toast-message';
 import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
 import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
+import CommentScreen from './src/screens/feedback/CommentScreen';
 import PickVoucherCodeScreen from './src/screens/voucher/PickVoucherCodeScreen';
 import ChatListScreen from './src/screens/chat/ChatListScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import {Provider} from 'react-redux';
 import InvoiceScreen from './src/screens/request/InvoiceScreen';
-import ChooseBankScreen from './src/screens/request/ChooseBankScreen';
 import {
   requestUserPermission,
   notificationListener,
 } from './src/notification/PushNotification';
 import {store} from './src/features/store';
 import useAxios from './src/hooks/useAxios';
+import linking from './global/Linking';
 
 const toastConfig = {
   customToast: ({text1}) => (
@@ -66,12 +68,12 @@ const toastConfig = {
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '90%',
+        width: '96%',
       }}>
       <Text
         style={{
           fontWeight: 'bold',
-          fontSize: 18,
+          fontSize: 16,
           color: 'white',
           textAlign: 'center',
         }}>
@@ -87,12 +89,12 @@ const toastConfig = {
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '90%',
+        width: '96%',
       }}>
       <Text
         style={{
           fontWeight: 'bold',
-          fontSize: 18,
+          fontSize: 16,
           color: 'white',
           textAlign: 'center',
         }}>
@@ -258,7 +260,7 @@ function App() {
           component={RequestDetailScreen}
         />
         <Stack.Screen name="InvoiceScreen" component={InvoiceScreen} />
-        <Stack.Screen name="ChooseBankScreen" component={ChooseBankScreen} />
+        <Stack.Screen name="CommentScreen" component={CommentScreen} />
       </Stack.Navigator>
     );
   }
@@ -314,7 +316,7 @@ function App() {
     </>
   ) : (
     <>
-      <NavigationContainer ref={navigationRef}>
+      <NavigationContainer ref={navigationRef} linking={linking}>
         <Tab.Navigator
           tabBarOptions={{
             showLabel: false,

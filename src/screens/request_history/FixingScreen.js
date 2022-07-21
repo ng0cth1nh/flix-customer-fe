@@ -8,6 +8,7 @@ import {
   fetchRequests,
   selectRequests,
   selectIsLoading,
+  setIsLoading,
 } from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 import Loading from '../../components/Loading';
@@ -19,14 +20,7 @@ const FixingScreen = ({navigation}) => {
   const requests = useSelector(selectRequests);
 
   const [refreshControl, setRefreshControl] = useState(false);
-  useEffect(() => {
-    (async () => {
-      await dispatch(
-        fetchRequests({customerAPI, status: RequestStatus.FIXING}),
-      );
-    })();
-  }, []);
-
+ 
   const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,
@@ -42,6 +36,7 @@ const FixingScreen = ({navigation}) => {
       submitButtonText: 'Hủy yêu cầu',
       typeSubmitButtonClick: 'CANCEL_REQUEST',
       isShowCancelButton: true,
+      navigateFromScreen: 'FIXING',
     });
   };
 
@@ -60,11 +55,47 @@ const FixingScreen = ({navigation}) => {
             <RefreshControl
               refreshing={refreshControl}
               onRefresh={async () => {
-                setRefreshControl(true);
-                await dispatch(
-                  fetchRequests({customerAPI, status: RequestStatus.FIXING}),
-                );
-                setRefreshControl(false);
+                try {
+                  setRefreshControl(true);
+                  await dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.FIXING,
+                    }),
+                  );
+                  await setIsLoading(true);
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PAYMENT_WAITING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.APPROVED,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.PENDING,
+                    }),
+                  );
+                  dispatch(
+                    fetchRequests({customerAPI, status: RequestStatus.DONE}),
+                  );
+                  dispatch(
+                    fetchRequests({
+                      customerAPI,
+                      status: RequestStatus.CANCELLED,
+                    }),
+                  );
+                } catch (err) {
+                  console.log(err);
+                } finally {
+                  setRefreshControl(false);
+                }
               }}
               colors={['#FEC54B']}
             />
@@ -77,6 +108,7 @@ const FixingScreen = ({navigation}) => {
               index={index}
               textButton="Xem giá dịch vụ"
               text="Phí dịch vụ kiểm tra"
+              isFixed={false}
             />
           )}
         />

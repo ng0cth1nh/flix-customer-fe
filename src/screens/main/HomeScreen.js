@@ -19,6 +19,11 @@ import BannerSlider from '../../components/BannerSlider';
 import ForwardButton from '../../components/ForwardButton';
 import MajorComponent from '../../components/MajorComponent';
 import SearchForm from '../../components/SearchForm';
+import {RequestStatus} from '../../utils/util';
+import {fetchRequests, setIsLoading} from '../../features/request/requestSlice';
+import useAxios from '../../hooks/useAxios';
+import {useDispatch} from 'react-redux';
+
 const ENTRIES = [
   {
     title: 'Ưu đãi hôm nay',
@@ -60,9 +65,9 @@ const MAJORS = [
 
 const HomeScreen = ({navigation}) => {
   const [search, setSearch] = useState('');
-  const [entries, setEntries] = useState(ENTRIES);
-  const [majors, setMajors] = useState(MAJORS);
   const carouselRef = useRef(null);
+  const dispatch = useDispatch();
+  const customerAPI = useAxios();
 
   const goForward = () => {
     carouselRef.current.snapToNext();
@@ -71,6 +76,18 @@ const HomeScreen = ({navigation}) => {
   const renderBanner = ({item, index}) => {
     return <BannerSlider data={item} />;
   };
+
+  useEffect(() => {
+    dispatch(setIsLoading());
+    dispatch(fetchRequests({customerAPI, status: RequestStatus.APPROVED}));
+    dispatch(fetchRequests({customerAPI, status: RequestStatus.PENDING}));
+    dispatch(fetchRequests({customerAPI, status: RequestStatus.FIXING}));
+    dispatch(
+      fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
+    );
+    dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
+    dispatch(fetchRequests({customerAPI, status: RequestStatus.CANCELLED}));
+  }, []);
 
   return (
     <>
@@ -87,7 +104,7 @@ const HomeScreen = ({navigation}) => {
           <View>
             <Carousel
               ref={carouselRef}
-              data={entries}
+              data={ENTRIES}
               renderItem={renderBanner}
               sliderWidth={width}
               itemWidth={300}
@@ -119,7 +136,7 @@ const HomeScreen = ({navigation}) => {
               flexWrap: 'wrap',
               justifyContent: 'space-between',
             }}>
-            {majors.map((data, index) => {
+            {MAJORS.map((data, index) => {
               return (
                 <MajorComponent
                   key={index}

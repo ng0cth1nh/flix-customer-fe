@@ -55,7 +55,7 @@ const ServiceComponent = ({
 const styles = StyleSheet.create({
   button: {
     paddingVertical: 5,
-    paddingHorizontal: 6,
+    paddingHorizontal: 10,
     borderRadius: 10,
     backgroundColor: '#FEC54B',
     marginTop: 20,
