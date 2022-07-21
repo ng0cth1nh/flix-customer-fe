@@ -37,10 +37,8 @@ import {numberWithCommas} from '../../utils/util';
 import {VnPayCode} from '../../constants/Error';
 import {RequestStatus} from '../../utils/util';
 const InvoiceScreen = ({route, navigation}) => {
-  const {isShowConfirm, vnp_ResponseCode, requestCode, vnp_TxnRef} =
-    route.params;
-  console.log('vnp_ResponseCode: ', vnp_ResponseCode);
-  console.log('vnp_TxnRef: ', vnp_TxnRef);
+  const {vnp_ResponseCode, requestCode, vnp_TxnRef} = route.params;
+
   const isLoading = useSelector(selectIsLoading);
   const [isLoad, setIsLoad] = useState(false);
   const customerAPI = useAxios();
@@ -713,7 +711,7 @@ const styles = StyleSheet.create({
   },
   datePicker: {
     flexDirection: 'row',
-    width: '80%',
+    width: '60%',
     height: 40,
     borderRadius: 10,
     alignItems: 'center',

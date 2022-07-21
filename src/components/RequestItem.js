@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   textBold: {
     fontWeight: '600',
     color: 'black',
-    fontSize: 13,
+    fontSize: 12,
   },
   serviceRow: {
     flexDirection: 'row',

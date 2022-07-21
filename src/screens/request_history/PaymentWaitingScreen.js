@@ -19,8 +19,6 @@ const PaymentWaitingScreen = ({navigation}) => {
   const isLoading = useSelector(selectIsLoading);
   const requests = useSelector(selectRequests);
 
-
-
   const handleGetInvoiceButton = async service => {
     navigation.push('InvoiceScreen', {
       requestCode: service.requestCode,
