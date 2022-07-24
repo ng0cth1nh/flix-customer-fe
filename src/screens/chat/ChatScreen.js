@@ -44,10 +44,10 @@ const ChatScreen = ({route, navigation}) => {
   const thisUserAvatar = user.avatarUrl;
   const targetUserAvatar = route.params.targetUserAvatar;
   const targetUsername = route.params.targetUsername;
+  const targetUserId = route.params.targetUserId;
   const [onlineStatus, setOnlineStatus] = useState(null);
   const [data, setData] = useState([]);
   const messRef = useRef(null);
-  const targetUserId = route.params.targetUserId;
   const [textMessage, setTextMessage] = useState('');
   const [fileSelect, setFileSelect] = useState(null);
   const [conversationId, setConversationId] = useState(

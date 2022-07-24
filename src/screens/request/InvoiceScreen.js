@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
-  ActivityIndicator,
   Linking,
 } from 'react-native';
 import moment from 'moment';

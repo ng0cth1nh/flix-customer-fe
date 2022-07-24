@@ -37,6 +37,7 @@ const RequestForm = function ({
   fixedService = null,
   isShowSubmitButton,
   submitButtonText,
+  chatHandler,
 }) {
   const [dateVisible, setDateVisible] = useState(false);
   //const [shouldPay, setShouldPay] = useState(data.price);
@@ -94,6 +95,7 @@ const RequestForm = function ({
                     {data.repairerAddress}
                   </Text>
                   <TouchableOpacity
+                    onPress={chatHandler}
                     style={[styles.viewServiceButton, {width: '40%'}]}>
                     <Text style={[styles.textBold, {textAlign: 'center'}]}>
                       Nhắn tin

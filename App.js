@@ -2,7 +2,7 @@ import './src/utils/ignoreWarnings';
 import 'react-native-gesture-handler';
 import React, {useEffect, useState, useContext} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {Image, View, Text, Dimensions} from 'react-native';
+import {Image, View, Text} from 'react-native';
 import {
   createStackNavigator,
   CardStyleInterpolators,
@@ -13,11 +13,7 @@ import {
   Provider as AuthProvider,
   Context as AuthContext,
 } from './src/context/AuthContext';
-import {
-  fetchProfile,
-  selectErrorMessage,
-  selectUser,
-} from './src/features/user/userSlice';
+import {fetchProfile, selectErrorMessage} from './src/features/user/userSlice';
 import {useSelector, useDispatch} from 'react-redux';
 import {firebase} from '@react-native-firebase/database';
 import SplashScreen from './src/screens/SplashScreen';

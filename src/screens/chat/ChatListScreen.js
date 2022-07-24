@@ -18,17 +18,17 @@ import Loading from '../../components/Loading';
 import firestore from '@react-native-firebase/firestore';
 import getErrorMessage from '../../utils/getErrorMessage';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
-import {getUserOnlineStatus} from '../../utils/firebaseUtil';
 import {getDiffTimeBetweenTwoDate} from '../../utils/util';
 
 const ChatListScreen = ({navigation}) => {
   const {state} = useContext(AuthContext);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [listChat, setListChat] = useState([]);
+  const [listMemberOne, setListMemberOne] = useState([]);
+  const [listMemberTwo, setListMemberTwo] = useState([]);
+  const [listOnline, setListOnline] = useState(null);
   const [firebaseLoading, setFireBaseLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const customerAPI = useAxios();
-
   useEffect(() => {
     const firstOneSubscriber = firestore()
       .collection('conversations')
@@ -38,26 +38,17 @@ const ChatListScreen = ({navigation}) => {
       .collection('conversations')
       .where('memberTwo', '==', state.userId)
       .onSnapshot(onResult, onError);
-    const watchTime = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
     const onlineRef = firebase
       .app()
       .database(
         'https://flix-cb844-default-rtdb.asia-southeast1.firebasedatabase.app/',
       )
       .ref('/online')
-      .on('value', snapshot => {
-        const val = snapshot.val();
-        setListChat(
-          listChat.map(chat => {
-            return {
-              ...chat,
-              onlineStatus: val[chat.id + ''],
-            };
-          }),
-        );
-      });
+      .on('value', onGetStatus);
+    const watchTime = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
     return () => {
       setFireBaseLoading(true);
       firstOneSubscriber();
@@ -73,15 +64,11 @@ const ChatListScreen = ({navigation}) => {
     };
   }, []);
 
-  async function onResult(querySnapshot) {
+  const onGetStatus = snapshot => {
+    setListOnline(snapshot.val());
+  };
+  const onResult = async querySnapshot => {
     if (querySnapshot.size > 0) {
-      const memberFilter =
-        querySnapshot.docs[0].data().memberOne === state.userId
-          ? 'memberOne'
-          : 'memberTwo';
-      let filterList = listChat.filter(
-        chat => chat[memberFilter] !== state.userId,
-      );
       const conversationsMap = await Promise.all(
         querySnapshot.docs.map(async doc => {
           // get active , get profile here
@@ -95,28 +82,25 @@ const ChatListScreen = ({navigation}) => {
               ApiConstants.GET_USER_INFORMATION + '?id=' + renderId,
             );
             const userProfile = res.data;
-            const onlineStatus = await getUserOnlineStatus(renderId);
             return {
               ...userProfile,
               ...doc.data(),
               conversationId: doc.id,
-              onlineStatus,
             };
           } catch (error) {
             setErrorMessage(getErrorMessage(error));
             console.log(error);
-            return {...doc.data(), conversationId: doc.id};
           }
         }),
       );
-      setListChat(
-        filterList.concat(conversationsMap).sort((a, b) => {
-          b.latestTimestamp - a.latestTimestamp;
-        }),
-      );
+      if (querySnapshot.docs[0].data().memberOne === state.userId) {
+        setListMemberOne(conversationsMap);
+      } else {
+        setListMemberTwo(conversationsMap);
+      }
     }
     setFireBaseLoading(false);
-  }
+  };
 
   function onError(error) {
     setFireBaseLoading(false);
@@ -153,7 +137,7 @@ const ChatListScreen = ({navigation}) => {
               resizeMode: 'cover',
             }}
           />
-          {item.onlineStatus && (
+          {listOnline && listOnline[item.id + ''] && (
             <View
               style={{
                 width: 10,
@@ -216,8 +200,10 @@ const ChatListScreen = ({navigation}) => {
           <Loading />
         ) : errorMessage ? null : (
           <FlatList
-            keyExtractor={(item, index) => index.toString()}
-            data={listChat}
+            keyExtractor={item => item.conversationId}
+            data={listMemberOne
+              .concat(listMemberTwo)
+              .sort((a, b) => b.latestTimestamp - a.latestTimestamp)}
             scrollEnabled={true}
             renderItem={renderItem}
           />

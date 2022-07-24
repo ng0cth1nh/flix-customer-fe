@@ -192,6 +192,13 @@ const RequestDetailScreen = ({route, navigation}) => {
                 ? handleApproveInvoiceButtonClick
                 : showModal
             }
+            chatHandler={() =>
+              navigation.navigate('ChatScreen', {
+                targetUserId: data.repairerId,
+                targetUserAvatar: data.repairerAvatar,
+                targetUsername: data.repairerName,
+              })
+            }
             isFetchFixedService={isFetchFixedService}
           />
         ) : null}
