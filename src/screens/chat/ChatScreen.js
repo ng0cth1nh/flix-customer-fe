@@ -487,7 +487,7 @@ const ChatScreen = ({route, navigation}) => {
                   textAlign: 'center',
                   marginTop: 20,
                   width: '70%',
-                }}>{`Bạn hiện chưa có tin nhắn với người này. Nhắn tin ngay với ${targetUserId}!`}</Text>
+                }}>{`Bạn hiện chưa có tin nhắn với người này. Nhắn tin ngay với ${targetUsername}!`}</Text>
             )}
 
             <View
