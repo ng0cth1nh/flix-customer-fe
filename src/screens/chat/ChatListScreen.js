@@ -111,7 +111,7 @@ const ChatListScreen = ({navigation}) => {
     return (
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate('ChatScreen', {
+          navigation.push('ChatScreen', {
             conversationId: item.conversationId,
             targetUserId: item.id,
             targetUserAvatar: item.avatar,
@@ -198,7 +198,10 @@ const ChatListScreen = ({navigation}) => {
         {errorMessage ? <NotFound /> : null}
         {firebaseLoading ? (
           <Loading />
-        ) : errorMessage ? null : (
+        ) : errorMessage ? null : listMemberOne.length === 0 &&
+          listMemberTwo.length === 0 ? (
+          <NotFound />
+        ) : (
           <FlatList
             keyExtractor={item => item.conversationId}
             data={listMemberOne

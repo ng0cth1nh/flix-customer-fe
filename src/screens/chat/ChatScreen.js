@@ -432,7 +432,7 @@ const ChatScreen = ({route, navigation}) => {
         <View
           style={{
             flexDirection: 'row',
-            alignSelf: 'center',
+            marginLeft: 60,
             marginVertical: 'auto',
           }}>
           <Image
@@ -487,7 +487,7 @@ const ChatScreen = ({route, navigation}) => {
                   textAlign: 'center',
                   marginTop: 20,
                   width: '70%',
-                }}>{`Bạn hiện chưa có tin nhắn với người này. Nhắn tin ngay với ${targetUserId}!`}</Text>
+                }}>{`Bạn hiện chưa có tin nhắn với người này. Nhắn tin ngay với ${targetUsername}!`}</Text>
             )}
 
             <View

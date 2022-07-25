@@ -59,7 +59,7 @@ export default function LoginScreen({navigation}) {
     const isValidForm = phoneValid && passwordValid;
     if (isValidForm) {
       showLoader();
-      login({username: phoneNumber, password});
+      login({username: phoneNumber, password, roleType: 'CUSTOMER'});
     }
   };
 
