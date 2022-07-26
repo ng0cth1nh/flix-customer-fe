@@ -26,6 +26,7 @@ const ApiConstants = {
   CONFIRM_INVOICE_API: '/customer/vnpay/payment/url',
   GET_USER_INFORMATION: '/user/information',
   CREATE_COMMENT_API: '/confirmedUser/comment',
+  SEARCH_SUB_SERVICE_API: '/category/services/search',
 };
 
 //http://localhost:8000
