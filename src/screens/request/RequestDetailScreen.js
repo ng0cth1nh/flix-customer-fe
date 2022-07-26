@@ -189,7 +189,7 @@ const RequestDetailScreen = ({route, navigation}) => {
                 : showModal
             }
             chatHandler={() =>
-              navigation.navigate('ChatScreen', {
+              navigation.push('ChatScreen', {
                 targetUserId: data.repairerId,
                 targetUserAvatar: data.repairerAvatar,
                 targetUsername: data.repairerName,

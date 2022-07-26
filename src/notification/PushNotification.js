@@ -14,13 +14,12 @@ export async function requestUserPermission() {
   }
 }
 async function getFcmToken() {
-  let fcmToken = null;
+  let fcmToken = await AsyncStorage.getItem('fcmtoken');
   if (!fcmToken) {
     try {
       fcmToken = await messaging().getToken();
       if (fcmToken) {
-        AsyncStorage.setItem('fcmtoken', fcmToken);
-        console.log('fcmToken : ', fcmToken);
+        await AsyncStorage.setItem('fcmtoken', fcmToken);
       } else {
         console.log('get Token fail');
       }
@@ -31,7 +30,14 @@ async function getFcmToken() {
 }
 export const notificationListener = () => {
   // Assume a message-notification contains a "type" property in the data payload of the screen to open
-
+  PushNotification.createChannel(
+    {
+      channelId: 'flix-cb844-customer',
+      channelName: 'flix-customer-notification',
+      channelDescription: 'A channel to categorise your notifications', // (optional) default: undefined.
+    },
+    created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+  );
   messaging().onNotificationOpenedApp(remoteMessage => {
     console.log(
       'Notification caused app to open from background state:',
@@ -52,6 +58,7 @@ export const notificationListener = () => {
   messaging().onMessage(async remoteMessage => {
     console.log('notification on foreround', remoteMessage);
     PushNotification.localNotification({
+      channelId: 'flix-cb844-customer',
       message: remoteMessage.notification.body,
       title: remoteMessage.notification.title,
       largeIconUrl: remoteMessage.notification.android.imageUrl,

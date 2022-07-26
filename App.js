@@ -7,6 +7,7 @@ import {
   createStackNavigator,
   CardStyleInterpolators,
 } from '@react-navigation/stack';
+import axios from 'axios';
 import {navigationRef} from './src/RootNavigation';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
@@ -16,6 +17,7 @@ import {
 import {fetchProfile, selectErrorMessage} from './src/features/user/userSlice';
 import {useSelector, useDispatch} from 'react-redux';
 import {firebase} from '@react-native-firebase/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
@@ -129,7 +131,30 @@ function App() {
           });
         }
       };
+      const saveFCMToken = async () => {
+        const fcmToken = await AsyncStorage.getItem('fcmtoken');
+        axios
+          .post(
+            'http://localhost:8080/api/v1/user/saveFCMToken',
+            {
+              token: fcmToken,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${state.token}`,
+              },
+            },
+          )
+          .then(function (response) {
+            console.log('save token success');
+            console.log(response);
+          })
+          .catch(err => {
+            console.log('save token error: ', err);
+          });
+      };
       getUserProfile();
+      saveFCMToken();
     }
   }, [state.token]);
   useEffect(() => {
@@ -257,6 +282,7 @@ function App() {
         />
         <Stack.Screen name="InvoiceScreen" component={InvoiceScreen} />
         <Stack.Screen name="CommentScreen" component={CommentScreen} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} />
       </Stack.Navigator>
     );
   }

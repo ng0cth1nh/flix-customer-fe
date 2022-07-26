@@ -432,7 +432,7 @@ const ChatScreen = ({route, navigation}) => {
         <View
           style={{
             flexDirection: 'row',
-            alignSelf: 'center',
+            marginLeft: 60,
             marginVertical: 'auto',
           }}>
           <Image
