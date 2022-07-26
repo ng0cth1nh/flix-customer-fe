@@ -195,7 +195,6 @@ function App() {
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen
           name="CategoryListScreen"
           component={CategoryListScreen}
@@ -214,6 +213,7 @@ function App() {
           name="ChoosePaymentMethodScreen"
           component={ChoosePaymentMethodScreen}
         />
+        <Stack.Screen name="SearchScreen" component={SearchScreen} />
       </Stack.Navigator>
     );
   }

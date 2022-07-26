@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   View,
@@ -6,36 +6,21 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  TouchableOpacity,
-  Dimensions,
-  FlatList,
-  ActivityIndicator,
   TextInput,
 } from 'react-native';
-import moment from 'moment';
-import {RadioButton} from 'react-native-paper';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import Clipboard from '@react-native-community/clipboard';
 import Button from '../../components/SubmitButton';
-const {height} = Dimensions.get('window');
 import {
-  fetchRequests,
   setIsLoading,
   selectIsLoading,
-  fetchFixedService,
-  confirmPayment,
-  confirmInvoice,
   rateRepairer,
 } from '../../features/request/requestSlice';
-import {Rating, AirbnbRating} from 'react-native-ratings';
+import {Rating} from 'react-native-ratings';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
-
 import ProgressLoader from 'rn-progress-loader';
 import {useSelector, useDispatch} from 'react-redux';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
-import {numberWithCommas} from '../../utils/util';
-import {VnPayCode} from '../../constants/Error';
 
 const CommentScreen = ({route, navigation}) => {
   const {data} = route.params;

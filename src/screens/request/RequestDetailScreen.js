@@ -3,17 +3,13 @@ import {
   Text,
   View,
   SafeAreaView,
-  ActivityIndicator,
   StyleSheet,
   TextInput,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import moment from 'moment';
-import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
-import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';

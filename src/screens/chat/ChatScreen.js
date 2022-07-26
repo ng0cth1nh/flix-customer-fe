@@ -541,15 +541,17 @@ const ChatScreen = ({route, navigation}) => {
                   <View style={{width: '20%'}}>
                     <TouchableOpacity
                       style={{
-                        width: '70%',
+                        width: '50%',
                         marginLeft: 'auto',
                       }}
                       disabled={fileSelect}
                       onPress={selectFile}>
-                      <Icon
-                        name="file-image-o"
-                        size={24}
-                        style={{marginLeft: 'auto', color: 'black'}}
+                      <Image
+                        source={require('../../../assets/images/type/image.png')}
+                        style={{
+                          height: 20,
+                          width: 20,
+                        }}
                       />
                     </TouchableOpacity>
                   </View>
@@ -560,13 +562,23 @@ const ChatScreen = ({route, navigation}) => {
                   height: 50,
                   width: '15%',
                   borderRadius: 10,
-                  backgroundColor: '#FEC54B',
+                  backgroundColor: textMessage !== '' ? '#FEC54B' : '#F0F0F0',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginLeft: 'auto',
                 }}
                 onPress={handleSendMessage}>
-                <Icon name="send-o" size={24} style={{color: 'black'}} />
+                <Image
+                  source={
+                    textMessage !== ''
+                      ? require('../../../assets/images/type/send-active.png')
+                      : require('../../../assets/images/type/send.png')
+                  }
+                  style={{
+                    height: 20,
+                    width: 20,
+                  }}
+                />
               </TouchableOpacity>
             </View>
           </View>

@@ -5,25 +5,21 @@ import {
   Dimensions,
   Image,
   SafeAreaView,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   StatusBar,
 } from 'react-native';
-import React, {useState, useRef, useEffect} from 'react';
-
-import Icon from 'react-native-vector-icons/FontAwesome';
-const {width} = Dimensions.get('window');
+import React, {useRef, useEffect} from 'react';
+const {width, height} = Dimensions.get('window');
 import Carousel from 'react-native-snap-carousel';
 import BannerSlider from '../../components/BannerSlider';
 import ForwardButton from '../../components/ForwardButton';
 import MajorComponent from '../../components/MajorComponent';
-import SearchForm from '../../components/SearchForm';
 import {RequestStatus} from '../../utils/util';
 import {fetchRequests, setIsLoading} from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
 import {useDispatch} from 'react-redux';
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 const ENTRIES = [
   {
     title: 'Ưu đãi hôm nay',
@@ -64,7 +60,6 @@ const MAJORS = [
 ];
 
 const HomeScreen = ({navigation}) => {
-  const [search, setSearch] = useState('');
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
   const customerAPI = useAxios();
@@ -93,14 +88,15 @@ const HomeScreen = ({navigation}) => {
     <>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={styles.searchForm}
+          onPress={() => navigation.push('SearchScreen')}>
+          <Text>Tìm kiếm dịch vụ</Text>
+          <Icon name="search" size={24} />
+        </TouchableOpacity>
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}>
-          <SearchForm
-            search={search}
-            setSearch={setSearch}
-            placeholder="Tìm kiếm dịch vụ"
-          />
           <View>
             <Carousel
               ref={carouselRef}
@@ -109,6 +105,9 @@ const HomeScreen = ({navigation}) => {
               sliderWidth={width}
               itemWidth={300}
               loop={true}
+              autoplay={true}
+              enableMomentum={false}
+              lockScrollWhileSnapping={true}
             />
           </View>
           <View
@@ -120,7 +119,6 @@ const HomeScreen = ({navigation}) => {
               style={{
                 fontSize: 20,
                 color: 'black',
-                fontFamily: 'Poppins',
                 fontWeight: '700',
               }}>
               Dịch vụ sửa chữa nổi bật
@@ -160,7 +158,6 @@ const HomeScreen = ({navigation}) => {
               style={{
                 fontSize: 20,
                 color: 'black',
-                fontFamily: 'Poppins',
                 fontWeight: '700',
               }}>
               Danh mục
@@ -255,11 +252,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#F0F0F0',
     justifyContent: 'space-between',
+    alignItems: 'center',
     borderRadius: 18,
+    height: height * 0.072,
     paddingHorizontal: 15,
+    marginBottom: 10,
+    paddingVertical: 12,
   },
   searchInput: {
     width: '80%',
+    marginLeft: 10,
   },
   container: {
     paddingHorizontal: '4%',
