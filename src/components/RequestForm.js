@@ -38,6 +38,9 @@ const RequestForm = function ({
   isShowSubmitButton,
   submitButtonText,
   chatHandler,
+  handleChangeAddress,
+  handleClickGetSubServices,
+  handleClickRepairerProfile,
 }) {
   const [dateVisible, setDateVisible] = useState(false);
   //const [shouldPay, setShouldPay] = useState(data.price);
@@ -61,7 +64,9 @@ const RequestForm = function ({
     <SafeAreaView style={{flex: 1, marginHorizontal: '4%'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {data.repairerName ? (
-          <View style={[styles.box, {marginTop: 12}]}>
+          <TouchableOpacity
+            style={[styles.box, {marginTop: 12}]}
+            onPress={handleClickRepairerProfile}>
             <View style={styles.boxHeader}>
               <Image
                 source={require('../../assets/images/type/mechanic.png')}
@@ -104,7 +109,7 @@ const RequestForm = function ({
                 </View>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ) : null}
         <View style={[styles.box, {flexDirection: 'column'}]}>
           <View style={styles.boxHeader}>
@@ -155,7 +160,9 @@ const RequestForm = function ({
                     data.inspectionPrice ? data.inspectionPrice : data.price,
                   )} vnđ`}
                 </Text>
-                <TouchableOpacity style={styles.viewServiceButton}>
+                <TouchableOpacity
+                  style={styles.viewServiceButton}
+                  onPress={handleClickGetSubServices}>
                   <Text style={styles.textBold}>Xem giá dịch vụ</Text>
                 </TouchableOpacity>
               </View>
@@ -198,12 +205,13 @@ const RequestForm = function ({
                           {item.name}
                         </Text>
                         <Text
-                          style={{
-                            color: 'black',
-                            fontWeight: 'bold',
-                            flex: 5,
-                            textAlign: 'right',
-                          }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
+                          style={[
+                            styles.servicePrice,
+                            {
+                              flex: 5,
+                              textAlign: 'right',
+                            },
+                          ]}>{`${numberWithCommas(item.price)} vnđ`}</Text>
                       </View>
                     );
                   })}
@@ -228,12 +236,13 @@ const RequestForm = function ({
                           {item.name}
                         </Text>
                         <Text
-                          style={{
-                            color: 'black',
-                            fontWeight: 'bold',
-                            flex: 5,
-                            textAlign: 'right',
-                          }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
+                          style={[
+                            styles.servicePrice,
+                            {
+                              flex: 5,
+                              textAlign: 'right',
+                            },
+                          ]}>{`${numberWithCommas(item.price)} vnđ`}</Text>
                       </View>
                     );
                   })}
@@ -260,12 +269,13 @@ const RequestForm = function ({
                           {item.name}
                         </Text>
                         <Text
-                          style={{
-                            color: 'black',
-                            fontWeight: 'bold',
-                            flex: 5,
-                            textAlign: 'right',
-                          }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
+                          style={[
+                            styles.servicePrice,
+                            {
+                              flex: 5,
+                              textAlign: 'right',
+                            },
+                          ]}>{`${numberWithCommas(item.price)} vnđ`}</Text>
                       </View>
                     );
                   })}
@@ -286,7 +296,9 @@ const RequestForm = function ({
             />
             <Text style={styles.tittleText}>Địa chỉ của bạn</Text>
             {editable && (
-              <TouchableOpacity style={styles.editTouch}>
+              <TouchableOpacity
+                style={styles.editTouch}
+                onPress={handleChangeAddress}>
                 <Text style={styles.editText}>Thay đổi</Text>
               </TouchableOpacity>
             )}
@@ -580,7 +592,7 @@ const RequestForm = function ({
             <Text style={styles.textBold}>
               TỔNG THANH TOÁN{fixedService ? '' : ' (dự kiến)'}
             </Text>
-            <Text style={styles.servicePrice}>
+            <Text style={styles.servicePriceBold}>
               {isNaN(data.actualPrice)
                 ? `${numberWithCommas(data.price * 1.05)} vnđ`
                 : `${numberWithCommas(data.actualPrice)} vnđ`}
@@ -679,9 +691,16 @@ const styles = StyleSheet.create({
   },
   servicePrice: {
     color: 'black',
-    fontWeight: '600',
     flex: 5,
     textAlign: 'right',
+    fontSize: 12,
+  },
+  servicePriceBold: {
+    color: 'black',
+    fontWeight: 'bold',
+    flex: 5,
+    textAlign: 'right',
+    fontSize: 14,
   },
 });
 

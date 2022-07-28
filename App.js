@@ -41,6 +41,7 @@ import ServiceListScreen from './src/screens/main/ServiceListScreen';
 import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
 import Toast from 'react-native-toast-message';
 import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
+import RepairerProfileScreen from './src/screens/profile/RepairerProfileScreen';
 import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 import CommentScreen from './src/screens/feedback/CommentScreen';
@@ -133,6 +134,9 @@ function App() {
       };
       const saveFCMToken = async () => {
         const fcmToken = await AsyncStorage.getItem('fcmtoken');
+        const token = await AsyncStorage.getItem('token');
+        console.log('fcmToken', fcmToken);
+        console.log('accessToken', token);
         axios
           .post(
             'http://localhost:8080/api/v1/user/saveFCMToken',
@@ -205,6 +209,9 @@ function App() {
           component={ServicePriceScreen}
         />
         <Stack.Screen name="RequestScreen" component={RequestScreen} />
+        <Stack.Screen name="AddressListScreen" component={AddressListScreen} />
+        <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} />
+        <Stack.Screen name="EditAddressScreen" component={EditAddressScreen} />
         <Stack.Screen
           name="PickVoucherCodeScreen"
           component={PickVoucherCodeScreen}
@@ -283,6 +290,10 @@ function App() {
         <Stack.Screen name="InvoiceScreen" component={InvoiceScreen} />
         <Stack.Screen name="CommentScreen" component={CommentScreen} />
         <Stack.Screen name="ChatScreen" component={ChatScreen} />
+        <Stack.Screen
+          name="RepairerProfileScreen"
+          component={RepairerProfileScreen}
+        />
       </Stack.Navigator>
     );
   }
@@ -392,12 +403,6 @@ function App() {
           />
         </Tab.Navigator>
       </NavigationContainer>
-      <Toast
-        config={toastConfig}
-        position="bottom"
-        visibilityTime={2000}
-        bottomOffset={90}
-      />
     </>
   );
 }
@@ -406,6 +411,12 @@ export default () => {
     <AuthProvider>
       <Provider store={store}>
         <App />
+        <Toast
+          config={toastConfig}
+          position="bottom"
+          visibilityTime={2000}
+          bottomOffset={90}
+        />
       </Provider>
     </AuthProvider>
   );

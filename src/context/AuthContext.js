@@ -24,6 +24,8 @@ const authReducer = (state, action) => {
       return {...state, errorMessage: '', loading: false};
     case 'show_loader':
       return {...state, loading: true};
+    case 'hide_loader':
+      return {...state, loading: false};
     case 'logout':
       return {token: null, userId: null, errorMessage: '', loading: false};
     default:
@@ -60,6 +62,20 @@ const register = dispatch => async params => {
       type: 'add_error',
       payload: getErrorMessage(err),
     });
+  } finally {
+    dispatch({type: 'hide_loader'});
+  }
+};
+const reRegister = dispatch => async params => {
+  try {
+    await axios.post(constants.SEND_OTP_API, {phone: params.phone});
+  } catch (err) {
+    dispatch({
+      type: 'add_error',
+      payload: getErrorMessage(err),
+    });
+  } finally {
+    dispatch({type: 'hide_loader'});
   }
 };
 const confirmOTP = dispatch => async params => {
@@ -67,24 +83,20 @@ const confirmOTP = dispatch => async params => {
   const formData = new FormData();
   formData.append('phone', params.phone);
   formData.append('otp', params.otp);
-  formData.append(
-    'avatar',
-    params.avatar
-      ? {
-          uri: params.avatar.path,
-          type: params.avatar.mime,
-          name: params.avatar.path.split('\\').pop().split('/').pop(),
-        }
-      : params.avatar,
-  );
+  if (params.avatar) {
+    formData.append('avatar', {
+      uri: params.avatar.path,
+      type: params.avatar.mime,
+      name: params.avatar.path.split('\\').pop().split('/').pop(),
+    });
+  }
   formData.append('fullName', params.fullName);
   formData.append('password', params.password);
-  formData.append('cityId', params.cityId);
-  formData.append('districtId', params.districtId);
   formData.append('communeId', params.communeId);
   formData.append('streetAddress', params.streetAddress);
   formData.append('roleType', 'ROLE_CUSTOMER');
   try {
+    console.log('formData: ', formData);
     const res = await axios.post(constants.CONFIRM_OTP_API, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -104,6 +116,8 @@ const confirmOTP = dispatch => async params => {
       type: 'add_error',
       payload: getErrorMessage(err),
     });
+  } finally {
+    dispatch({type: 'hide_loader'});
   }
 };
 
@@ -181,6 +195,7 @@ export const {Provider, Context} = createDataContext(
     TryLocalLogin,
     refreshToken,
     confirmOTP,
+    reRegister,
   },
   {token: null, errorMessage: '', userId: null, loading: false},
 );

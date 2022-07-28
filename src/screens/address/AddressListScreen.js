@@ -1,34 +1,60 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
   SafeAreaView,
   StyleSheet,
-  StatusBar,
-  ScrollView,
   FlatList,
   Dimensions,
-  ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 const {height} = Dimensions.get('window');
-import Loading from '../../components/Loading';
 import {RadioButton} from 'react-native-paper';
-import Toast from 'react-native-toast-message';
-import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
-import useFetchData from '../../hooks/useFetchData';
 import SubmitButton from '../../components/SubmitButton';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
-import BackButton from '../../components/BackButton';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  selectIsLoading,
+  selectAddresses,
+  selectErrorMessage,
+  updateMainAddress,
+  fetchAddresses,
+} from '../../features/user/userSlice';
+import useAxios from '../../hooks/useAxios';
+import Toast from 'react-native-toast-message';
 
 const AddressListScreen = ({navigation}) => {
   const [checked, setChecked] = useState('first');
+  const customerAPI = useAxios();
+  const dispatch = useDispatch();
+  const isLoading = useSelector(selectIsLoading);
+  const addresses = useSelector(selectAddresses);
+  const errorMessage = useSelector(selectErrorMessage);
 
-  const {loading, data, isError} = useFetchData(
-    ApiConstants.GET_ADDRESS_LIST_API,
-  );
+  const handleUpdateMainAddressButtonClick = async addressId => {
+    try {
+      // await dispatch(setIsLoading());
+      await dispatch(
+        updateMainAddress({
+          customerAPI,
+          body: {addressId},
+        }),
+      ).unwrap();
+      await dispatch(fetchAddresses(customerAPI));
+      Toast.show({
+        type: 'customToast',
+        text1: 'Đặt địa chỉ mặc thành công',
+      });
+      // navigation.goBack();
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
+  };
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
@@ -38,17 +64,14 @@ const AddressListScreen = ({navigation}) => {
         isBackButton={true}
         statusBarColor="white"
       />
-      <SafeAreaView style={{flex: 1}}>
-        {isError ? <NotFound /> : null}
-        {data !== null ? (
+      <SafeAreaView style={{flex: 1, marginHorizontal: '4%'}}>
+        {errorMessage ? <NotFound /> : null}
+        {addresses ? (
           <FlatList
             showsVerticalScrollIndicator={false}
-            data={data.addresses}
+            data={addresses}
             style={{
-              marginHorizontal: '4%',
               height: 0.78 * height,
-              borderBottomWidth: 1,
-              borderBottomColor: '#CACACA',
             }}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({item, index}) => (
@@ -67,10 +90,9 @@ const AddressListScreen = ({navigation}) => {
                   value="first"
                   status={item.mainAddress ? 'checked' : 'unchecked'}
                   color="#FFBC00"
-                  onPress={() => {
-                    setChecked('first');
-                    // showToast();
-                  }}
+                  onPress={() =>
+                    handleUpdateMainAddressButtonClick(item.addressId)
+                  }
                 />
                 <View
                   style={{flex: 1, marginHorizontal: 6, marginVertical: 10}}>
@@ -78,7 +100,11 @@ const AddressListScreen = ({navigation}) => {
                     <Text style={styles.tittleText}>{item.customerName}</Text>
                     <TouchableOpacity
                       style={styles.editTouch}
-                      onPress={() => navigation.push('EditAddressScreen')}>
+                      onPress={() =>
+                        navigation.push('EditAddressScreen', {
+                          data: item,
+                        })
+                      }>
                       <Text style={styles.editText}>Thay đổi</Text>
                     </TouchableOpacity>
                   </View>
@@ -91,22 +117,17 @@ const AddressListScreen = ({navigation}) => {
             )}
           />
         ) : null}
-        {loading ? (
-          <Loading />
-        ) : (
-          <SubmitButton
-            style={{
-              marginTop: 15,
-              marginBottom: 15,
-              width: '90%',
-              alignSelf: 'center',
-            }}
-            onPress={() => {
-              navigation.push('AddAddressScreen');
-            }}
-            buttonText="THÊM ĐỊA CHỈ"
-          />
-        )}
+        <SubmitButton
+          style={{
+            marginVertical: 8,
+            width: '100%',
+            alignSelf: 'center',
+          }}
+          onPress={() => {
+            navigation.push('AddAddressScreen');
+          }}
+          buttonText="THÊM ĐỊA CHỈ"
+        />
       </SafeAreaView>
     </View>
   );

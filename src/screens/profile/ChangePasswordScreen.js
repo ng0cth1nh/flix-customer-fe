@@ -4,13 +4,11 @@ import {
   View,
   SafeAreaView,
   StyleSheet,
-  StatusBar,
+  ScrollView,
   TextInput,
-  Dimensions,
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-const {height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import SubmitButton from '../../components/SubmitButton';
@@ -110,16 +108,10 @@ const ChangePasswordScreen = ({navigation}) => {
         isBackButton={true}
         statusBarColor="white"
       />
-      <SafeAreaView style={{flex: 1}}>
-        <View
-          style={[
-            styles.box,
-            {
-              height: height * 0.6,
-              flexDirection: 'column',
-              marginVertical: '4%',
-            },
-          ]}>
+      <SafeAreaView style={{flex: 1, marginHorizontal: '4%'}}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{paddingTop: 10}}>
           <View style={styles.inputField}>
             <Text style={styles.inputLabel}>Nhập mật khẩu hiện tại</Text>
             <View
@@ -231,12 +223,11 @@ const ChangePasswordScreen = ({navigation}) => {
               <Text style={styles.errorMessage}>{reNewPasswordInputError}</Text>
             )}
           </View>
-        </View>
+        </ScrollView>
         <SubmitButton
           style={{
-            marginTop: 15,
-            marginBottom: 15,
-            width: '90%',
+            marginVertical: 8,
+            width: '100%',
             alignSelf: 'center',
           }}
           onPress={handleChangePassword}
@@ -275,7 +266,7 @@ const styles = StyleSheet.create({
     color: 'black',
     marginLeft: 15,
   },
-  inputField: {marginBottom: 12},
+  inputField: {marginBottom: 16},
   inputLabel: {
     fontWeight: 'bold',
     color: 'black',

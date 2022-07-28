@@ -44,7 +44,7 @@ const ServiceListScreen = ({route, navigation}) => {
                 index={index}
                 onPressPriceHandler={() =>
                   navigation.push('ServicePriceScreen', {
-                    serviceId: item.serviceId,
+                    serviceId: item.id,
                     serviceName: item.serviceName,
                   })
                 }

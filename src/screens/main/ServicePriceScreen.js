@@ -43,6 +43,7 @@ const ServicePriceScreen = ({route, navigation}) => {
                 borderTopLeftRadius: 10,
                 borderTopRightRadius: 10,
                 height: 40,
+                marginTop: 10,
               }}>
               <Text
                 style={{
@@ -71,22 +72,23 @@ const ServicePriceScreen = ({route, navigation}) => {
           {data !== null ? (
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={data.services}
+              data={data.subServices}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({item, index}) => (
                 <View
-                  key={index}
+                  key={index.toString()}
                   style={{
                     borderBottomWidth: 0.5,
                     borderBottomColor: '#DDDDDD',
                     flexDirection: 'row',
                     backgroundColor: 'white',
                     paddingLeft: 15,
-                    height: 50,
+                    height: 'auto',
+                    paddingVertical: 10,
                   }}>
                   <Text
                     style={{
-                      flex: 3,
+                      flex: 2,
                       color: 'black',
                       fontSize: 14,
                       alignSelf: 'center',
@@ -101,6 +103,7 @@ const ServicePriceScreen = ({route, navigation}) => {
                       fontSize: 14,
                       fontWeight: 'bold',
                       alignSelf: 'center',
+                      textAlign: 'center',
                     }}>
                     {numberWithCommas(item.price)}
                   </Text>
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
     color: 'black',
     marginTop: getStatusBarHeight(),
     paddingBottom: 15,
-    borderBottomWidth: 1,
+    borderBottomWidth: 2,
     borderBottomColor: '#CACACA',
     width: '100%',
     marginBottom: 10,

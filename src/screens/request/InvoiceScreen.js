@@ -68,12 +68,13 @@ const InvoiceScreen = ({route, navigation}) => {
           {item.name}
         </Text>
         <Text
-          style={{
-            color: 'black',
-            fontWeight: 'bold',
-            flex: 5,
-            textAlign: 'right',
-          }}>{`${numberWithCommas(item.price)} vnđ`}</Text>
+          style={[
+            styles.servicePrice,
+            {
+              flex: 5,
+              textAlign: 'right',
+            },
+          ]}>{`${numberWithCommas(item.price)} vnđ`}</Text>
       </View>
     );
   };
@@ -147,6 +148,12 @@ const InvoiceScreen = ({route, navigation}) => {
     });
   };
 
+  const handleClickGetSubServices = () => {
+    navigation.push('ServicePriceScreen', {
+      serviceId: data.serviceId,
+      serviceName: data.serviceName,
+    });
+  };
   const loadData = async () => {
     try {
       await setLoading(true);
@@ -356,7 +363,9 @@ const InvoiceScreen = ({route, navigation}) => {
                       <Text style={styles.textBold}>{`${numberWithCommas(
                         data.inspectionPrice,
                       )} vnđ`}</Text>
-                      <TouchableOpacity style={styles.viewServiceButton}>
+                      <TouchableOpacity
+                        style={styles.viewServiceButton}
+                        onPress={handleClickGetSubServices}>
                         <Text style={styles.textBold}>Xem giá dịch vụ</Text>
                       </TouchableOpacity>
                     </View>
@@ -388,8 +397,11 @@ const InvoiceScreen = ({route, navigation}) => {
                             justifyContent: 'space-around',
                           },
                         ]}>
-                        <Text style={styles.textBold}>Tổng</Text>
-                        <Text style={styles.servicePrice}>{`${numberWithCommas(
+                        <Text style={[styles.textBold, {fontSize: 16}]}>
+                          Tổng
+                        </Text>
+                        <Text
+                          style={styles.servicePriceBold}>{`${numberWithCommas(
                           data.totalSubServicePrice,
                         )} vnđ`}</Text>
                       </View>
@@ -415,8 +427,11 @@ const InvoiceScreen = ({route, navigation}) => {
                             justifyContent: 'space-around',
                           },
                         ]}>
-                        <Text style={styles.textBold}>Tổng</Text>
-                        <Text style={styles.servicePrice}>{`${numberWithCommas(
+                        <Text style={[styles.textBold, {fontSize: 16}]}>
+                          Tổng
+                        </Text>
+                        <Text
+                          style={styles.servicePriceBold}>{`${numberWithCommas(
                           data.totalAccessoryPrice,
                         )} vnđ`}</Text>
                       </View>
@@ -442,8 +457,11 @@ const InvoiceScreen = ({route, navigation}) => {
                             justifyContent: 'space-around',
                           },
                         ]}>
-                        <Text style={styles.textBold}>Tổng</Text>
-                        <Text style={styles.servicePrice}>{`${numberWithCommas(
+                        <Text style={[styles.textBold, {fontSize: 16}]}>
+                          Tổng
+                        </Text>
+                        <Text
+                          style={styles.servicePriceBold}>{`${numberWithCommas(
                           data.totalExtraServicePrice,
                         )} vnđ`}</Text>
                       </View>
@@ -591,7 +609,7 @@ const InvoiceScreen = ({route, navigation}) => {
               ) : null}
               <View style={[styles.serviceRow, {marginBottom: 16}]}>
                 <Text style={styles.textBold}>TỔNG THANH TOÁN</Text>
-                <Text style={styles.servicePrice}>{`${numberWithCommas(
+                <Text style={styles.servicePriceBold}>{`${numberWithCommas(
                   data.actualPrice,
                 )} vnđ`}</Text>
               </View>
@@ -698,7 +716,7 @@ const styles = StyleSheet.create({
   },
   datePicker: {
     flexDirection: 'row',
-    width: '68%',
+    width: '72%',
     height: 40,
     borderRadius: 10,
     alignItems: 'center',
@@ -715,9 +733,17 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   servicePrice: {
-    marginLeft: 'auto',
     color: 'black',
-    fontWeight: '600',
+    flex: 5,
+    textAlign: 'right',
+    fontSize: 12,
+  },
+  servicePriceBold: {
+    color: 'black',
+    fontWeight: 'bold',
+    flex: 5,
+    textAlign: 'right',
+    fontSize: 14,
   },
 });
 

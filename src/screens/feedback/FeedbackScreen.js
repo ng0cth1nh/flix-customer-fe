@@ -4,7 +4,6 @@ import {
   View,
   SafeAreaView,
   StyleSheet,
-  StatusBar,
   ScrollView,
   Dimensions,
   TextInput,
@@ -13,47 +12,122 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-const {height, width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import RNPickerSelect from 'react-native-picker-select';
-
+import {FeedbackType} from '../../utils/util';
 import Toast from 'react-native-toast-message';
 import ImagePicker from 'react-native-image-crop-picker';
 import SubmitButton from '../../components/SubmitButton';
-import BackButton from '../../components/BackButton';
+import useAxios from '../../hooks/useAxios';
+import ProgressLoader from 'rn-progress-loader';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  sendFeedback,
+  setIsLoading,
+  selectIsLoading,
+} from '../../features/user/userSlice';
 
 const FeedbackScreen = ({navigation}) => {
-  const [checked, setChecked] = useState('first');
-  const [phone, setPhone] = useState('');
-  const [type, setType] = useState(null);
-  const [code, setCode] = useState('');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [file, setFile] = useState([]);
-
-  const [sex, setSex] = useState(null);
-
-  const showToast = () => {
-    console.log('show toast');
-    Toast.show({
-      type: 'success',
-      text1: 'Flix',
-      text2: 'Thay đổi địa chỉ mặc định thành công!',
-    });
-  };
-
+  const [feedbackType, setFeedbackType] = useState(null);
+  const [requestCode, setRequestCode] = useState(null);
+  const [title, setTitle] = useState(null);
+  const [description, setDescription] = useState(null);
+  const [images, setImages] = useState([]);
+  const [feedbackTypeError, setFeedbackTypeError] = useState(null);
+  const [requestCodeInputError, setRequestCodeInputError] = useState(null);
+  const [titleInputError, setTitleInputError] = useState(null);
+  const [descriptionInputError, setDescriptionInputError] = useState(null);
+  const isLoading = useSelector(selectIsLoading);
+  const customerAPI = useAxios();
+  const dispatch = useDispatch();
   const selectFile = () => {
     ImagePicker.openPicker({
       cropping: true,
       multiple: true,
     })
-      .then(images => {
-        setFile([...file, ...images]);
+      .then(image => {
+        setImages([...images, ...image]);
       })
       .catch(err => {
         console.log(err);
       });
+  };
+
+  const checkRequestCodeValid = async () => {
+    if (feedbackType === 'ACCOUNT') {
+      return true;
+    }
+    if (!requestCode || requestCode.trim() === '') {
+      setRequestCodeInputError('Vui lòng nhập mã yêu cầu');
+      return false;
+    } else if (requestCode.length !== 12) {
+      setRequestCodeInputError('Mã yêu cầu không hợp lệ');
+      return false;
+    }
+    return true;
+  };
+  const checkTitleValid = async () => {
+    if (!title || title.trim() === '') {
+      setTitleInputError('Vui lòng nhập tiêu đề');
+      return false;
+    }
+    return true;
+  };
+  const checkDescriptionValid = async () => {
+    if (!description || description.trim() === '') {
+      setDescriptionInputError('Vui lòng nhập mô tả chi tiết');
+      return false;
+    }
+    return true;
+  };
+
+  const checkFeedbackTypeValid = async () => {
+    if (!feedbackType || feedbackType.trim() === '') {
+      setFeedbackTypeError('Vui lòng chọn loại yêu cầu');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmitButton = async () => {
+    try {
+      let isDescriptionValid = await checkDescriptionValid();
+      let isFeedbackValid = await checkFeedbackTypeValid();
+      let isRequestCodeValid = await checkRequestCodeValid();
+      let isTitleValid = await checkTitleValid();
+      if (
+        isDescriptionValid &&
+        isFeedbackValid &&
+        isRequestCodeValid &&
+        isTitleValid
+      ) {
+        await dispatch(setIsLoading());
+        await dispatch(
+          sendFeedback({
+            customerAPI,
+            body: {
+              images,
+              requestCode,
+              feedbackType,
+              title,
+              description,
+            },
+          }),
+        ).unwrap();
+        Toast.show({
+          type: 'customToast',
+          text1: 'Gửi yêu cầu hỗ trợ thành công',
+        });
+        navigation.goBack();
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
   };
 
   return (
@@ -64,123 +138,130 @@ const FeedbackScreen = ({navigation}) => {
         isBackButton={true}
         statusBarColor="white"
       />
-      <SafeAreaView style={{flex: 1}}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{
-            marginHorizontal: '4%',
-            height: 0.78 * height,
-            flexDirection: 'column',
-          }}>
+      <SafeAreaView style={{flex: 1, marginHorizontal: '4%'}}>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.inputField}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.inputLabel}>Loại yêu cầu </Text>
-              <Text style={[styles.inputLabel, {color: 'red'}]}>*</Text>
+              <Text style={styles.inputLabel}>Loại yêu cầu *</Text>
             </View>
-            <View style={styles.valueSpace}>
+            <View
+              style={[
+                styles.valueSpace,
+                {borderColor: feedbackTypeError ? '#FF6442' : '#CACACA'},
+              ]}>
               <RNPickerSelect
-                value={type ? type : 'Chọn loại yêu cầu'}
+                value={feedbackType ? feedbackType : 'Chọn loại yêu cầu'}
                 fixAndroidTouchableBug={true}
-                onValueChange={value => setType(value)}
+                onValueChange={value => {
+                  setFeedbackType(value);
+                  setFeedbackTypeError(null);
+                }}
                 placeholder={{
                   label: 'Chọn loại yêu cầu',
                   value: null,
                 }}
                 useNativeAndroidPickerStyle={false}
-                style={[styles.pickerStyle]}
-                items={[
-                  {label: 'Vấn đề về yêu cầu sửa chữa', value: 'nam'},
-                  {label: 'Vấn đề về hệ thống', value: 'nu'},
-                ]}
+                style={styles.pickerStyle}
+                items={FeedbackType}
+                Icon={() => (
+                  <Ionicons
+                    name="chevron-down-sharp"
+                    size={20}
+                    style={{marginTop: (0.075 * height) / 4}}
+                  />
+                )}
               />
-              <Ionicons
-                name="chevron-down-sharp"
-                size={20}
-                style={{
-                  color: 'black',
-                  alignSelf: 'center',
-                  marginLeft: 10,
-                }}
-              />
+              {feedbackTypeError && (
+                <Text style={styles.errorMessage}>{feedbackTypeError}</Text>
+              )}
             </View>
           </View>
-
-          <View style={styles.inputField}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={styles.inputLabel}>Số điện thoại liên lạc </Text>
-              <Text style={[styles.inputLabel, {color: 'red'}]}>*</Text>
-            </View>
-            <View style={styles.valueSpace}>
-              <TextInput
-                style={styles.valueText}
-                value={phone}
-                onChangeText={text => setPhone(text)}
-                placeholder="Nhập số điện thoại"
-                placeholderTextColor="#DFDFDF"
-              />
-            </View>
-          </View>
-          {type === 'nam' ? (
+          {feedbackType !== 'ACCOUNT' ? (
             <View style={styles.inputField}>
               <View style={{flexDirection: 'row'}}>
-                <Text style={styles.inputLabel}>Mã yêu cầu sửa chữa </Text>
-                <Text style={[styles.inputLabel, {color: 'red'}]}>*</Text>
+                <Text style={styles.inputLabel}>Mã yêu cầu sửa chữa *</Text>
               </View>
-              <View style={styles.valueSpace}>
+              <View
+                style={[
+                  styles.valueSpace,
+                  {borderColor: requestCodeInputError ? '#FF6442' : '#CACACA'},
+                ]}>
                 <TextInput
                   style={styles.valueText}
-                  value={phone}
-                  onChangeText={text => setPhone(text)}
+                  value={requestCode}
+                  onChangeText={text => setRequestCode(text)}
+                  onFocus={() => setRequestCodeInputError(null)}
                   placeholder="Nhập mã yêu cầu"
                   placeholderTextColor="#DFDFDF"
                 />
+                {requestCodeInputError && (
+                  <Text style={styles.errorMessage}>
+                    {requestCodeInputError}
+                  </Text>
+                )}
               </View>
             </View>
           ) : null}
           <View style={styles.inputField}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.inputLabel}>Tiêu đề </Text>
-              <Text style={[styles.inputLabel, {color: 'red'}]}>*</Text>
+              <Text style={styles.inputLabel}>Tiêu đề *</Text>
             </View>
-            <View style={styles.valueSpace}>
+            <View
+              style={[
+                styles.valueSpace,
+                {borderColor: titleInputError ? '#FF6442' : '#CACACA'},
+              ]}>
               <TextInput
                 style={styles.valueText}
-                value={phone}
-                onChangeText={text => setPhone(text)}
+                value={title}
+                onChangeText={text => setTitle(text)}
+                onFocus={() => setTitleInputError(null)}
                 placeholder="Nhập tiêu đề"
                 placeholderTextColor="#DFDFDF"
               />
+              {titleInputError && (
+                <Text style={styles.errorMessage}>{titleInputError}</Text>
+              )}
             </View>
           </View>
           <View style={styles.inputField}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.inputLabel}>Nội dung </Text>
-              <Text style={[styles.inputLabel, {color: 'red'}]}>*</Text>
+              <Text style={styles.inputLabel}>Nội dung *</Text>
             </View>
             <View
               style={[
                 styles.valueSpace,
                 {
                   height: 100,
+                  borderColor: descriptionInputError ? '#FF6442' : '#CACACA',
                 },
               ]}>
               <TextInput
                 style={styles.valueText}
-                value={phone}
-                onChangeText={text => setPhone(text)}
+                value={description}
+                onChangeText={text => setDescription(text)}
                 placeholder="Mô tả chi tiết vấn đề của bạn"
                 placeholderTextColor="#DFDFDF"
+                onFocus={() => setDescriptionInputError(null)}
                 multiline
                 numberOfLines={5}
               />
+              {descriptionInputError && (
+                <Text style={styles.errorMessage}>{descriptionInputError}</Text>
+              )}
             </View>
           </View>
           <View style={styles.inputField}>
             <Text style={styles.inputLabel}>Tệp ảnh đính kèm (nếu có)</Text>
             <View
-              style={{width: '100%', flexDirection: 'row', flexWrap: 'wrap'}}>
-              {file.length !== 0
-                ? file.map((item, index) => {
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                marginBottom: 20,
+              }}>
+              {images.length !== 0
+                ? images.map((item, index) => {
                     return (
                       <ImageBackground
                         source={{uri: item.path}}
@@ -189,7 +270,9 @@ const FeedbackScreen = ({navigation}) => {
                         resizeMode="cover">
                         <TouchableOpacity
                           style={styles.cameraButton}
-                          onPress={() => setFile(file.splice(index + 1, 1))}>
+                          onPress={() =>
+                            setImages(images.splice(index + 1, 1))
+                          }>
                           <Image
                             style={{
                               width: 12,
@@ -214,15 +297,20 @@ const FeedbackScreen = ({navigation}) => {
             </View>
           </View>
         </ScrollView>
+        <ProgressLoader
+          visible={isLoading}
+          isModal={true}
+          isHUD={true}
+          hudColor={'#FEC54B'}
+          color={'#000000'}
+        />
         <SubmitButton
           style={{
             marginBottom: 15,
-            width: '90%',
+            width: '92%',
             alignSelf: 'center',
           }}
-          onPress={() => {
-            navigation.push('AddAddressScreen');
-          }}
+          onPress={handleSubmitButton}
           buttonText="GỬI YÊU CẦU"
         />
       </SafeAreaView>
@@ -298,28 +386,33 @@ const styles = StyleSheet.create({
     color: 'black',
     marginBottom: 5,
   },
+  errorMessage: {
+    position: 'absolute',
+    bottom: -14,
+    left: 5,
+    fontSize: 10,
+    color: '#FF6442',
+  },
   inputField: {marginVertical: 6},
   inputLabel: {
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: 14,
   },
   valueSpace: {
-    height: 50,
+    height: 'auto',
+    justifyContent: 'center',
     paddingHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 10,
+    borderRadius: 18,
     backgroundColor: '#FFFFFF',
-    borderColor: '#E8E8E8',
     borderWidth: 1,
+    borderColor: '#F0F0F0',
+    width: '100%',
   },
   valueText: {
     fontSize: 16,
     color: 'black',
-    flex: 15,
   },
   valueTextBlur: {
     fontSize: 16,
@@ -327,11 +420,11 @@ const styles = StyleSheet.create({
   },
   pickerStyle: {
     inputIOS: {
-      fontSize: 18,
+      fontSize: 16,
       color: 'black',
     },
     inputAndroid: {
-      fontSize: 18,
+      fontSize: 16,
       color: 'black',
     },
   },

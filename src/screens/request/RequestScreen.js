@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, SafeAreaView, ActivityIndicator} from 'react-native';
 import moment from 'moment';
 import ApiConstants from '../../constants/Api';
@@ -16,11 +16,15 @@ import {
 import {RequestStatus} from '../../utils/util';
 import ProgressLoader from 'rn-progress-loader';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
-import Loading from '../../components/Loading';
+import {selectAddresses} from '../../features/user/userSlice';
+
+const getMainAddress = addresses => {
+  return addresses.filter(val => val.mainAddress)[0];
+};
 
 const RequestScreen = ({navigation, route}) => {
   const {service} = route.params;
-  const [date, setDate] = useState(moment().add(1, 'hours'));
+  const [date, setDate] = useState(moment().add(2, 'hours'));
   const [description, setDescription] = useState('');
   const [voucher, setVoucher] = useState(null);
   const isLoading = useSelector(selectIsLoading);
@@ -30,9 +34,16 @@ const RequestScreen = ({navigation, route}) => {
   });
   const customerAPI = useAxios();
   const dispatch = useDispatch();
+  const addresses = useSelector(selectAddresses);
+  const [address, setAddress] = useState(getMainAddress(addresses));
+  //const {loading, data} = useFetchData(ApiConstants.GET_MAIN_ADDRESS_API);
 
   const handleClickVoucher = () => {
     navigation.push('PickVoucherCodeScreen');
+  };
+
+  const handleChangeAddress = () => {
+    navigation.push('AddressListScreen');
   };
 
   const handleClickService = () => {
@@ -46,10 +57,14 @@ const RequestScreen = ({navigation, route}) => {
     });
   };
 
+  useEffect(() => {
+    setAddress(getMainAddress(addresses));
+  }, [addresses]);
+
   const handleSubmitButtonClick = async () => {
     const body = {
       serviceId: service.id,
-      addressId: data.addressId,
+      addressId: address.addressId,
       expectFixingDay: date.format('yyyy-MM-DD HH:mm:ss'),
       description,
       voucherId: voucher,
@@ -76,8 +91,6 @@ const RequestScreen = ({navigation, route}) => {
     }
   };
 
-  const {loading, data} = useFetchData(ApiConstants.GET_MAIN_ADDRESS_API);
-
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <TopHeaderComponent
@@ -87,7 +100,7 @@ const RequestScreen = ({navigation, route}) => {
         statusBarColor="white"
       />
       <SafeAreaView style={{flex: 1}}>
-        {loading ? <Loading /> : null}
+        {/* {loading ? <Loading /> : null} */}
         <ProgressLoader
           visible={isLoading}
           isModal={true}
@@ -95,25 +108,25 @@ const RequestScreen = ({navigation, route}) => {
           hudColor={'#FEC54B'}
           color={'#000000'}
         />
-        {data !== null ? (
-          <RequestForm
-            date={date}
-            setDate={setDate}
-            description={description}
-            setDescription={setDescription}
-            data={service}
-            address={data}
-            paymentMethod={paymentMethod}
-            handleClickVoucher={handleClickVoucher}
-            handleClickService={handleClickService}
-            handleClickChoosePaymentMethod={handleClickChoosePaymentMethod}
-            handleSubmitButtonClick={handleSubmitButtonClick}
-            isShowSubmitButton={true}
-            submitButtonText="ĐẶT LỊCH"
-            editable={true}
-            isFetchFixedService={false}
-          />
-        ) : null}
+
+        <RequestForm
+          date={date}
+          setDate={setDate}
+          description={description}
+          setDescription={setDescription}
+          data={service}
+          address={address}
+          paymentMethod={paymentMethod}
+          handleClickVoucher={handleClickVoucher}
+          handleClickService={handleClickService}
+          handleClickChoosePaymentMethod={handleClickChoosePaymentMethod}
+          handleSubmitButtonClick={handleSubmitButtonClick}
+          isShowSubmitButton={true}
+          handleChangeAddress={handleChangeAddress}
+          submitButtonText="ĐẶT LỊCH"
+          editable={true}
+          isFetchFixedService={false}
+        />
       </SafeAreaView>
     </View>
   );

@@ -22,15 +22,16 @@ export default function ForgotPassScreen({navigation}) {
   const [coverRepassword, setCoverRepassword] = useState(true);
   const [passwordInputError, setPasswordInputError] = useState(null);
   const [repasswordInputError, setRePasswordInputError] = useState(null);
+
   const checkPasswordValid = () => {
     if (password.trim() === '') {
-      setPasswordInputError('Vui lòng nhập mật khẩu!');
+      setPasswordInputError('Vui lòng nhập mật khẩu');
       return false;
     } else if (password.length < 6 || password.length > 10) {
-      setPasswordInputError('Mật khẩu phải từ 6 đến 10 kí tự!');
+      setPasswordInputError('Mật khẩu phải từ 6 đến 10 kí tự');
       return false;
     } else if (password.indexOf(' ') >= 0) {
-      setPasswordInputError('Mật khẩu không bao gồm khoảng trắng!');
+      setPasswordInputError('Mật khẩu không bao gồm khoảng trắng');
       return false;
     }
     setPasswordInputError(null);
@@ -38,7 +39,7 @@ export default function ForgotPassScreen({navigation}) {
   };
   const checkRepasswordValid = () => {
     if (repassword !== password && password.trim() !== '') {
-      setRePasswordInputError('Mật khẩu nhập lại không khớp!');
+      setRePasswordInputError('Mật khẩu nhập lại không khớp');
       return false;
     }
     setRePasswordInputError(null);
@@ -53,10 +54,10 @@ export default function ForgotPassScreen({navigation}) {
   };
   return (
     <>
-      <HeaderComponent height={0.55 * height} />
+      <HeaderComponent height={0.8 * height} />
       <BackButton onPressHandler={navigation.goBack} color="#FEC54B" />
       <SafeAreaView>
-        <Card cornerRadius={20} elevation={10} style={styles.loginForm}>
+        <View style={styles.loginForm}>
           <Text style={styles.headerText}>Đổi Mật Khẩu</Text>
           <View style={{height: '60%'}}>
             <View
@@ -76,18 +77,26 @@ export default function ForgotPassScreen({navigation}) {
                 ]}
                 secureTextEntry={coverPassword}
                 onChangeText={text => setPassword(text)}
+                onFocus={() => {
+                  setPasswordInputError(null);
+                  setRePasswordInputError(null);
+                }}
                 value={password}
                 placeholder="Mật khẩu"
               />
               <TouchableOpacity
                 style={styles.iconView}
                 onPress={() => setCoverPassword(!coverPassword)}>
-                <Icon name="eye-slash" size={18} />
+                {coverPassword ? (
+                  <Icon name="eye" size={18} />
+                ) : (
+                  <Icon name="eye-slash" size={18} />
+                )}
               </TouchableOpacity>
+              {passwordInputError && (
+                <Text style={styles.errorMessage}>{passwordInputError}</Text>
+              )}
             </View>
-            {passwordInputError && (
-              <Text style={styles.errorMessage}>{passwordInputError}</Text>
-            )}
             <View
               style={[
                 styles.inputView,
@@ -105,41 +114,48 @@ export default function ForgotPassScreen({navigation}) {
                 ]}
                 secureTextEntry={coverRepassword}
                 onChangeText={text => setRepassword(text)}
+                onFocus={() => {
+                  setPasswordInputError(null);
+                  setRePasswordInputError(null);
+                }}
                 value={repassword}
                 placeholder="Nhập lại mật khẩu"
               />
               <TouchableOpacity
                 style={styles.iconView}
                 onPress={() => setCoverRepassword(!coverRepassword)}>
-                <Icon name="eye-slash" size={18} />
+                {coverRepassword ? (
+                  <Icon name="eye" size={18} />
+                ) : (
+                  <Icon name="eye-slash" size={18} />
+                )}
               </TouchableOpacity>
+              {repasswordInputError && (
+                <Text style={styles.errorMessage}>{repasswordInputError}</Text>
+              )}
             </View>
-            {repasswordInputError && (
-              <Text style={styles.errorMessage}>{repasswordInputError}</Text>
-            )}
           </View>
           <Button
             style={{marginBottom: 30}}
             onPress={changePassHandler}
             buttonText="ĐỔI MẬT KHẨU"
           />
-        </Card>
+        </View>
       </SafeAreaView>
     </>
   );
 }
 const styles = StyleSheet.create({
   loginForm: {
-    marginTop: 0.45 * height,
+    marginTop: 0.56 * height,
     width: '100%',
-    height: 0.55 * height,
+    height: 0.48 * height,
     position: 'absolute',
     paddingTop: 15,
-    shadowOffset: {width: 5, height: 5},
-    paddingLeft: 40,
-    paddingRight: 40,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+    paddingHorizontal: '8%',
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    backgroundColor: 'white',
   },
   headerText: {
     fontSize: 22,
@@ -161,9 +177,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorMessage: {
-    fontSize: 12,
+    position: 'absolute',
+    bottom: -14,
+    left: 5,
+    fontSize: 10,
     color: '#FF6442',
-    paddingLeft: 20,
   },
   iconView: {
     height: '100%',

@@ -11,9 +11,9 @@ import {
   ImageBackground,
   ScrollView,
 } from 'react-native';
-import {Card} from 'react-native-shadow-cards';
 import ImagePicker from 'react-native-image-crop-picker';
 const {height, width} = Dimensions.get('window');
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BackButton from '../../components/BackButton';
 import HeaderComponent from '../../components/HeaderComponent';
@@ -22,24 +22,12 @@ import {Context as AuthContext} from '../../context/AuthContext';
 import constants from '../../constants/Api';
 import Button from '../../components/SubmitButton';
 import axios from 'axios';
-
-function removeAscent(str) {
-  if (str === null || str === undefined) {
-    return str;
-  }
-  str = str.toLowerCase();
-  str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
-  str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
-  str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
-  str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
-  str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
-  str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
-  str = str.replace(/đ/g, 'd');
-  return str;
-}
+import {removeAscent} from '../../utils/util';
+import ProgressLoader from 'rn-progress-loader';
 
 export default function RegisterScreen({navigation}) {
-  const {register, state, clearErrorMessage} = useContext(AuthContext);
+  const {register, state, clearErrorMessage, showLoader} =
+    useContext(AuthContext);
   const [avatar, setAvatar] = useState(null);
   const [username, setUsername] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -86,10 +74,10 @@ export default function RegisterScreen({navigation}) {
   };
   const checkPhoneNumberValid = () => {
     if (phoneNumber.trim() === '') {
-      setPhoneInputError('Vui lòng nhập số điện thoại!');
+      setPhoneInputError('Vui lòng nhập số điện thoại');
       return false;
     } else if (!/(03|05|07|08|09|01[2|6|8|9])([0-9]{8})\b/.test(phoneNumber)) {
-      setPhoneInputError('Số điện thoại không đúng!');
+      setPhoneInputError('Số điện thoại không đúng');
       return false;
     }
     setPhoneInputError(null);
@@ -97,31 +85,31 @@ export default function RegisterScreen({navigation}) {
   };
   const checkPasswordValid = () => {
     if (password.trim() === '') {
-      setPasswordInputError('Vui lòng nhập mật khẩu!');
+      setPasswordInputError('Vui lòng nhập mật khẩu');
       return false;
     } else if (!/((?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,10})\b/.test(password)) {
       setPasswordInputError(
-        'Mật khẩu phải từ 6 đến 10 kí tự và bao gồm ít nhất 1 số hoặc 1 kí tự!',
+        'Mật khẩu phải từ 6 đến 10 kí tự và bao gồm ít nhất 1 số hoặc 1 kí tự',
       );
       return false;
     } else if (password.indexOf(' ') >= 0) {
-      setPasswordInputError('Mật khẩu không bao gồm khoảng trắng!');
+      setPasswordInputError('Mật khẩu không bao gồm khoảng trắng');
       return false;
     }
     setPasswordInputError(null);
     return true;
   };
   const checkAddressValid = () => {
-    if (cityId && districtId && communeId) {
+    if (cityId && districtId && communeId && homeAddress !== '') {
       setAddressError(null);
       return true;
     }
-    setAddressError('Vui lòng chọn đầy đủ thông tin địa chỉ của bạn!');
+    setAddressError('Vui lòng chọn và điền đầy đủ thông tin địa chỉ của bạn');
     return false;
   };
   const checkRepasswordValid = () => {
     if (repassword !== password && password.trim() !== '') {
-      setRePasswordInputError('Mật khẩu nhập lại không khớp!');
+      setRePasswordInputError('Mật khẩu nhập lại không khớp');
       return false;
     }
     setRePasswordInputError(null);
@@ -133,7 +121,7 @@ export default function RegisterScreen({navigation}) {
       return false;
     } else if (!/^[a-zA-Z\s]{3,}$/.test(removeAscent(username.slice()))) {
       setUsernameInputError(
-        'Họ và Tên từ 3 ký tự trở lên không bao gồm số và kí tự đặc biệt!',
+        'Họ và Tên từ 3 ký tự trở lên không bao gồm số và kí tự đặc biệt',
       );
       return false;
     }
@@ -144,6 +132,7 @@ export default function RegisterScreen({navigation}) {
   const onchangeCity = async value => {
     setCityId(value);
     setDistrictId(null);
+    setAddressError(null);
     setCommuneId(null);
     if (!value) {
       setListDistrict([]);
@@ -161,6 +150,7 @@ export default function RegisterScreen({navigation}) {
   };
   const onchangeDistrict = async value => {
     setDistrictId(value);
+    setAddressError(null);
     setCommuneId(null);
     if (!value) {
       setListCommune([]);
@@ -188,6 +178,7 @@ export default function RegisterScreen({navigation}) {
       (isUsernameValid,
       isAddressValid && isPasswordValid && isPhoneValid && isRepasswordValid)
     ) {
+      showLoader();
       register({
         avatar,
         fullName: username,
@@ -203,10 +194,10 @@ export default function RegisterScreen({navigation}) {
 
   return (
     <>
-      <HeaderComponent height={0.55 * height} />
+      <HeaderComponent height={0.6 * height} />
       <BackButton onPressHandler={navigation.goBack} color="#FEC54B" />
       <SafeAreaView>
-        <Card cornerRadius={20} elevation={10} style={styles.registerForm}>
+        <View style={styles.registerForm}>
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={styles.scrollView}>
@@ -232,7 +223,7 @@ export default function RegisterScreen({navigation}) {
               </TouchableOpacity>
             </ImageBackground>
             <Text style={styles.headerText}>Đăng Ký Tài Khoản</Text>
-            <Text style={styles.inputTittle}>Họ và tên*</Text>
+            <Text style={styles.inputTittle}>Họ và tên *</Text>
             <View
               style={[
                 styles.inputView,
@@ -240,30 +231,42 @@ export default function RegisterScreen({navigation}) {
               ]}>
               <TextInput
                 style={styles.input}
+                placeholder="Nhập họ và tên"
                 onChangeText={text => setUsername(text)}
+                onFocus={() => setUsernameInputError(null)}
                 value={username}
               />
+              {usernameInputError && (
+                <Text style={styles.errorMessage}>{usernameInputError}</Text>
+              )}
             </View>
-            {usernameInputError && (
-              <Text style={styles.errorMessage}>{usernameInputError}</Text>
-            )}
-            <Text style={styles.inputTittle}>Số điện thoại*</Text>
+            <Text style={styles.inputTittle}>Số điện thoại *</Text>
             <View
               style={[
                 styles.inputView,
-                {borderColor: phoneInputError ? '#FF6442' : '#CACACA'},
+                {
+                  borderColor:
+                    phoneInputError || state.errorMessage
+                      ? '#FF6442'
+                      : '#CACACA',
+                },
               ]}>
               <TextInput
                 style={styles.input}
                 onChangeText={text => setPhoneNumber(text)}
                 value={phoneNumber}
+                placeholder="Nhập số điện thoại"
+                onFocus={() => {
+                  setPhoneInputError(null);
+                  clearErrorMessage();
+                }}
                 keyboardType="number-pad"
               />
+              {phoneInputError && (
+                <Text style={styles.errorMessage}>{phoneInputError}</Text>
+              )}
             </View>
-            {phoneInputError && (
-              <Text style={styles.errorMessage}>{phoneInputError}</Text>
-            )}
-            <Text style={styles.inputTittle}>Địa chỉ*</Text>
+            <Text style={styles.inputTittle}>Địa chỉ *</Text>
             <View style={styles.addressPicker}>
               <View style={styles.addressSelectItem}>
                 <RNPickerSelect
@@ -275,19 +278,20 @@ export default function RegisterScreen({navigation}) {
                     value: null,
                   }}
                   useNativeAndroidPickerStyle={false}
-                  style={styles.pickerStyle}
+                  style={styles.pickerCityStyle}
                   items={listCity}
                   Icon={() => (
-                    <Icon
-                      name="caret-down"
+                    <Ionicons
+                      name="chevron-down-sharp"
                       size={20}
-                      color="#E67F1E"
-                      style={{marginTop: (0.075 * height) / 4, marginRight: 5}}
+                      style={{marginTop: (0.075 * height) / 4, marginRight: 12}}
                     />
                   )}
                 />
               </View>
-              <View style={styles.addressSelectItem}>
+            </View>
+            <View style={styles.addressPicker}>
+              <View style={[styles.addressSelectItem, {width: '49%'}]}>
                 <RNPickerSelect
                   value={districtId}
                   fixAndroidTouchableBug={true}
@@ -299,22 +303,22 @@ export default function RegisterScreen({navigation}) {
                   }}
                   useNativeAndroidPickerStyle={false}
                   Icon={() => (
-                    <Icon
-                      name="caret-down"
+                    <Ionicons
+                      name="chevron-down-sharp"
                       size={20}
-                      color="#E67F1E"
-                      style={{marginTop: (0.075 * height) / 4, marginRight: 5}}
+                      style={{marginTop: (0.075 * height) / 4, marginRight: 12}}
                     />
                   )}
                   style={styles.pickerStyle}
                 />
               </View>
-              <View style={styles.addressSelectItem}>
+              <View style={[styles.addressSelectItem, {width: '49%'}]}>
                 <RNPickerSelect
                   value={communeId}
                   fixAndroidTouchableBug={true}
                   onValueChange={value => {
                     setCommuneId(value);
+                    setAddressError(null);
                   }}
                   items={listCommune}
                   placeholder={{
@@ -323,30 +327,36 @@ export default function RegisterScreen({navigation}) {
                   }}
                   useNativeAndroidPickerStyle={false}
                   Icon={() => (
-                    <Icon
-                      name="caret-down"
+                    <Ionicons
+                      name="chevron-down-sharp"
                       size={20}
-                      color="#E67F1E"
-                      style={{marginTop: (0.075 * height) / 4, marginRight: 5}}
+                      style={{marginTop: (0.075 * height) / 4, marginRight: 12}}
                     />
                   )}
                   style={styles.pickerStyle}
                 />
               </View>
             </View>
-            {addressError && (
-              <Text style={styles.errorMessage}>{addressError}</Text>
-            )}
-
-            <View style={styles.inputView}>
+            <View
+              style={[
+                styles.inputView,
+                {
+                  marginTop: 20,
+                  borderColor: addressError ? '#FF6442' : '#CACACA',
+                },
+              ]}>
               <TextInput
                 style={styles.input}
-                placeholder="Địa chỉ nhà"
+                placeholder="Nhập địa chỉ nhà"
                 onChangeText={text => setHomeAddress(text)}
+                onFocus={() => setAddressError(null)}
                 value={homeAddress}
               />
+              {addressError && (
+                <Text style={styles.errorMessage}>{addressError}</Text>
+              )}
             </View>
-            <Text style={styles.inputTittle}>Mật khẩu*</Text>
+            <Text style={styles.inputTittle}>Mật khẩu *</Text>
             <View
               style={[
                 styles.inputView,
@@ -364,7 +374,12 @@ export default function RegisterScreen({navigation}) {
                 ]}
                 secureTextEntry={coverPassword}
                 onChangeText={text => setPassword(text)}
+                onFocus={() => {
+                  setPasswordInputError(null);
+                  clearErrorMessage();
+                }}
                 value={password}
+                placeholder="Nhập mật khẩu"
               />
               <TouchableOpacity
                 style={styles.iconView}
@@ -375,11 +390,12 @@ export default function RegisterScreen({navigation}) {
                   <Icon name="eye-slash" size={18} />
                 )}
               </TouchableOpacity>
+              {passwordInputError && (
+                <Text style={styles.errorMessage}>{passwordInputError}</Text>
+              )}
             </View>
-            {passwordInputError && (
-              <Text style={styles.errorMessage}>{passwordInputError}</Text>
-            )}
-            <Text style={styles.inputTittle}>Nhập lại mật khẩu*</Text>
+
+            <Text style={styles.inputTittle}>Nhập lại mật khẩu *</Text>
             <View
               style={[
                 styles.inputView,
@@ -398,6 +414,11 @@ export default function RegisterScreen({navigation}) {
                 secureTextEntry={coverRepassword}
                 onChangeText={text => setRepassword(text)}
                 value={repassword}
+                onFocus={() => {
+                  setRePasswordInputError(null);
+                  clearErrorMessage();
+                }}
+                placeholder="Nhập lại mật khẩu"
               />
               <TouchableOpacity
                 style={styles.iconView}
@@ -408,60 +429,69 @@ export default function RegisterScreen({navigation}) {
                   <Icon name="eye-slash" size={18} />
                 )}
               </TouchableOpacity>
+              {repasswordInputError && (
+                <Text style={styles.errorMessage}>{repasswordInputError}</Text>
+              )}
+              {state.errorMessage !== '' && (
+                <Text style={styles.errorMessage}>{state.errorMessage}</Text>
+              )}
             </View>
-            {repasswordInputError && (
-              <Text style={styles.errorMessage}>{repasswordInputError}</Text>
-            )}
-            {state.errorMessage !== '' && (
-              <Text style={styles.errorMessage}>{state.errorMessage}</Text>
-            )}
-
             <View style={styles.termContainer}>
               <Text>Bằng việc nhấn đăng ký là bạn đã chấp nhận</Text>
               <TouchableOpacity
                 onPress={() => {
                   navigation.push('TermsOfUseScreen');
                 }}>
-                <Text style={styles.termLink}>điều khoản</Text>
+                <Text style={styles.termLink}>điều khoản sử dụng</Text>
               </TouchableOpacity>
-              <Text> sử dụng</Text>
             </View>
             <Button
               style={{marginTop: 20}}
               onPress={registerHandler}
               buttonText="ĐĂNG KÝ"
             />
-            <TouchableOpacity style={styles.loginView}>
-              <Text style={styles.loginText}>Bạn đã có tài khoản? </Text>
-              <Text
-                style={[styles.loginText, {textDecorationLine: 'underline'}]}>
-                Đăng nhập
+            <View style={styles.loginView}>
+              <Text style={[styles.loginText, {color: 'black'}]}>
+                Bạn đã có tài khoản?{' '}
               </Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.push('LoginScreen')}>
+                <Text
+                  style={[styles.loginText, {textDecorationLine: 'underline'}]}>
+                  Đăng nhập
+                </Text>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
-        </Card>
+        </View>
       </SafeAreaView>
+      <ProgressLoader
+        visible={state.loading ? state.loading : false}
+        isModal={true}
+        isHUD={true}
+        hudColor={'#FEC54B'}
+        color={'#000000'}
+      />
     </>
   );
 }
 const styles = StyleSheet.create({
   registerForm: {
+    marginTop: 0.28 * height,
     width: '100%',
-    height: 0.75 * height,
-    marginTop: 0.25 * height,
+    height: 0.8 * height,
     position: 'absolute',
-    shadowOffset: {width: 5, height: 5},
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+    paddingTop: 15,
+    paddingHorizontal: '6%',
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    backgroundColor: 'white',
+    paddingBottom: 60,
   },
   scrollView: {
     width: '100%',
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingTop: 20,
   },
   avatar: {
-    width: width * 0.3,
+    width: width * 0.24,
     aspectRatio: 1,
     borderRadius: width * 0.15,
     alignSelf: 'center',
@@ -511,7 +541,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addressSelectItem: {
-    width: '32%',
+    width: '100%',
     height: '100%',
     borderWidth: 1,
     borderColor: '#CACACA',
@@ -526,32 +556,47 @@ const styles = StyleSheet.create({
   },
   pickerStyle: {
     inputIOS: {
-      fontSize: 11,
+      fontSize: 12,
+      color: 'black',
       textAlign: 'center',
-      borderRadius: 30,
-      marginRight: 15,
+      marginRight: 14,
     },
     inputAndroid: {
-      fontSize: 11,
+      fontSize: 12,
+      color: 'black',
       textAlign: 'center',
-      borderRadius: 30,
-      marginRight: 15,
+      marginRight: 12,
     },
-    width: '50%',
+  },
+
+  pickerCityStyle: {
+    inputIOS: {
+      fontSize: 14,
+      color: 'black',
+      textAlign: 'center',
+      marginRight: 14,
+    },
+    inputAndroid: {
+      fontSize: 14,
+      color: 'black',
+      textAlign: 'center',
+      marginRight: 0.52 * width,
+    },
   },
 
   termContainer: {
-    width: '80%',
+    width: '90%',
     alignSelf: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     marginTop: 20,
+    alignItems: 'center',
   },
 
   termLink: {
     fontWeight: 'bold',
     color: '#FEC54B',
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
   loginView: {
     width: '100%',
@@ -567,8 +612,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorMessage: {
-    fontSize: 12,
+    position: 'absolute',
+    bottom: -14,
+    left: 5,
+    fontSize: 10,
     color: '#FF6442',
-    paddingLeft: 20,
   },
 });
