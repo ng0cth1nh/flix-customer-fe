@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   Text,
   View,
@@ -8,14 +8,21 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import {Card} from 'react-native-shadow-cards';
 const {height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import HeaderComponent from '../../components/HeaderComponent';
 import BackButton from '../../components/BackButton';
 import Button from '../../components/SubmitButton';
+import {Context as AuthContext} from '../../context/AuthContext';
 
 export default function ForgotPassScreen({navigation}) {
+  const {
+    showLoader,
+    state,
+    clearErrorMessage,
+    resetPassword,
+    clearIsChangePassSuccess,
+  } = useContext(AuthContext);
   const [password, setPassword] = useState('');
   const [coverPassword, setCoverPassword] = useState(true);
   const [repassword, setRepassword] = useState('');
@@ -49,7 +56,12 @@ export default function ForgotPassScreen({navigation}) {
     let isPasswordValid = checkPasswordValid();
     let isRepasswordValid = checkRepasswordValid();
     if (isPasswordValid && isRepasswordValid) {
-      // do smth
+      console.log(password);
+      showLoader();
+      resetPassword({
+        newPassword: password,
+        tempAccessToken: state.tempAccessToken,
+      });
     }
   };
   return (
@@ -58,7 +70,7 @@ export default function ForgotPassScreen({navigation}) {
       <BackButton onPressHandler={navigation.goBack} color="#FEC54B" />
       <SafeAreaView>
         <View style={styles.loginForm}>
-          <Text style={styles.headerText}>Đổi Mật Khẩu</Text>
+          <Text style={styles.headerText}>Quên Mật Khẩu</Text>
           <View style={{height: '60%'}}>
             <View
               style={[
@@ -82,7 +94,7 @@ export default function ForgotPassScreen({navigation}) {
                   setRePasswordInputError(null);
                 }}
                 value={password}
-                placeholder="Mật khẩu"
+                placeholder="Nhập mật khẩu mới"
               />
               <TouchableOpacity
                 style={styles.iconView}
@@ -119,7 +131,7 @@ export default function ForgotPassScreen({navigation}) {
                   setRePasswordInputError(null);
                 }}
                 value={repassword}
-                placeholder="Nhập lại mật khẩu"
+                placeholder="Nhập lại mật khẩu mới"
               />
               <TouchableOpacity
                 style={styles.iconView}

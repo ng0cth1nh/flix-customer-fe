@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {
   Text,
   View,
@@ -8,21 +8,42 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import {Card} from 'react-native-shadow-cards';
 const {height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import HeaderComponent from '../../components/HeaderComponent';
 import Button from '../../components/SubmitButton';
 import {Context as AuthContext} from '../../context/AuthContext';
 import ProgressLoader from 'rn-progress-loader';
+import Toast from 'react-native-toast-message';
 
 export default function LoginScreen({navigation}) {
-  const {login, showLoader, state, clearErrorMessage} = useContext(AuthContext);
+  const {
+    login,
+    showLoader,
+    state,
+    sendOTPForgotPassword,
+    clearErrorMessage,
+    clearIsChangePassSuccess,
+  } = useContext(AuthContext);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [phoneInputError, setPhoneInputError] = useState(null);
   const [passwordInputError, setPasswordInputError] = useState(null);
   const [coverPassword, setCoverPassword] = useState(true);
+  const [isForgotPass, setIsForgotPass] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (state.isChangePassSuccess) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Đổi mật khẩu thành công',
+        });
+        clearIsChangePassSuccess();
+      }
+    })();
+  }, []);
+
   const checkPhoneNumberValid = () => {
     if (phoneNumber.trim() === '') {
       setPhoneInputError('Vui lòng nhập số điện thoại');
@@ -65,10 +86,15 @@ export default function LoginScreen({navigation}) {
 
   const handleForgotPasswordClick = () => {
     let phoneValid = checkPhoneNumberValid();
-    phoneValid &&
-      navigation.push('ForgotPassScreen', {
-        phoneNumber,
+    if (phoneValid) {
+      showLoader();
+      setIsForgotPass(true);
+      clearErrorMessage();
+      sendOTPForgotPassword({
+        phone: phoneNumber,
+        type: 'FORGOT_PASSWORD',
       });
+    }
   };
 
   return (
@@ -80,7 +106,12 @@ export default function LoginScreen({navigation}) {
           <View
             style={[
               styles.inputView,
-              {borderColor: phoneInputError ? '#FF6442' : '#CACACA'},
+              {
+                borderColor:
+                  phoneInputError || (state.errorMessage && isForgotPass)
+                    ? '#FF6442'
+                    : '#CACACA',
+              },
             ]}>
             <TextInput
               style={styles.input}
@@ -90,20 +121,24 @@ export default function LoginScreen({navigation}) {
               onFocus={() => {
                 setPhoneInputError(null);
                 clearErrorMessage();
+                setIsForgotPass(false);
               }}
               defaultValue={phoneNumber}
               keyboardType="number-pad"
             />
-            {phoneInputError && (
-              <Text style={styles.errorMessage}>{phoneInputError}</Text>
-            )}
+            {(phoneInputError && !isForgotPass) ||
+            (!phoneInputError && isForgotPass && state.errorMessage) ? (
+              <Text style={styles.errorMessage}>
+                {phoneInputError ? phoneInputError : state.errorMessage}
+              </Text>
+            ) : null}
           </View>
           <View
             style={[
               styles.inputView,
               {
                 borderColor:
-                  passwordInputError || state.errorMessage
+                  passwordInputError || (state.errorMessage && !isForgotPass)
                     ? '#FF6442'
                     : '#CACACA',
               },
@@ -137,9 +172,9 @@ export default function LoginScreen({navigation}) {
             {passwordInputError && (
               <Text style={styles.errorMessage}>{passwordInputError}</Text>
             )}
-            {state.errorMessage !== '' && (
+            {state.errorMessage !== '' && !isForgotPass ? (
               <Text style={styles.errorMessage}>{state.errorMessage}</Text>
-            )}
+            ) : null}
           </View>
 
           <TouchableOpacity

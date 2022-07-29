@@ -44,7 +44,7 @@ const FeedbackScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const selectFile = () => {
     ImagePicker.openPicker({
-      cropping: true,
+      cropping: false,
       multiple: true,
     })
       .then(image => {
@@ -89,6 +89,16 @@ const FeedbackScreen = ({navigation}) => {
       return false;
     }
     return true;
+  };
+
+  const handleClose = index => {
+    let temp = [];
+    for (let i = 0; i < images.length; i++) {
+      if (i !== index) {
+        temp.push(images[i]);
+      }
+    }
+    setImages(temp);
   };
 
   const handleSubmitButton = async () => {
@@ -270,9 +280,7 @@ const FeedbackScreen = ({navigation}) => {
                         resizeMode="cover">
                         <TouchableOpacity
                           style={styles.cameraButton}
-                          onPress={() =>
-                            setImages(images.splice(index + 1, 1))
-                          }>
+                          onPress={() => handleClose(index)}>
                           <Image
                             style={{
                               width: 12,
@@ -288,8 +296,10 @@ const FeedbackScreen = ({navigation}) => {
               <TouchableOpacity onPress={selectFile}>
                 <Image
                   style={{
-                    width: 80,
-                    height: 80,
+                    width: width * 0.18,
+                    height: width * 0.18,
+                    marginRight: 20,
+                    marginVertical: 20,
                   }}
                   source={require('../../../assets/images/type/add-image.png')}
                 />
@@ -306,7 +316,7 @@ const FeedbackScreen = ({navigation}) => {
         />
         <SubmitButton
           style={{
-            marginBottom: 15,
+            marginVertical: 10,
             width: '92%',
             alignSelf: 'center',
           }}
@@ -319,13 +329,14 @@ const FeedbackScreen = ({navigation}) => {
 };
 const styles = StyleSheet.create({
   avatar: {
-    width: width * 0.2,
+    width: width * 0.18,
     aspectRatio: 1,
     borderRadius: width * 0.15,
     alignSelf: 'center',
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
     marginRight: 20,
+    marginBottom: 20,
   },
   cameraButton: {
     width: width * 0.3 * 0.2,

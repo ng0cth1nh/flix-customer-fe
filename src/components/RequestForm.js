@@ -328,7 +328,7 @@ const RequestForm = function ({
               }}
             />
             <Text style={styles.tittleText}>
-              {editable ? 'Chọn ngày muốn sửa' : 'Ngày muốn sửa'}
+              {editable ? 'Chọn thời gian muốn sửa' : 'Thời gian muốn sửa'}
             </Text>
           </View>
           <View style={{flex: 4, marginLeft: 40}}>
@@ -371,37 +371,42 @@ const RequestForm = function ({
             )}
           </View>
         </View>
-        <View
-          style={[styles.box, {height: 0.2 * height, flexDirection: 'column'}]}>
-          <View style={styles.boxHeader}>
-            <Image
-              source={require('../../assets/images/type/writing.png')}
-              style={{
-                height: 20,
-                width: 20,
-              }}
-            />
-            <Text style={styles.tittleText}>Tình trạng</Text>
+        {editable || (!editable && data.requestDescription) ? (
+          <View
+            style={[
+              styles.box,
+              {height: 0.2 * height, flexDirection: 'column'},
+            ]}>
+            <View style={styles.boxHeader}>
+              <Image
+                source={require('../../assets/images/type/writing.png')}
+                style={{
+                  height: 20,
+                  width: 20,
+                }}
+              />
+              <Text style={styles.tittleText}>Tình trạng</Text>
+            </View>
+            <View style={{flex: 4, marginLeft: 40, marginTop: 10}}>
+              <TextInput
+                multiline
+                numberOfLines={2}
+                onChangeText={text => setDescription(text)}
+                value={description ? description : data.requestDescription}
+                style={{
+                  padding: 5,
+                  backgroundColor: 'white',
+                  borderRadius: 10,
+                  height: '80%',
+                  color: 'black',
+                  paddingLeft: 16,
+                }}
+                editable={editable}
+                placeholder="Nhập tình trạng của thiết bị"
+              />
+            </View>
           </View>
-          <View style={{flex: 4, marginLeft: 40, marginTop: 10}}>
-            <TextInput
-              multiline
-              numberOfLines={2}
-              onChangeText={text => setDescription(text)}
-              value={description ? description : data.requestDescription}
-              style={{
-                padding: 5,
-                backgroundColor: 'white',
-                borderRadius: 10,
-                height: '80%',
-                color: 'black',
-                paddingLeft: 16,
-              }}
-              editable={editable}
-              placeholder="Nhập tình trạng của thiết bị"
-            />
-          </View>
-        </View>
+        ) : null}
         {!data.voucherDiscount && editable ? (
           <View style={[styles.box]}>
             <View style={styles.boxHeader}>
@@ -492,7 +497,7 @@ const RequestForm = function ({
                   width: 20,
                 }}
               />
-              <Text style={styles.tittleText}>Mã yêu cầu</Text>
+              <Text style={styles.tittleText}>{data.requestCode}</Text>
               <TouchableOpacity
                 style={[
                   {marginLeft: 'auto', marginBottom: 3},
@@ -501,7 +506,7 @@ const RequestForm = function ({
                 onPress={copyToClipboard}>
                 <Text
                   style={{color: 'black', fontSize: 14, fontWeight: 'bold'}}>
-                  {data.requestCode}
+                  Sao chép
                 </Text>
               </TouchableOpacity>
             </View>

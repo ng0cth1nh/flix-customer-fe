@@ -16,16 +16,27 @@ import BackButton from '../../components/BackButton';
 import Button from '../../components/SubmitButton';
 const {width} = Dimensions.get('window');
 export default function ConfirmOTPScreen({route, navigation}) {
-  const {confirmOTP, state, clearErrorMessage, showLoader, reRegister} =
-    useContext(AuthContext);
-  const {phone} = route.params;
+  const {
+    confirmOTP,
+    state,
+    clearErrorMessage,
+    showLoader,
+    reRegister,
+    confirmOTPForgotPassword,
+    reSendOTPForgotPassword,
+  } = useContext(AuthContext);
+  const {phone, type} = route.params;
   const [code, setCode] = useState('');
   const handlerConfirmOTP = () => {
     if (state.errorMessage !== '') {
       clearErrorMessage();
     }
     showLoader();
-    confirmOTP({...route.params, otp: code});
+    if (type === 'REGISTER') {
+      confirmOTP({...route.params, otp: code});
+    } else {
+      confirmOTPForgotPassword({...route.params, otp: code});
+    }
   };
 
   const Ref = useRef(null);
@@ -76,9 +87,16 @@ export default function ConfirmOTPScreen({route, navigation}) {
 
   const handleResendOTP = () => {
     clearTimer(getDeadTime());
-    reRegister({
-      ...route.params,
-    });
+    showLoader();
+    if (type === 'REGISTER') {
+      reRegister({
+        ...route.params,
+      });
+    } else {
+      reSendOTPForgotPassword({
+        ...route.params,
+      });
+    }
   };
 
   return (
@@ -212,6 +230,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: 16,
     color: '#888B96',
+    marginTop: 20,
   },
   continueContainer: {
     flex: 1,
@@ -220,7 +239,7 @@ const styles = StyleSheet.create({
   errorMessage: {
     position: 'absolute',
     bottom: 6,
-    left: width * 0.348,
+    left: width * 0.22,
     fontSize: 12,
     color: '#FF6442',
   },

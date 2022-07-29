@@ -62,12 +62,14 @@ const toastConfig = {
   customToast: ({text1}) => (
     <View
       style={{
-        height: 64,
+        height: 'auto',
         backgroundColor: '#56CA76',
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '96%',
+        width: '92%',
+        paddingVertical: 20,
+        paddingHorizontal: 10,
       }}>
       <Text
         style={{
@@ -75,6 +77,7 @@ const toastConfig = {
           fontSize: 16,
           color: 'white',
           textAlign: 'center',
+          flexWrap: 'wrap',
         }}>
         {text1}
       </Text>
@@ -83,12 +86,14 @@ const toastConfig = {
   customErrorToast: ({text1}) => (
     <View
       style={{
-        height: 64,
+        height: 'auto',
         backgroundColor: 'red',
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '96%',
+        width: '92%',
+        paddingVertical: 20,
+        paddingHorizontal: 10,
       }}>
       <Text
         style={{
@@ -96,6 +101,7 @@ const toastConfig = {
           fontSize: 16,
           color: 'white',
           textAlign: 'center',
+          flexWrap: 'wrap',
         }}>
         {text1}
       </Text>
@@ -161,6 +167,7 @@ function App() {
       saveFCMToken();
     }
   }, [state.token]);
+
   useEffect(() => {
     const userId = state.userId;
     if (userId) {
@@ -269,6 +276,7 @@ function App() {
   function RequestHistoryStackScreen() {
     return (
       <Stack.Navigator
+        initialRouteName="RequestHistoryScreen"
         screenOptions={{
           headerShown: false,
           gestureEnabled: true,
@@ -345,12 +353,18 @@ function App() {
           <Stack.Screen name="ConfirmOTPScreen" component={ConfirmOTPScreen} />
         </Stack.Navigator>
       </NavigationContainer>
-      <Toast />
+      <Toast
+        config={toastConfig}
+        position="bottom"
+        visibilityTime={2000}
+        bottomOffset={90}
+      />
     </>
   ) : (
     <>
       <NavigationContainer ref={navigationRef} linking={linking}>
         <Tab.Navigator
+          initialRouteName="HomeStackScreen"
           tabBarOptions={{
             showLabel: false,
             keyboardHidesTabBar: true,
@@ -360,6 +374,7 @@ function App() {
           }}
           screenOptions={({route}) => ({
             tabBarShowLabel: false,
+            unmountOnBlur: true,
             headerShown: false,
             tabBarStyle: {
               height: 50,

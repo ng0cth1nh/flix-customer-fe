@@ -21,9 +21,12 @@ const TopHeaderComponent = ({
   return (
     <View
       style={{
-        height: height * 0.1,
+        height: 'auto',
         borderBottomWidth: 1,
         borderBottomColor: '#CACACA',
+        paddingBottom: 20,
+        paddingHorizontal: '12%',
+        flexDirection: 'row',
       }}>
       <StatusBar barStyle="dark-content" backgroundColor={statusBarColor} />
       {isBackButton ? (

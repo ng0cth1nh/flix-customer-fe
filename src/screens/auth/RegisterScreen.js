@@ -188,6 +188,7 @@ export default function RegisterScreen({navigation}) {
         districtId,
         communeId,
         streetAddress: homeAddress,
+        type: 'REGISTER',
       });
     }
   };

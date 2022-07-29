@@ -24,8 +24,16 @@ const authReducer = (state, action) => {
       return {...state, errorMessage: '', loading: false};
     case 'show_loader':
       return {...state, loading: true};
+    case 'add_is_change_pass_success':
+      return {...state, isChangePassSuccess: true};
+    case 'clear_is_change_pass_success':
+      return {...state, isChangePassSuccess: false};
     case 'hide_loader':
       return {...state, loading: false};
+    case 'add_temp_access_token':
+      return {...state, tempAccessToken: action.payload};
+    case 'clear_temp_access_token':
+      return {...state, tempAccessToken: null};
     case 'logout':
       return {token: null, userId: null, errorMessage: '', loading: false};
     default:
@@ -37,6 +45,10 @@ const clearErrorMessage = dispatch => {
 };
 const showLoader = dispatch => {
   return () => dispatch({type: 'show_loader'});
+};
+
+const clearIsChangePassSuccess = dispatch => {
+  return () => dispatch({type: 'clear_is_change_pass_success'});
 };
 
 const TryLocalLogin = dispatch =>
@@ -53,6 +65,91 @@ const TryLocalLogin = dispatch =>
     }
   }, [dispatch]);
 
+const sendOTPForgotPassword = dispatch => async params => {
+  try {
+    await axios.post(constants.SEND_OTP_FORGOT_PASSWORD_API, {
+      phone: params.phone,
+    });
+    RootNavigation.push('ConfirmOTPScreen', params);
+  } catch (err) {
+    dispatch({
+      type: 'add_error',
+      payload: getErrorMessage(err),
+    });
+  } finally {
+    dispatch({type: 'hide_loader'});
+  }
+};
+const reSendOTPForgotPassword = dispatch => async params => {
+  try {
+    await axios.post(constants.SEND_OTP_FORGOT_PASSWORD_API, {
+      phone: params.phone,
+    });
+  } catch (err) {
+    dispatch({
+      type: 'add_error',
+      payload: getErrorMessage(err),
+    });
+  } finally {
+    dispatch({type: 'hide_loader'});
+  }
+};
+
+const confirmOTPForgotPassword = dispatch => async params => {
+  try {
+    const response = await axios.post(
+      constants.CONFIRM_OTP_FORGOT_PASSWORD_API,
+      JSON.stringify({phone: params.phone, otp: params.otp}),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    console.log(response.data);
+    await dispatch({
+      type: 'add_temp_access_token',
+      payload: response.data.accessToken,
+    });
+    RootNavigation.push('ForgotPassScreen');
+  } catch (err) {
+    dispatch({
+      type: 'add_error',
+      payload: getErrorMessage(err),
+    });
+  } finally {
+    dispatch({type: 'hide_loader'});
+  }
+};
+
+const resetPassword = dispatch => async params => {
+  try {
+    const response = await axios.put(
+      constants.RESET_PASSWORD_API,
+      JSON.stringify({newPassword: params.newPassword}),
+      {
+        headers: {
+          Authorization: `Bearer ${params.tempAccessToken}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    console.log(response.data);
+    await dispatch({
+      type: 'clear_temp_access_token',
+    });
+    await dispatch({type: 'add_is_change_pass_success'});
+    RootNavigation.push('LoginScreen');
+  } catch (err) {
+    dispatch({
+      type: 'add_error',
+      payload: getErrorMessage(err),
+    });
+  } finally {
+    dispatch({type: 'hide_loader'});
+  }
+};
+
 const register = dispatch => async params => {
   try {
     await axios.post(constants.SEND_OTP_API, {phone: params.phone});
@@ -66,6 +163,7 @@ const register = dispatch => async params => {
     dispatch({type: 'hide_loader'});
   }
 };
+
 const reRegister = dispatch => async params => {
   try {
     await axios.post(constants.SEND_OTP_API, {phone: params.phone});
@@ -78,6 +176,7 @@ const reRegister = dispatch => async params => {
     dispatch({type: 'hide_loader'});
   }
 };
+
 const confirmOTP = dispatch => async params => {
   console.log(params);
   const formData = new FormData();
@@ -196,6 +295,11 @@ export const {Provider, Context} = createDataContext(
     refreshToken,
     confirmOTP,
     reRegister,
+    sendOTPForgotPassword,
+    confirmOTPForgotPassword,
+    reSendOTPForgotPassword,
+    resetPassword,
+    clearIsChangePassSuccess,
   },
   {token: null, errorMessage: '', userId: null, loading: false},
 );

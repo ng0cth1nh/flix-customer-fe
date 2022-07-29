@@ -1,7 +1,8 @@
 export default {
   LOGIN_FAILED: 'Tài khoản hoặc mật khẩu không đúng',
+  ACCOUNT_NOT_FOUND: 'Tài khoản không tồn tại',
   ACCOUNT_EXISTED: 'Số điện thoại đăng kí đã tồn tại',
-  INVALID_OTP: 'Mã OTP không chính xác',
+  INVALID_OTP: 'Mã chưa đúng, vui lòng thử lại',
   INVALID_PHONE_NUMBER: 'Số điện thoại đăng kí không hợp lệ',
   INVALID_PASSWORD: 'Mật khẩu đăng kí không hợp lệ',
   INVALID_CITY: 'Địa chỉ thành phố không tồn tại',

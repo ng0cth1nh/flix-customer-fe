@@ -57,13 +57,20 @@ const RequestScreen = ({navigation, route}) => {
     });
   };
 
+  const handleClickGetSubServices = () => {
+    navigation.push('ServicePriceScreen', {
+      serviceId: service.id,
+      serviceName: service.serviceName,
+    });
+  };
+
   useEffect(() => {
     setAddress(getMainAddress(addresses));
   }, [addresses]);
 
   const handleSubmitButtonClick = async () => {
     const body = {
-      serviceId: service.id,
+      serviceId: service.id ? service.id : service.serviceId,
       addressId: address.addressId,
       expectFixingDay: date.format('yyyy-MM-DD HH:mm:ss'),
       description,
@@ -71,16 +78,17 @@ const RequestScreen = ({navigation, route}) => {
       paymentMethodId: paymentMethod.id,
     };
     try {
+      console.log(body);
       await dispatch(setIsLoading());
       await dispatch(createRequest({customerAPI, body})).unwrap();
       Toast.show({
         type: 'customToast',
         text1: 'Đặt lịch thành công',
       });
-      dispatch(
+      await dispatch(
         fetchRequests({customerAPI, status: RequestStatus.PENDING}),
       ).unwrap();
-      navigation.navigate('RequestHistoryScreen', {
+      navigation.navigate('RequestHistoryStackScreen', {
         screen: 'PendingScreen',
       });
     } catch (err) {
@@ -125,6 +133,7 @@ const RequestScreen = ({navigation, route}) => {
           handleChangeAddress={handleChangeAddress}
           submitButtonText="ĐẶT LỊCH"
           editable={true}
+          handleClickGetSubServices={handleClickGetSubServices}
           isFetchFixedService={false}
         />
       </SafeAreaView>
