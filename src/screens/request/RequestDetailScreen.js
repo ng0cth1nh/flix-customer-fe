@@ -55,6 +55,20 @@ const RequestDetailScreen = ({route, navigation}) => {
     setModalVisible(true);
   };
 
+  const handleClickGetSubServices = () => {
+    navigation.push('ServicePriceScreen', {
+      serviceId: data.serviceId,
+      serviceName: data.serviceName,
+    });
+  };
+
+  const handleClickRepairerProfile = () => {
+    navigation.push('RepairerProfileScreen', {
+      repairerId: data.repairerId,
+      repairerAvatar: data.repairerAvatar,
+    });
+  };
+
   const loadData = async () => {
     try {
       await setLoading(true);
@@ -183,6 +197,8 @@ const RequestDetailScreen = ({route, navigation}) => {
             isRequestIdVisible={true}
             isShowSubmitButton={isShowSubmitButton}
             submitButtonText={submitButtonText}
+            handleClickGetSubServices={handleClickGetSubServices}
+            handleClickRepairerProfile={handleClickRepairerProfile}
             handleSubmitButtonClick={
               typeSubmitButtonClick === 'APPROVE_INVOICE'
                 ? handleApproveInvoiceButtonClick

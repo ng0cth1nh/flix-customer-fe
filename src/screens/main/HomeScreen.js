@@ -18,6 +18,7 @@ import MajorComponent from '../../components/MajorComponent';
 import {RequestStatus} from '../../utils/util';
 import {fetchRequests, setIsLoading} from '../../features/request/requestSlice';
 import useAxios from '../../hooks/useAxios';
+import {fetchAddresses} from '../../features/user/userSlice';
 import {useDispatch} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 const ENTRIES = [
@@ -82,6 +83,7 @@ const HomeScreen = ({navigation}) => {
     );
     dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
     dispatch(fetchRequests({customerAPI, status: RequestStatus.CANCELLED}));
+    dispatch(fetchAddresses(customerAPI));
   }, []);
 
   return (

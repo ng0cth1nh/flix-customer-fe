@@ -10,7 +10,6 @@ import {
 import React, {useState, useContext, useEffect} from 'react';
 const {height, width} = Dimensions.get('window');
 import {Context as AuthContext} from '../../context/AuthContext';
-import {Context as ProfileContext} from '../../context/ProfileContext';
 import CustomModal from '../../components/CustomModal';
 import {useSelector, useDispatch} from 'react-redux';
 // import {fetchUserInfo} from '../../redux/actions/userAction';
@@ -83,7 +82,7 @@ const ProfileScreen = ({navigation}) => {
           backgroundColor: 'white',
           borderTopLeftRadius: 18,
           borderTopRightRadius: 18,
-          paddingTop: 40,
+          paddingTop: 60,
         }}>
         <TouchableOpacity
           onPress={() => navigation.push('ProfileInfoScreen')}
@@ -172,7 +171,7 @@ const ProfileScreen = ({navigation}) => {
       <CustomModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        modalRatio={0.35}>
+        modalRatio={0.3}>
         <Text style={styles.modalText}>
           Bạn có chắc chắn muốn đăng xuất tài khoản này không?
         </Text>
@@ -190,7 +189,7 @@ const ProfileScreen = ({navigation}) => {
           <TouchableOpacity
             style={[styles.button, styles.buttonClose]}
             onPress={() => setModalVisible(!modalVisible)}>
-            <Text style={styles.textStyle}>THOÁT</Text>
+            <Text style={styles.textStyle}>ĐÓNG</Text>
           </TouchableOpacity>
         </View>
       </CustomModal>

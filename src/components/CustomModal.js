@@ -36,6 +36,7 @@ export default function CustomModal(props) {
         shadowOpacity: 1,
         shadowRadius: 10,
         elevation: 10,
+        bottom: 0,
       },
     }),
     [modalRatio],
