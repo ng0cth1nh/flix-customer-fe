@@ -27,7 +27,7 @@ export default function ConfirmOTPScreen({route, navigation}) {
   } = useContext(AuthContext);
   const {phone, type} = route.params;
   const [code, setCode] = useState('');
-  const handlerConfirmOTP = () => {
+  const handleConfirmOTP = () => {
     if (state.errorMessage !== '') {
       clearErrorMessage();
     }
@@ -130,8 +130,19 @@ export default function ConfirmOTPScreen({route, navigation}) {
             codeInputFieldStyle={styles.otpTextStyle}
             codeInputHighlightStyle={styles.underlineStyleHighLighted}
           />
-          {state.errorMessage !== '' && (
-            <Text style={styles.errorMessage}>{state.errorMessage}</Text>
+           {state.errorMessage !== '' && (
+            <Text
+              style={{
+                alignSelf: 'center',
+                bottom: -10,
+                width: '60%',
+                position: 'absolute',
+                fontSize: 10,
+                color: '#FF6442',
+                textAlign: 'center',
+              }}>
+              {state.errorMessage}
+            </Text>
           )}
         </View>
         {timer !== '00:00:00' ? (
@@ -153,7 +164,7 @@ export default function ConfirmOTPScreen({route, navigation}) {
         <View style={styles.continueContainer}>
           <Button
             style={{marginBottom: 30, width: '92%', alignSelf: 'center'}}
-            onPress={handlerConfirmOTP}
+            onPress={handleConfirmOTP}
             buttonText="TIẾP TỤC"
           />
         </View>

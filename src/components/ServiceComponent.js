@@ -32,6 +32,8 @@ const ServiceComponent = ({
       <View style={{flex: 1}}>
         <View style={{flexDirection: 'row'}}>
           <Text
+            numberOfLines={2}
+            ellipsizeMode="tail"
             style={{
               fontWeight: 'bold',
               fontSize: 20,
@@ -53,7 +55,10 @@ const ServiceComponent = ({
             justifyContent: 'space-between',
             marginTop: 'auto',
           }}>
-          <Text style={{marginVertical: 4}}>
+          <Text
+            numberOfLines={2}
+            ellipsizeMode="tail"
+            style={{marginVertical: 4}}>
             {data.description
               ? data.description
               : 'Tất cả các dịch vụ sửa ' + data.serviceName}
@@ -76,7 +81,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     backgroundColor: '#FEC54B',
-    width: '40%',
+    width: '46%',
   },
   textBold: {
     fontWeight: 'bold',

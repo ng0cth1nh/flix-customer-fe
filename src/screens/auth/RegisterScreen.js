@@ -165,7 +165,7 @@ export default function RegisterScreen({navigation}) {
       setAddressError(err.message);
     }
   };
-  const registerHandler = () => {
+  const handleRegisterClick = () => {
     if (state.errorMessage !== '') {
       clearErrorMessage();
     }
@@ -448,7 +448,7 @@ export default function RegisterScreen({navigation}) {
             </View>
             <Button
               style={{marginTop: 20}}
-              onPress={registerHandler}
+              onPress={handleRegisterClick}
               buttonText="ĐĂNG KÝ"
             />
             <View style={styles.loginView}>

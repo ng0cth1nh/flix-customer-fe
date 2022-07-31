@@ -143,7 +143,10 @@ const RequestForm = function ({
               }}
             />
             <View style={styles.boxBodyContent}>
-              <Text style={[styles.textBold, {fontSize: 24}]}>
+              <Text
+                numberOfLines={2}
+                ellipsizeMode="tail"
+                style={[styles.textBold, {fontSize: 24}]}>
                 {data.serviceName}
               </Text>
               <Text style={{fontSize: 16, color: 'black', marginVertical: 6}}>

@@ -336,10 +336,27 @@ const ChatScreen = ({route, navigation}) => {
               {item.content}
             </Text>
           ) : (
-            <Image
-              source={{uri: item.content}}
-              style={{width: 0.4 * width, aspectRatio: 1}}
-            />
+            <>
+              <ImageResize
+                source={{uri: item.content}}
+                width={width * 0.4}
+                style={{borderRadius: 10}}
+                onPress={() => {
+                  setImages([
+                    {
+                      uri: item.content,
+                    },
+                  ]);
+                  setIsVisible(true);
+                }}
+              />
+              <ImageView
+                images={images}
+                imageIndex={0}
+                visible={visible}
+                onRequestClose={() => setIsVisible(false)}
+              />
+            </>
           )}
           <Text
             style={{

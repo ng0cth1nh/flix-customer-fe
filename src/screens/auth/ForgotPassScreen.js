@@ -52,7 +52,7 @@ export default function ForgotPassScreen({navigation}) {
     setRePasswordInputError(null);
     return true;
   };
-  const changePassHandler = () => {
+  const handleChangePassClick = () => {
     let isPasswordValid = checkPasswordValid();
     let isRepasswordValid = checkRepasswordValid();
     if (isPasswordValid && isRepasswordValid) {
@@ -149,7 +149,7 @@ export default function ForgotPassScreen({navigation}) {
           </View>
           <Button
             style={{marginBottom: 30}}
-            onPress={changePassHandler}
+            onPress={handleChangePassClick}
             buttonText="ĐỔI MẬT KHẨU"
           />
         </View>

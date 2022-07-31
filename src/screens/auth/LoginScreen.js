@@ -71,7 +71,7 @@ export default function LoginScreen({navigation}) {
     setPasswordInputError(null);
     return true;
   };
-  const loginHandler = () => {
+  const handleLoginClick = () => {
     if (state.errorMessage !== '') {
       clearErrorMessage();
     }
@@ -184,7 +184,7 @@ export default function LoginScreen({navigation}) {
           </TouchableOpacity>
           <Button
             style={{marginTop: 10}}
-            onPress={loginHandler}
+            onPress={handleLoginClick}
             buttonText="ĐĂNG NHẬP"
           />
 

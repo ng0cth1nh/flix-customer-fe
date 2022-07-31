@@ -189,7 +189,7 @@ const ProfileScreen = ({navigation}) => {
           <TouchableOpacity
             style={[styles.button, styles.buttonClose]}
             onPress={() => setModalVisible(!modalVisible)}>
-            <Text style={styles.textStyle}>THOÁT</Text>
+            <Text style={styles.textStyle}>ĐÓNG</Text>
           </TouchableOpacity>
         </View>
       </CustomModal>
