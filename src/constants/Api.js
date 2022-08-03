@@ -36,8 +36,8 @@ const ApiConstants = {
   CONFIRM_INVOICE_API: '/customer/vnpay/payment/url',
   GET_USER_INFORMATION: '/user/information',
   CREATE_COMMENT_API: '/confirmedUser/comment',
+  SAVE_FCM_TOKEN: '/user/saveFCMToken',
   SEARCH_SUB_SERVICE_API: '/category/services/search',
 };
 
-//http://localhost:8000
 export default ApiConstants;
