@@ -56,6 +56,7 @@ import {
 import {store} from './src/features/store';
 import useAxios from './src/hooks/useAxios';
 import linking from './global/Linking';
+import ApiConstants from './src/constants/Api';
 
 const toastConfig = {
   customToast: ({text1}) => (
@@ -122,6 +123,7 @@ function App() {
   }, [TryLocalLogin]);
   useEffect(() => {
     if (state.token) {
+      console.log('token :', state.token);
       const getUserProfile = async () => {
         await dispatch(fetchProfile(customerAPI));
         if (errorMessage) {
@@ -132,26 +134,15 @@ function App() {
         }
       };
       const saveFCMToken = async () => {
-        const fcmToken = await AsyncStorage.getItem('fcmtoken');
-        axios
-          .post(
-            'http://localhost:8080/api/v1/user/saveFCMToken',
-            {
-              token: fcmToken,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${state.token}`,
-              },
-            },
-          )
-          .then(function (response) {
-            console.log('save token success');
-            console.log(response);
-          })
-          .catch(err => {
-            console.log('save token error: ', err);
+        let fcmToken = await AsyncStorage.getItem('fcmtoken');
+        try {
+          await customerAPI.post(ApiConstants.SAVE_FCM_TOKEN, {
+            token: fcmToken,
           });
+          console.log('save token success');
+        } catch (err) {
+          console.log('save token error: ', err.toJSON());
+        }
       };
       getUserProfile();
       saveFCMToken();
