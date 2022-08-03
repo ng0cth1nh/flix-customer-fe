@@ -27,6 +27,7 @@ export default function CustomModal(props) {
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
         padding: 30,
+        paddingHorizontal: 20,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
@@ -36,7 +37,6 @@ export default function CustomModal(props) {
         shadowOpacity: 1,
         shadowRadius: 10,
         elevation: 10,
-        bottom: 0,
       },
     }),
     [modalRatio],

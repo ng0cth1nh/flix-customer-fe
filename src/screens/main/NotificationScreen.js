@@ -31,7 +31,8 @@ const NOTIFICATIONS = [
   {
     id: 2,
     time: '20:59 - 13/05/2022',
-    title: 'EVN78FH - Đã tìm được thợ ',
+    title:
+      'EVN78FH - Đã tìm được thợ Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
     content:
       'Đơn của bạn sẽ được xử lý muộn nhất trong 6 tiếng. Bấm để xem chi tiết.',
     icon: 'https://i.postimg.cc/s21gHhHD/archive.png',
@@ -86,66 +87,70 @@ const NotificationScreen = () => {
     return (
       <View
         style={{
-          flexDirection: 'row',
-          height: 96,
+          height: 'auto',
           backgroundColor: item.isRead ? 'white' : '#F0F0F0',
           borderBottomColor: '#F0F0F0',
           borderBottomWidth: 1,
+          paddingBottom: 10,
         }}>
-        <Image
-          source={{uri: item.icon}}
-          style={{
-            height: 24,
-            width: 24,
-            alignSelf: 'center',
-            marginHorizontal: 14,
+        <TouchableOpacity
+          onPress={() => {
+            setIdDelete(item.id);
+            showModal();
           }}
-        />
-        <View style={{paddingRight: 60, alignSelf: 'center'}}>
-          <Text
-            style={{
-              fontSize: 14,
-              color: '#E67F1E',
-              fontWeight: 'bold',
-            }}>
-            {item.title}
-          </Text>
-          <Text
-            style={{
-              fontSize: 13,
-              color: 'black',
-              flexWrap: 'wrap',
-              marginVertical: 8,
-            }}>
-            {item.content}
-          </Text>
-          <Text
-            style={{
-              fontSize: 8,
-              color: '#7C7C7C',
-            }}>
-            {item.time}
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              setIdDelete(item.id);
-              showModal();
-            }}
+          style={{
+            height: 14,
+            width: 14,
+            alignSelf: 'flex-end',
+            marginRight: 10,
+            marginTop: 10,
+          }}>
+          <Image
+            source={require('../../../assets/images/type/close.png')}
             style={{
               height: 12,
               width: 12,
-              position: 'absolute',
-              top: 6,
-              right: 56,
-            }}>
-            <Image
-              source={require('../../../assets/images/type/close.png')}
+            }}
+          />
+        </TouchableOpacity>
+        <View style={{flexDirection: 'row'}}>
+          <Image
+            source={{uri: item.icon}}
+            style={{
+              height: 24,
+              width: 24,
+              alignSelf: 'center',
+              marginHorizontal: 14,
+            }}
+          />
+          <View style={{paddingRight: 60, alignSelf: 'center'}}>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
               style={{
-                height: 12,
-                width: 12,
-              }}
-            />
-          </TouchableOpacity>
+                fontSize: 14,
+                color: '#E67F1E',
+                fontWeight: 'bold',
+              }}>
+              {item.title}
+            </Text>
+            <Text
+              style={{
+                fontSize: 13,
+                color: 'black',
+                flexWrap: 'wrap',
+                marginVertical: 8,
+              }}>
+              {item.content}
+            </Text>
+            <Text
+              style={{
+                fontSize: 8,
+                color: '#7C7C7C',
+              }}>
+              {item.time}
+            </Text>
+          </View>
         </View>
       </View>
     );

@@ -263,6 +263,7 @@ const EditProfileInfoScreen = ({navigation}) => {
                 <TextInput
                   style={styles.valueText}
                   value={fullNames}
+                  onFocus={() => setFullNameInputError(null)}
                   onChangeText={text => setFullNames(text)}
                 />
               </View>
@@ -373,6 +374,7 @@ const EditProfileInfoScreen = ({navigation}) => {
                   style={emails ? styles.valueText : styles.valueTextBlur}
                   onChangeText={text => setEmails(text)}
                   value={emails}
+                  onFocus={() => setEmailInputError(null)}
                   placeholder="Nhập email"
                   placeholderTextColor="#DFDFDF"
                 />

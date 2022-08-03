@@ -55,8 +55,8 @@ const ChatScreen = ({route, navigation}) => {
   );
   const [visible, setIsVisible] = useState(false);
   const [images, setImages] = useState([]);
-
   const [isloading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const subscriber = firestore()
       .collection('chats')
