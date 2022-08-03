@@ -41,6 +41,7 @@ import ServiceListScreen from './src/screens/main/ServiceListScreen';
 import ServicePriceScreen from './src/screens/main/ServicePriceScreen';
 import Toast from 'react-native-toast-message';
 import ProfileInfoScreen from './src/screens/profile/ProfileInfoScreen';
+import RepairerProfileScreen from './src/screens/profile/RepairerProfileScreen';
 import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 import CommentScreen from './src/screens/feedback/CommentScreen';
@@ -62,12 +63,14 @@ const toastConfig = {
   customToast: ({text1}) => (
     <View
       style={{
-        height: 64,
+        height: 'auto',
         backgroundColor: '#56CA76',
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '96%',
+        width: '92%',
+        paddingVertical: 20,
+        paddingHorizontal: 10,
       }}>
       <Text
         style={{
@@ -75,6 +78,7 @@ const toastConfig = {
           fontSize: 16,
           color: 'white',
           textAlign: 'center',
+          flexWrap: 'wrap',
         }}>
         {text1}
       </Text>
@@ -83,12 +87,14 @@ const toastConfig = {
   customErrorToast: ({text1}) => (
     <View
       style={{
-        height: 64,
+        height: 'auto',
         backgroundColor: 'red',
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '96%',
+        width: '92%',
+        paddingVertical: 20,
+        paddingHorizontal: 10,
       }}>
       <Text
         style={{
@@ -96,6 +102,7 @@ const toastConfig = {
           fontSize: 16,
           color: 'white',
           textAlign: 'center',
+          flexWrap: 'wrap',
         }}>
         {text1}
       </Text>
@@ -148,6 +155,7 @@ function App() {
       saveFCMToken();
     }
   }, [state.token]);
+
   useEffect(() => {
     const userId = state.userId;
     if (userId) {
@@ -186,7 +194,6 @@ function App() {
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen
           name="CategoryListScreen"
           component={CategoryListScreen}
@@ -197,6 +204,9 @@ function App() {
           component={ServicePriceScreen}
         />
         <Stack.Screen name="RequestScreen" component={RequestScreen} />
+        <Stack.Screen name="AddressListScreen" component={AddressListScreen} />
+        <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} />
+        <Stack.Screen name="EditAddressScreen" component={EditAddressScreen} />
         <Stack.Screen
           name="PickVoucherCodeScreen"
           component={PickVoucherCodeScreen}
@@ -205,6 +215,7 @@ function App() {
           name="ChoosePaymentMethodScreen"
           component={ChoosePaymentMethodScreen}
         />
+        <Stack.Screen name="SearchScreen" component={SearchScreen} />
       </Stack.Navigator>
     );
   }
@@ -253,6 +264,7 @@ function App() {
   function RequestHistoryStackScreen() {
     return (
       <Stack.Navigator
+        initialRouteName="RequestHistoryScreen"
         screenOptions={{
           headerShown: false,
           gestureEnabled: true,
@@ -274,6 +286,10 @@ function App() {
         <Stack.Screen name="InvoiceScreen" component={InvoiceScreen} />
         <Stack.Screen name="CommentScreen" component={CommentScreen} />
         <Stack.Screen name="ChatScreen" component={ChatScreen} />
+        <Stack.Screen
+          name="RepairerProfileScreen"
+          component={RepairerProfileScreen}
+        />
       </Stack.Navigator>
     );
   }
@@ -325,12 +341,18 @@ function App() {
           <Stack.Screen name="ConfirmOTPScreen" component={ConfirmOTPScreen} />
         </Stack.Navigator>
       </NavigationContainer>
-      <Toast />
+      <Toast
+        config={toastConfig}
+        position="bottom"
+        visibilityTime={2000}
+        bottomOffset={90}
+      />
     </>
   ) : (
     <>
       <NavigationContainer ref={navigationRef} linking={linking}>
         <Tab.Navigator
+          initialRouteName="HomeStackScreen"
           tabBarOptions={{
             showLabel: false,
             keyboardHidesTabBar: true,
@@ -340,6 +362,7 @@ function App() {
           }}
           screenOptions={({route}) => ({
             tabBarShowLabel: false,
+            unmountOnBlur: true,
             headerShown: false,
             tabBarStyle: {
               height: 50,
@@ -383,12 +406,6 @@ function App() {
           />
         </Tab.Navigator>
       </NavigationContainer>
-      <Toast
-        config={toastConfig}
-        position="bottom"
-        visibilityTime={2000}
-        bottomOffset={90}
-      />
     </>
   );
 }
@@ -397,6 +414,12 @@ export default () => {
     <AuthProvider>
       <Provider store={store}>
         <App />
+        <Toast
+          config={toastConfig}
+          position="bottom"
+          visibilityTime={2000}
+          bottomOffset={90}
+        />
       </Provider>
     </AuthProvider>
   );

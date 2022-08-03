@@ -7,156 +7,127 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
+  Dimensions,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
-import {Checkbox, NativeBaseProvider} from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
-
-import BackButton from '../../components/BackButton';
-import Button from '../../components/SubmitButton';
+import React, {useState, useRef} from 'react';
+import NotFound from '../../components/NotFound';
+import Icon from 'react-native-vector-icons/Ionicons';
+const {height} = Dimensions.get('window');
+import useAxios from '../../hooks/useAxios';
 import SearchForm from '../../components/SearchForm';
-
-const listId = [
-  {id: 1},
-  {id: 2},
-  {id: 3},
-  {id: 4},
-  {id: 5},
-  {id: 6},
-  {id: 7},
-  {id: 8},
-  {id: 9},
-  {id: 10},
-  {id: 11},
-  {id: 12},
-];
-const items = [{id: 1}, {id: 2}, {id: 3}];
+import ApiConstants from '../../constants/Api';
 
 export default function SearchScreen({navigation}) {
   const [search, setSearch] = useState('');
-  const renderItem = ({item}) => {
+  const typingTimeoutRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const customerAPI = useAxios();
+  const [searchedSubService, setSearchedSubService] = useState(null);
+
+  const renderItem = ({item, index}) => {
     return (
-      <NativeBaseProvider>
-        <View style={styles.serviceRow}>
-          <Icon
-            name="tools"
-            size={20}
-            style={{marginBottom: 3, marginRight: 15}}
-          />
-          <Text style={{color: 'black', fontSize: 16}}>Tủ lạnh</Text>
-          <View style={{marginLeft: 'auto'}}>
-            <Checkbox
-              value={'fjsdkfjsldf'}
-              onChange={() => console.log('testing smth')}
-              colorScheme="yellow"
-              _icon={{color: 'black'}}
-            />
-          </View>
-        </View>
-      </NativeBaseProvider>
+      <TouchableOpacity
+        style={styles.serviceRow}
+        key={index.toString()}
+        onPress={() => {
+          navigation.push('RequestScreen', {
+            service: item,
+          });
+        }}>
+        <Image
+          source={{uri: item.icon}}
+          style={{marginBottom: 3, marginRight: 15, height: 24, width: 24}}
+        />
+        <Text style={{color: 'black', fontSize: 16, fontWeight: '600'}}>
+          {item.serviceName}
+        </Text>
+      </TouchableOpacity>
     );
   };
-  const renderService = ({item}) => {
-    return (
-      <View style={styles.selectedService}>
-        <Ionicons name="location-outline" size={22} style={{color: 'black'}} />
-        <Text style={{marginLeft: 5, color: 'black'}}>Máy tính abcjsjs</Text>
-        <TouchableOpacity style={styles.closeIcon}>
-          <Ionicons name="close" size={16} />
-        </TouchableOpacity>
-      </View>
-    );
+
+  const handleOnChangeSearch = async text => {
+    setSearch(text);
+    if (text === '') {
+      return;
+    }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    setLoading(true);
+    typingTimeoutRef.current = setTimeout(async () => {
+      let response = await customerAPI.get(
+        ApiConstants.SEARCH_SUB_SERVICE_API,
+        {
+          params: {keyword: text},
+        },
+      );
+      console.log('search: ' + text);
+      setSearchedSubService(response.data.services);
+      setLoading(false);
+    }, 200);
   };
+
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <SafeAreaView style={{flex: 1, paddingHorizontal: 20}}>
-        <View style={styles.headerBox}>
-          <View style={{flex: 1, marginLeft: 20}}>
-            <Text style={styles.headerText}>Dịch vụ sửa chữa</Text>
-          </View>
-        </View>
-        <SearchForm
-          search={search}
-          setSearch={setSearch}
-          placeholder="Tìm kiếm dịch vụ"
-        />
+      <SafeAreaView style={{flex: 1, paddingHorizontal: '4%'}}>
         <View
           style={{
-            flex: 1,
-            paddingVertical: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: '#CACACA',
+            height: height * 0.1,
+            flexDirection: 'row',
+            paddingVertical: 12,
+            alignItems: 'center',
           }}>
-          <ScrollView>
-            {items.length !== 0 && (
-              <View style={{marginBottom: 20}}>
-                <View style={styles.titleBox}>
-                  <Text style={[styles.textBold, {fontSize: 20}]}>Đã thêm</Text>
-                </View>
-                <FlatList
-                  data={items}
-                  keyExtractor={item => item.id}
-                  renderItem={renderService}
-                  contentContainerStyle={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    marginBottom: 5,
-                  }}
-                />
-              </View>
-            )}
-            <View>
-              <View style={styles.titleBox}>
-                <Text style={[styles.textBold, {fontSize: 20}]}>
-                  Tất cả dịch vụ
-                </Text>
-              </View>
-              <FlatList
-                nestedScrollEnabled
-                data={listId}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-              />
-            </View>
-          </ScrollView>
+          <TouchableOpacity onPress={navigation.goBack}>
+            <Icon name="ios-arrow-back-outline" color="black" size={34} />
+          </TouchableOpacity>
+          <SearchForm
+            search={search}
+            setSearch={setSearch}
+            handleOnChangeSearch={handleOnChangeSearch}
+            placeholder="Tìm kiếm dịch vụ"
+          />
         </View>
-        <Button
-          style={{
-            width: '80%',
-            alignSelf: 'center',
-            marginVertical: 10,
-          }}
-          onPress={() => console.log('test')}
-          buttonText="THÊM"
-        />
+        <ScrollView>
+          {loading ? (
+            <ActivityIndicator
+              size="small"
+              color="#FEC54B"
+              style={{
+                alignItems: 'center',
+                marginTop: 40,
+                justifyContent: 'center',
+              }}
+            />
+          ) : (
+            <>
+              {searchedSubService ? (
+                <View>
+                  <View style={styles.titleBox}>
+                    <Text style={[styles.textBold, {fontSize: 20}]}>
+                      Kết quả tìm kiếm
+                    </Text>
+                  </View>
+                  <FlatList
+                    nestedScrollEnabled
+                    data={searchedSubService}
+                    renderItem={renderItem}
+                    ListEmptyComponent={NotFound}
+                    keyExtractor={item => item.id}
+                  />
+                </View>
+              ) : null}
+            </>
+          )}
+        </ScrollView>
       </SafeAreaView>
-      <BackButton onPressHandler={navigation.goBack} color="black" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerText: {
-    fontWeight: 'bold',
-    fontSize: 22,
-    color: 'black',
-    marginTop: getStatusBarHeight(),
-    paddingBottom: 15,
-    alignSelf: 'center',
-  },
-  headerBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#CACACA',
-    paddingRight: 20,
-    marginBottom: 10,
-  },
   textBold: {
     fontWeight: 'bold',
     color: 'black',
@@ -170,11 +141,12 @@ const styles = StyleSheet.create({
   serviceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 7,
+    paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 10,
     backgroundColor: '#D3D3D3',
     marginTop: 10,
+    height: 'auto',
   },
   selectedService: {
     flexDirection: 'row',
@@ -186,7 +158,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginRight: 15,
   },
-
   closeIcon: {
     width: 20,
     height: 20,

@@ -3,17 +3,13 @@ import {
   Text,
   View,
   SafeAreaView,
-  ActivityIndicator,
   StyleSheet,
   TextInput,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import moment from 'moment';
-import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
-import useFetchData from '../../hooks/useFetchData';
 import {RequestStatus} from '../../utils/util';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';
@@ -57,6 +53,20 @@ const RequestDetailScreen = ({route, navigation}) => {
   const dispatch = useDispatch();
   const showModal = () => {
     setModalVisible(true);
+  };
+
+  const handleClickGetSubServices = () => {
+    navigation.push('ServicePriceScreen', {
+      serviceId: data.serviceId,
+      serviceName: data.serviceName,
+    });
+  };
+
+  const handleClickRepairerProfile = () => {
+    navigation.push('RepairerProfileScreen', {
+      repairerId: data.repairerId,
+      repairerAvatar: data.repairerAvatar,
+    });
   };
 
   const loadData = async () => {
@@ -187,6 +197,8 @@ const RequestDetailScreen = ({route, navigation}) => {
             isRequestIdVisible={true}
             isShowSubmitButton={isShowSubmitButton}
             submitButtonText={submitButtonText}
+            handleClickGetSubServices={handleClickGetSubServices}
+            handleClickRepairerProfile={handleClickRepairerProfile}
             handleSubmitButtonClick={
               typeSubmitButtonClick === 'APPROVE_INVOICE'
                 ? handleApproveInvoiceButtonClick

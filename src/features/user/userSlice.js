@@ -13,6 +13,7 @@ const initialState = {
   },
   errorMessage: null,
   isLoading: false,
+  addresses: null,
 };
 
 export const fetchProfile = createAsyncThunk(
@@ -20,6 +21,35 @@ export const fetchProfile = createAsyncThunk(
   async (customerAPI, {rejectWithValue}) => {
     try {
       const response = await customerAPI.get(ApiConstants.PROFILE_INFO_API);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const fetchComments = createAsyncThunk(
+  'user/fetchComments',
+  async ({customerAPI, repairerId, offset, limit}, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.get(
+        ApiConstants.GET_REPAIRER_COMMENT_API,
+        {
+          params: {repairerId, offset, limit},
+        },
+      );
+      return response.data.repairerComments;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const fetchAddresses = createAsyncThunk(
+  'user/fetchAddresses',
+  async (customerAPI, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.get(ApiConstants.GET_ADDRESS_LIST_API);
       return response.data;
     } catch (err) {
       return rejectWithValue(getErrorMessage(err));
@@ -40,6 +70,105 @@ export const updateProfile = createAsyncThunk(
           },
         },
       );
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const addAddress = createAsyncThunk(
+  'user/addAddress',
+  async ({customerAPI, body}, {rejectWithValue}) => {
+    try {
+      await customerAPI.post(
+        ApiConstants.POST_ADDRESS_API,
+        JSON.stringify(body),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+export const sendFeedback = createAsyncThunk(
+  'user/sendFeedback',
+  async ({customerAPI, body}, {rejectWithValue}) => {
+    try {
+      console.log(body);
+      const formData = new FormData();
+      formData.append('feedbackType', body.feedbackType);
+      formData.append('title', body.title);
+      formData.append('description', body.description);
+      body.requestCode && formData.append('requestCode', body.requestCode);
+      if (body.images) {
+        for (let image of body.images) {
+          formData.append('images[]', {
+            uri: image.path,
+            type: image.mime,
+            name: image.path.split('\\').pop().split('/').pop(),
+          });
+        }
+      }
+      await customerAPI.post(ApiConstants.POST_FEEDBACK_API, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const updateAddress = createAsyncThunk(
+  'user/updateAddress',
+  async ({customerAPI, body}, {rejectWithValue}) => {
+    try {
+      await customerAPI.put(
+        ApiConstants.POST_ADDRESS_API,
+        JSON.stringify(body),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const updateMainAddress = createAsyncThunk(
+  'user/updateMainAddress',
+  async ({customerAPI, body}, {rejectWithValue}) => {
+    try {
+      await customerAPI.put(
+        ApiConstants.GET_MAIN_ADDRESS_API,
+        JSON.stringify(body),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
+export const deleteAddress = createAsyncThunk(
+  'user/deleteAddress',
+  async ({customerAPI, addressId}, {rejectWithValue}) => {
+    try {
+      await customerAPI.delete(ApiConstants.POST_ADDRESS_API, {
+        params: {addressId},
+      });
     } catch (err) {
       return rejectWithValue(getErrorMessage(err));
     }
@@ -76,7 +205,11 @@ export const updateAvatar = createAsyncThunk(
 export const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    setIsLoading(state) {
+      state.isLoading = true;
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchProfile.pending, state => {
       state.isLoading = true;
@@ -109,6 +242,65 @@ export const userSlice = createSlice({
       state.errorMessage = action.payload;
     });
 
+    builder.addCase(fetchAddresses.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.addresses = action.payload.addresses;
+      state.errorMessage = null;
+    });
+    builder.addCase(fetchAddresses.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+
+    builder.addCase(addAddress.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(addAddress.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(sendFeedback.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(sendFeedback.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(updateAddress.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(updateAddress.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(updateMainAddress.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(updateMainAddress.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(deleteAddress.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(deleteAddress.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(fetchComments.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(fetchComments.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+
     builder.addCase(updateAvatar.pending, state => {
       state.isLoading = true;
     });
@@ -123,7 +315,9 @@ export const userSlice = createSlice({
   },
 });
 
+export const {setIsLoading} = userSlice.actions;
 export const selectUser = state => state.user.user;
+export const selectAddresses = state => state.user.addresses;
 export const selectErrorMessage = state => state.user.errorMessage;
 export const selectIsLoading = state => state.user.isLoading;
 export default userSlice.reducer;

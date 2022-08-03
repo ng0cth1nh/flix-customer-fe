@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import React from 'react';
-const {width, height} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
 const ServiceComponent = ({
   data,
@@ -23,24 +23,46 @@ const ServiceComponent = ({
         borderRadius: 10,
         marginVertical: 12,
         marginTop: index === 0 ? 12 : 0,
-        height: height * 0.152,
         marginHorizontal: '4%',
+        height: 'auto',
+        paddingVertical: 10,
+        paddingHorizontal: 10,
       }}>
       <Image source={{uri: data.image}} style={styles.image} />
-      <View style={{alignSelf: 'center'}}>
-        <Text style={{fontWeight: 'bold', fontSize: 20, color: 'black'}}>
-          {data.serviceName}
-        </Text>
+      <View style={{flex: 1}}>
+        <View style={{flexDirection: 'row'}}>
+          <Text
+            numberOfLines={2}
+            ellipsizeMode="tail"
+            style={{
+              fontWeight: 'bold',
+              fontSize: 20,
+              color: 'black',
+              flexWrap: 'wrap',
+              flex: 5,
+            }}>
+            {data.serviceName}
+          </Text>
+          <TouchableOpacity
+            style={styles.editTouch}
+            onPress={onPressPriceHandler}>
+            <Text style={styles.editText}>Xem thêm{'>'}</Text>
+          </TouchableOpacity>
+        </View>
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: 'column',
             justifyContent: 'space-between',
+            marginTop: 'auto',
           }}>
-          <TouchableOpacity
-            style={[styles.button, {marginRight: 10}]}
-            onPress={onPressPriceHandler}>
-            <Text style={styles.textBold}>Xem giá dịch vụ</Text>
-          </TouchableOpacity>
+          <Text
+            numberOfLines={2}
+            ellipsizeMode="tail"
+            style={{marginVertical: 4}}>
+            {data.description
+              ? data.description
+              : 'Tất cả các dịch vụ sửa ' + data.serviceName}
+          </Text>
           <TouchableOpacity
             style={styles.button}
             onPress={onPressRequestHandler}>
@@ -54,22 +76,33 @@ const ServiceComponent = ({
 
 const styles = StyleSheet.create({
   button: {
+    marginTop: 6,
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     borderRadius: 10,
     backgroundColor: '#FEC54B',
-    marginTop: 20,
+    width: '46%',
   },
   textBold: {
     fontWeight: 'bold',
     color: 'black',
+    textAlign: 'center',
   },
   image: {
     height: height * 0.12,
     width: height * 0.111,
     borderRadius: 10,
     alignSelf: 'center',
-    marginHorizontal: '4%',
+    marginRight: 10,
+  },
+  editTouch: {
+    marginLeft: 'auto',
+  },
+  editText: {
+    color: '#FEC54B',
+    textDecorationLine: 'underline',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
 

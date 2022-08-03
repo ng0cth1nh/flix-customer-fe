@@ -1,16 +1,15 @@
 import {
   Text,
   View,
-  SafeAreaView,
   StyleSheet,
   StatusBar,
   Dimensions,
-  TextInput,
+  TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState, useRef, useEffect} from 'react';
+import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-const {height, width} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 import BackButton from '../../components/BackButton';
 import MajorComponent from '../../components/MajorComponent';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
@@ -60,77 +59,7 @@ const MAJORS = [
   },
 ];
 
-const SERVICE_PRICE = [
-  {
-    id: 1,
-    price: 60000,
-    name: 'Kiểm tra cơ bản ',
-  },
-  {
-    id: 2,
-    price: 30000,
-    name: 'Nạp ga điều hòa',
-  },
-  {
-    id: 3,
-    price: 25000,
-    name: 'Hỏng chức năng làm lạnh',
-  },
-  {
-    id: 4,
-    price: 2000000,
-    name: 'Băng tuyết bám thành mảng trên dàn nhiệt độ',
-  },
-  {
-    id: 5,
-    price: 1300000,
-    name: 'Điều hòa có tiếng ồn lớn, bất thường',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-  {
-    id: 6,
-    price: 200000,
-    name: 'Thiết bị tự động ngừng trong khi sử dụng',
-  },
-];
-
 const CategoryListScreen = ({navigation}) => {
-  const [search, setSearch] = useState('');
-
   return (
     <View style={{backgroundColor: '#FEC54B', flex: 1}}>
       <StatusBar barStyle="dark-content" backgroundColor="#FEC54B" />
@@ -143,19 +72,12 @@ const CategoryListScreen = ({navigation}) => {
           borderTopLeftRadius: 18,
           borderTopRightRadius: 18,
         }}>
-        <View style={styles.searchForm}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Tìm kiếm dịch vụ"
-            onChangeText={text => setSearch(text)}
-            defaultValue={search}
-          />
-          <Icon
-            name="search"
-            size={24}
-            style={{paddingTop: 12, alignItems: 'center'}}
-          />
-        </View>
+        <TouchableOpacity
+          style={styles.searchForm}
+          onPress={() => navigation.push('SearchScreen')}>
+          <Text>Tìm kiếm dịch vụ</Text>
+          <Icon name="search" size={24} />
+        </TouchableOpacity>
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{paddingHorizontal: '4%'}}>
@@ -203,7 +125,9 @@ const styles = StyleSheet.create({
     marginHorizontal: '5%',
     borderRadius: 18,
     paddingHorizontal: 15,
-    marginVertical: 26,
+    marginVertical: 16,
+    height: height * 0.072,
+    alignItems: 'center',
   },
 });
 

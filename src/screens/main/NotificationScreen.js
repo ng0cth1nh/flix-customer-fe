@@ -271,7 +271,7 @@ const NotificationScreen = () => {
       <CustomModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        modalRatio={0.35}>
+        modalRatio={0.3}>
         <Text style={styles.modalText}>
           Bạn có chắc chắn muốn xóa thông báo này không?
         </Text>
@@ -289,7 +289,7 @@ const NotificationScreen = () => {
           <TouchableOpacity
             style={[styles.button, styles.buttonClose]}
             onPress={() => setModalVisible(!modalVisible)}>
-            <Text style={styles.textStyle}>THOÁT</Text>
+            <Text style={styles.textStyle}>ĐÓNG</Text>
           </TouchableOpacity>
         </View>
       </CustomModal>

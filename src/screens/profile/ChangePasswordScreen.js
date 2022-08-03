@@ -4,13 +4,11 @@ import {
   View,
   SafeAreaView,
   StyleSheet,
-  StatusBar,
+  ScrollView,
   TextInput,
-  Dimensions,
   TouchableOpacity,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-const {height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import SubmitButton from '../../components/SubmitButton';
@@ -18,6 +16,7 @@ import TopHeaderComponent from '../../components/TopHeaderComponent';
 import ApiConstants from '../../constants/Api';
 import useAxios from '../../hooks/useAxios';
 import getErrorMessage from '../../utils/getErrorMessage';
+import ProgressLoader from 'rn-progress-loader';
 
 const ChangePasswordScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
@@ -30,6 +29,7 @@ const ChangePasswordScreen = ({navigation}) => {
   const [passwordInputError, setPasswordInputError] = useState(null);
   const [reNewPasswordInputError, setReNewPasswordInputError] = useState(null);
   const customerAPI = useAxios();
+  const [loading, setLoading] = useState(false);
 
   const checkPasswordValid = () => {
     if (password.trim() === '') {
@@ -75,6 +75,7 @@ const ChangePasswordScreen = ({navigation}) => {
       checkReNewPasswordValid()
     ) {
       try {
+        await setLoading(true);
         const body = {
           oldPassword: password,
           newPassword,
@@ -93,11 +94,12 @@ const ChangePasswordScreen = ({navigation}) => {
             type: 'customToast',
             text1: 'Đổi mật khẩu thành công',
           });
+          navigation.goBack();
         }
       } catch (err) {
-        //console.log('status: ' + err.response.status);
-        // console.log('ERRo' + err.data.response);
         setPasswordInputError(getErrorMessage(err));
+      } finally {
+        await setLoading(false);
       }
     }
   };
@@ -110,18 +112,12 @@ const ChangePasswordScreen = ({navigation}) => {
         isBackButton={true}
         statusBarColor="white"
       />
-      <SafeAreaView style={{flex: 1}}>
-        <View
-          style={[
-            styles.box,
-            {
-              height: height * 0.6,
-              flexDirection: 'column',
-              marginVertical: '4%',
-            },
-          ]}>
+      <SafeAreaView style={{flex: 1, marginHorizontal: '4%'}}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{paddingTop: 10}}>
           <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Nhập mật khẩu hiện tại</Text>
+            <Text style={styles.inputLabel}>Nhập mật khẩu hiện tại *</Text>
             <View
               style={[
                 styles.valueSpace,
@@ -158,7 +154,7 @@ const ChangePasswordScreen = ({navigation}) => {
             )}
           </View>
           <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Nhập mật khẩu mới</Text>
+            <Text style={styles.inputLabel}>Nhập mật khẩu mới *</Text>
             <View
               style={[
                 styles.valueSpace,
@@ -195,7 +191,7 @@ const ChangePasswordScreen = ({navigation}) => {
             )}
           </View>
           <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Nhập lại mật khẩu mới</Text>
+            <Text style={styles.inputLabel}>Nhập lại mật khẩu mới *</Text>
             <View
               style={[
                 styles.valueSpace,
@@ -231,16 +227,22 @@ const ChangePasswordScreen = ({navigation}) => {
               <Text style={styles.errorMessage}>{reNewPasswordInputError}</Text>
             )}
           </View>
-        </View>
+        </ScrollView>
         <SubmitButton
           style={{
-            marginTop: 15,
-            marginBottom: 15,
-            width: '90%',
+            marginVertical: 8,
+            width: '100%',
             alignSelf: 'center',
           }}
           onPress={handleChangePassword}
           buttonText="ĐỔI MẬT KHẨU"
+        />
+        <ProgressLoader
+          visible={loading}
+          isModal={true}
+          isHUD={true}
+          hudColor={'#FEC54B'}
+          color={'#000000'}
         />
       </SafeAreaView>
     </View>
@@ -275,23 +277,23 @@ const styles = StyleSheet.create({
     color: 'black',
     marginLeft: 15,
   },
-  inputField: {marginBottom: 12},
+  inputField: {marginVertical: 6},
   inputLabel: {
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
-    fontSize: 18,
+    fontSize: 14,
   },
   valueSpace: {
-    height: 50,
+    height: 'auto',
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 10,
+    borderRadius: 18,
     backgroundColor: '#FFFFFF',
-    borderColor: '#E8E8E8',
-    borderWidth: 2,
+    borderColor: '#F0F0F0',
+    borderWidth: 1,
   },
   valueText: {
     fontSize: 20,

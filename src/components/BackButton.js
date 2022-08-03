@@ -10,7 +10,7 @@ export default function BackButton({color, onPressHandler}) {
         position: 'absolute',
         zIndex: 1,
         marginTop: getStatusBarHeight(),
-        marginLeft: 20,
+        left: '4%',
       }}
       onPress={onPressHandler}>
       <Icon name="ios-arrow-back-outline" color={color} size={34} />
