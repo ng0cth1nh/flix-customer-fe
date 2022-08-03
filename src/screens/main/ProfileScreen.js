@@ -8,11 +8,10 @@ import {
   StyleSheet,
 } from 'react-native';
 import React, {useState, useContext, useEffect} from 'react';
-const {height, width} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 import {Context as AuthContext} from '../../context/AuthContext';
 import CustomModal from '../../components/CustomModal';
 import {useSelector, useDispatch} from 'react-redux';
-// import {fetchUserInfo} from '../../redux/actions/userAction';
 import useAxios from '../../hooks/useAxios';
 import {
   fetchProfile,

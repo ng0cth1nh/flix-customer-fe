@@ -347,7 +347,10 @@ const InvoiceScreen = ({route, navigation}) => {
                     }}
                   />
                   <View style={styles.boxBodyContent}>
-                    <Text style={[styles.textBold, {fontSize: 24}]}>
+                    <Text
+                      style={[styles.textBold, {fontSize: 24}]}
+                      numberOfLines={2}
+                      ellipsizeMode="tail">
                       {data.serviceName}
                     </Text>
                     <Text
