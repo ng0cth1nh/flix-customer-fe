@@ -40,5 +40,4 @@ const ApiConstants = {
   SEARCH_SUB_SERVICE_API: '/category/services/search',
 };
 
-//http://localhost:8000
 export default ApiConstants;
