@@ -6,90 +6,298 @@ import {
   SafeAreaView,
   TouchableOpacity,
   FlatList,
-  Dimensions,
-  StatusBar,
   RefreshControl,
   ActivityIndicator,
-  TouchableHighlight,
 } from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import React, {useState, useEffect} from 'react';
-const {width, height} = Dimensions.get('window');
 import CustomModal from '../../components/CustomModal';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
+import {NUMBER_RECORD_PER_PAGE} from '../../constants/Api';
+import Toast from 'react-native-toast-message';
+import moment from 'moment';
+import {useSelector, useDispatch} from 'react-redux';
+import useAxios from '../../hooks/useAxios';
+import {
+  selectIsLoading,
+  setIsLoading,
+  fetchNotifications,
+  deleteNotification,
+  markReadNotification,
+  selectNotifications,
+  selectPageNumbers,
+  selectTotalPageNotifications,
+  setNotifications as setNotis,
+  setPageNumbers,
+  setTotalPageNotifications,
+} from '../../features/user/userSlice';
 
-const NOTIFICATIONS = [
-  {
-    id: 1,
-    time: '20:59 - 13/05/2022',
-    title: 'DV68GH - Đặt lịch thành công',
-    content:
-      'Đơn của bạn sẽ được xử lý muộn nhất trong 6 tiếng. Bấm để xem chi tiết.',
-    icon: 'https://i.postimg.cc/s21gHhHD/archive.png',
-    isRead: false,
-  },
-  {
-    id: 2,
-    time: '20:59 - 13/05/2022',
-    title:
-      'EVN78FH - Đã tìm được thợ Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    content:
-      'Đơn của bạn sẽ được xử lý muộn nhất trong 6 tiếng. Bấm để xem chi tiết.',
-    icon: 'https://i.postimg.cc/s21gHhHD/archive.png',
-    isRead: true,
-  },
-  {
-    id: 3,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 4,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-  {
-    id: 5,
-    time: '20:59 - 13/05/2022',
-    title: 'Bạn có 1 mã giảm giá mới',
-    content: 'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-    isRead: true,
-  },
-];
-
-const NotificationScreen = () => {
-  const [notifications, setNotifications] = useState([]);
+const NotificationScreen = ({navigation}) => {
+  const [notifications, setNotifications] = useState(
+    useSelector(selectNotifications),
+  );
   const [idDelete, setIdDelete] = useState(-1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [refreshControl, setRefreshControl] = useState(false);
+  const [refreshControl, setRefreshControl] = useState(null);
+  const [pageNumber, setPageNumber] = useState(useSelector(selectPageNumbers));
+  const [totalPage, setTotalPage] = useState(
+    useSelector(selectTotalPageNotifications),
+  );
   const [modalVisible, setModalVisible] = useState(false);
+  const customerAPI = useAxios();
+  const dispatch = useDispatch();
+  const isLoading = useSelector(selectIsLoading);
+  const [stopFetchMore, setStopFetchMore] = useState(false);
 
   const showModal = () => {
     setModalVisible(true);
   };
 
   useEffect(() => {
-    setNotifications(NOTIFICATIONS);
-  }, []);
+    (async () => {
+      if (
+        (refreshControl === null && notifications.length === 0) ||
+        refreshControl
+      ) {
+        console.log('loadNotifications: ');
+        await loadNotifications();
+      }
+    })();
+  }, [refreshControl]);
 
-  const handleOnDelete = id => {
-    alert('id delete: ' + id);
+  useEffect(() => {
+    (async () => {
+      let temp = [];
+      notifications &&
+        notifications.forEach(async item => {
+          if (
+            (item.type === null ||
+              item.type.startsWith('DEPOSIT') ||
+              item.type.startsWith('REGISTER_') ||
+              item.type.startsWith('RESPONSE_FEEDBACK')) &&
+            !item.read
+          ) {
+            let body = {
+              id: item.id,
+            };
+            await dispatch(
+              markReadNotification({
+                customerAPI,
+                body,
+              }),
+            ).unwrap();
+            temp.push({
+              ...item,
+              read: true,
+            });
+          } else {
+            temp.push(item);
+          }
+        });
+      dispatch(setNotis([...notifications]));
+    })();
+  }, [notifications]);
+
+  const loadNotifications = async () => {
+    try {
+      let temp = 0;
+      await dispatch(setIsLoading());
+      let res = await dispatch(
+        fetchNotifications({
+          customerAPI,
+          pageNumber: temp,
+          pageSize: NUMBER_RECORD_PER_PAGE,
+        }),
+      ).unwrap();
+      setNotifications(res.notifications);
+      dispatch(setNotis(res.notifications));
+      if (refreshControl) {
+        setRefreshControl(false);
+        setStopFetchMore(false);
+        setPageNumber(0);
+        dispatch(setPageNumbers(0));
+      }
+      setTotalPage(Math.ceil(+res.totalRecord / NUMBER_RECORD_PER_PAGE));
+      dispatch(
+        setTotalPageNotifications(
+          Math.ceil(+res.totalRecord / NUMBER_RECORD_PER_PAGE),
+        ),
+      );
+      console.log('+res.totalRecord:', +res.totalRecord);
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
   };
 
-  const renderItem = ({item}) => {
-    return (
+  const handleOnEndReached = async () => {
+    try {
+      if (!stopFetchMore) {
+        if (totalPage <= pageNumber + 1) {
+          setStopFetchMore(true);
+          return;
+        }
+        let temp = pageNumber + 1;
+        await dispatch(setIsLoading());
+        console.log(temp);
+        let res = await dispatch(
+          fetchNotifications({
+            customerAPI,
+            pageNumber: temp,
+            pageSize: NUMBER_RECORD_PER_PAGE,
+          }),
+        ).unwrap();
+
+        setNotifications([...notifications, ...res.notifications]);
+        dispatch(setNotis([...notifications, ...res.notifications]));
+        setPageNumber(pageNumber + 1);
+        dispatch(setPageNumbers(pageNumber + 1));
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
+  };
+
+  const handleDeleteCLick = async () => {
+    try {
+      setModalVisible(false);
+      await dispatch(setIsLoading());
+      await dispatch(
+        deleteNotification({
+          customerAPI,
+          id: idDelete,
+        }),
+      ).unwrap();
+      let temp = notifications.filter(item => {
+        return item.id !== idDelete;
+      });
+      setNotifications(temp);
+      dispatch(setNotis(temp));
+    } catch (err) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: err,
+      });
+    }
+  };
+
+  const handleNavigate = async (requestCode, type, id, read) => {
+    try {
+      if (!read) {
+        let body = {
+          id,
+        };
+        await dispatch(
+          markReadNotification({
+            customerAPI,
+            body,
+          }),
+        ).unwrap();
+        let temp = [];
+        notifications.forEach(element => {
+          if (element.id === id) {
+            temp.push({
+              ...element,
+              read: true,
+            });
+          } else {
+            temp.push(element);
+          }
+        });
+        setNotifications(temp);
+        dispatch(setNotis(temp));
+      }
+      console.log(requestCode);
+      let params = null;
+      if (type.startsWith('REQUEST')) {
+        if (type === 'REQUEST_APPROVED') {
+          params = {
+            requestCode,
+            isFetchFixedService: false,
+            isShowSubmitButton: true,
+            submitButtonText: 'Hủy yêu cầu',
+            typeSubmitButtonClick: 'CANCEL_REQUEST',
+            isShowCancelButton: true,
+            navigateFromScreen: 'APPROVED',
+            isNavigateFromNotiScreen: true,
+          };
+        }
+        if (type === 'REQUEST_CREATE_SUCCESS') {
+          params = {
+            requestCode,
+            isFetchFixedService: false,
+            isShowSubmitButton: true,
+            submitButtonText: 'Hủy yêu cầu',
+            typeSubmitButtonClick: 'CANCEL_REQUEST',
+            isShowCancelButton: true,
+            navigateFromScreen: 'PENDING',
+            isNavigateFromNotiScreen: true,
+          };
+        }
+        if (type === 'REQUEST_CONFIRM_FIXING') {
+          params = {
+            requestCode,
+            isFetchFixedService: true,
+            isShowSubmitButton: true,
+            submitButtonText: 'Hủy yêu cầu',
+            typeSubmitButtonClick: 'CANCEL_REQUEST',
+            isShowCancelButton: true,
+            navigateFromScreen: 'FIXING',
+            isNavigateFromNotiScreen: true,
+          };
+        }
+        if (type === 'REQUEST_DONE') {
+          params = {
+            requestCode,
+            isFetchFixedService: true,
+            isShowSubmitButton: false,
+            submitButtonText: 'Hủy yêu cầu',
+            typeSubmitButtonClick: 'CANCEL_REQUEST',
+            isNavigateFromNotiScreen: true,
+          };
+        }
+        if (type === 'REQUEST_CANCELED') {
+          params = {
+            requestCode,
+            isFetchFixedService: false,
+            isShowSubmitButton: false,
+            submitButtonText: 'Hủy yêu cầu',
+            typeSubmitButtonClick: 'CANCEL_REQUEST',
+            isNavigateFromNotiScreen: true,
+          };
+        }
+        navigation.navigate('RequestHistoryStackScreen', {
+          screen: 'RequestDetailScreen',
+          params,
+        });
+      } else {
+        navigation.navigate('RequestHistoryStackScreen', {
+          screen: 'InvoiceScreen',
+          params: {
+            requestCode,
+            isNavigateFromNotiScreen: true,
+            vnp_TxnRef: null,
+            vnp_ResponseCode: null,
+          },
+        });
+      }
+    } catch (err) {}
+  };
+
+  const renderItem = ({item, index}) => {
+    return item.type === null ||
+      item.type.startsWith('DEPOSIT') ||
+      item.type.startsWith('REGISTER_') ||
+      item.type.startsWith('RESPONSE_FEEDBACK') ? (
       <View
         style={{
           height: 'auto',
-          backgroundColor: item.isRead ? 'white' : '#F0F0F0',
-          borderBottomColor: '#F0F0F0',
+          backgroundColor: item.read ? 'white' : '#F0F0F0',
+          borderBottomColor: '#6b6b6b',
           borderBottomWidth: 1,
           paddingBottom: 10,
         }}>
@@ -115,7 +323,17 @@ const NotificationScreen = () => {
         </TouchableOpacity>
         <View style={{flexDirection: 'row'}}>
           <Image
-            source={{uri: item.icon}}
+            source={
+              !item.type
+                ? require('../../../assets/images/type/archive.png')
+                : item.type.startsWith('RESPONSE_FEEDBACK')
+                ? require('../../../assets/images/type/help-desk.png')
+                : item.type.startsWith('DEPOSIT')
+                ? require('../../../assets/images/type/deposit.png')
+                : item.type.startsWith('REGISTER_FAIL')
+                ? require('../../../assets/images/type/unCheck.png')
+                : require('../../../assets/images/type/check.png')
+            }
             style={{
               height: 24,
               width: 24,
@@ -132,7 +350,7 @@ const NotificationScreen = () => {
                 color: '#E67F1E',
                 fontWeight: 'bold',
               }}>
-              {item.title}
+              {index + 1}
             </Text>
             <Text
               style={{
@@ -148,11 +366,87 @@ const NotificationScreen = () => {
                 fontSize: 8,
                 color: '#7C7C7C',
               }}>
-              {item.time}
+              {moment(item.date).format('HH:mm - DD/MM/YYYY')}
             </Text>
           </View>
         </View>
       </View>
+    ) : (
+      <TouchableOpacity
+        style={{
+          height: 'auto',
+          backgroundColor: item.read ? 'white' : '#F0F0F0',
+          borderBottomColor: '#6b6b6b',
+          borderBottomWidth: 1,
+          paddingBottom: 10,
+        }}
+        onPress={() =>
+          handleNavigate(item.requestCode, item.type, item.id, item.read)
+        }>
+        <TouchableOpacity
+          onPress={() => {
+            setIdDelete(item.id);
+            showModal();
+          }}
+          style={{
+            height: 14,
+            width: 14,
+            alignSelf: 'flex-end',
+            marginRight: 10,
+            marginTop: 10,
+          }}>
+          <Image
+            source={require('../../../assets/images/type/close.png')}
+            style={{
+              height: 12,
+              width: 12,
+            }}
+          />
+        </TouchableOpacity>
+        <View style={{flexDirection: 'row'}}>
+          <Image
+            source={
+              item.type.startsWith('REQUEST')
+                ? require('../../../assets/images/type/archive.png')
+                : require('../../../assets/images/type/invoice.png')
+            }
+            style={{
+              height: 24,
+              width: 24,
+              alignSelf: 'center',
+              marginHorizontal: 14,
+            }}
+          />
+          <View style={{paddingRight: 60, alignSelf: 'center'}}>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{
+                fontSize: 14,
+                color: '#E67F1E',
+                fontWeight: 'bold',
+              }}>
+              {index + 1}
+            </Text>
+            <Text
+              style={{
+                fontSize: 13,
+                color: 'black',
+                flexWrap: 'wrap',
+                marginVertical: 8,
+              }}>
+              {item.content}
+            </Text>
+            <Text
+              style={{
+                fontSize: 8,
+                color: '#7C7C7C',
+              }}>
+              {moment(item.date).format('HH:mm - DD/MM/YYYY')}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -160,7 +454,7 @@ const NotificationScreen = () => {
     <View
       style={[
         {backgroundColor: 'white', flex: 1},
-        modalVisible ? {opacity: 0.3} : {},
+        modalVisible ? {opacity: 0.9} : {},
       ]}>
       <TopHeaderComponent
         navigation={null}
@@ -177,100 +471,30 @@ const NotificationScreen = () => {
           refreshControl={
             <RefreshControl
               refreshing={refreshControl}
-              onRefresh={() => {
-                setRefreshControl(true);
-                console.log('lam moi');
-                // setData(mang_du_lieu)
-                setNotifications(
-                  notifications.concat([
-                    {
-                      id: 6,
-                      time: '20:59 - 13/05/2022',
-                      title: 'Bạn có 1 mã giảm giá mới',
-                      content:
-                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-                      isRead: true,
-                    },
-                    {
-                      id: 7,
-                      time: '20:59 - 13/05/2022',
-                      title: 'Bạn có 1 mã giảm giá mới',
-                      content:
-                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-                      isRead: true,
-                    },
-                    {
-                      id: 8,
-                      time: '20:59 - 13/05/2022',
-                      title: 'Bạn có 1 mã giảm giá mới',
-                      content:
-                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-                      isRead: true,
-                    },
-                    {
-                      id: 9,
-                      time: '20:59 - 13/05/2022',
-                      title: 'Bạn có 1 mã giảm giá mới',
-                      content:
-                        'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-                      icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-                      isRead: true,
-                    },
-                  ]),
-                );
-                setRefreshControl(false);
-              }}
+              onRefresh={() => setRefreshControl(true)}
               colors={['#FEC54B']}
             />
           }
           ListFooterComponent={() =>
-            isLoading ? ( //  a==b ? b : a
-              <View
+            isLoading && (
+              <ActivityIndicator
+                size="small"
+                color="#FEC54B"
                 style={{
                   marginTop: 10,
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexDirection: 'row',
                   padding: 10,
-                }}>
-                <ActivityIndicator size="small" color="#FEC54B" />
-              </View>
-            ) : null
+                }}
+              />
+            )
           }
-          onEndReached={() => {
-            setIsLoading(true);
-            console.log('Load More');
-            // setData(mang_du_lieu)
-            setTimeout(() => {
-              setNotifications(
-                notifications.concat([
-                  {
-                    id: 8,
-                    time: '20:59 - 13/05/2022',
-                    title: 'Bạn có 1 mã giảm giá mới',
-                    content:
-                      'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-                    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-                    isRead: true,
-                  },
-                  {
-                    id: 9,
-                    time: '20:59 - 13/05/2022',
-                    title: 'Bạn có 1 mã giảm giá mới',
-                    content:
-                      'Mã giảm giá áp dụng cho tất cả các shop ở Hồ Chí Minh.',
-                    icon: 'https://i.postimg.cc/t4Bgz55M/coupon.png',
-                    isRead: true,
-                  },
-                ]),
-              );
-              setIsLoading(false);
-            }, 2000);
+          onEndReached={handleOnEndReached}
+          onScrollBeginDrag={() => {
+            setStopFetchMore(false);
           }}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={1}
         />
       </SafeAreaView>
       <CustomModal
@@ -288,7 +512,7 @@ const NotificationScreen = () => {
           }}>
           <TouchableOpacity
             style={[styles.button, styles.buttonOpen]}
-            onPress={() => console.log('delete id ' + idDelete)}>
+            onPress={handleDeleteCLick}>
             <Text style={styles.textStyle}>XÓA</Text>
           </TouchableOpacity>
           <TouchableOpacity

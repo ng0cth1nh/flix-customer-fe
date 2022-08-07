@@ -38,7 +38,12 @@ import Loading from '../../components/Loading';
 import {VnPayCode} from '../../constants/Error';
 import {RequestStatus} from '../../utils/util';
 const InvoiceScreen = ({route, navigation}) => {
-  const {vnp_ResponseCode, requestCode, vnp_TxnRef} = route.params;
+  const {
+    vnp_ResponseCode,
+    requestCode,
+    vnp_TxnRef,
+    isNavigateFromNotiScreen = false,
+  } = route.params;
 
   const isLoading = useSelector(selectIsLoading);
   const [isLoad, setIsLoad] = useState(false);
@@ -191,6 +196,7 @@ const InvoiceScreen = ({route, navigation}) => {
         title="Xem hóa đơn"
         isBackButton={true}
         statusBarColor="white"
+        isNavigateFromNotiScreen={isNavigateFromNotiScreen}
       />
       {isError ? <NotFound /> : null}
       {loading || isLoad ? <Loading /> : null}

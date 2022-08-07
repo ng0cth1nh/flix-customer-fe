@@ -287,7 +287,6 @@ const RequestForm = function ({
             </View>
           ) : null}
         </View>
-
         <View style={[styles.box, {flexDirection: 'column'}]}>
           <View style={styles.boxHeader}>
             <Image
@@ -306,7 +305,7 @@ const RequestForm = function ({
               </TouchableOpacity>
             )}
           </View>
-          <View style={{flex: 5, marginLeft: 30}}>
+          <View style={{flex: 5, marginLeft: '6%'}}>
             <Text style={[styles.textBold, {fontSize: 14, marginVertical: 10}]}>
               {address !== null
                 ? `${address.customerName} - ${address.phone}`
@@ -334,7 +333,7 @@ const RequestForm = function ({
               {editable ? 'Chọn thời gian muốn sửa' : 'Thời gian muốn sửa'}
             </Text>
           </View>
-          <View style={{flex: 4, marginLeft: 40}}>
+          <View style={{flex: 4, marginLeft: '6%'}}>
             {editable ? (
               <TouchableOpacity
                 style={styles.datePicker}
@@ -362,9 +361,7 @@ const RequestForm = function ({
                 />
               </TouchableOpacity>
             ) : (
-              <View
-                style={styles.datePicker}
-                onPress={() => setDateVisible(true)}>
+              <View style={styles.datePicker}>
                 <Text style={styles.textBold}>
                   {date !== null
                     ? date.format('HH:mm - DD/MM/YYYY')
@@ -390,7 +387,7 @@ const RequestForm = function ({
               />
               <Text style={styles.tittleText}>Tình trạng</Text>
             </View>
-            <View style={{flex: 4, marginLeft: 40, marginTop: 10}}>
+            <View style={{flex: 4, marginLeft: '6%', marginTop: 10}}>
               <TextInput
                 multiline
                 numberOfLines={2}
@@ -473,6 +470,7 @@ const RequestForm = function ({
               flex: 3,
               flexDirection: 'row',
               alignItems: 'center',
+              marginLeft: '1%',
             }}>
             <RadioButton value="Tiền mặt" status="checked" color="#FFBC00" />
             <Text style={{color: 'black', fontSize: 16}}>

@@ -49,7 +49,7 @@ const ProfileScreen = ({navigation}) => {
     <View
       style={[
         {backgroundColor: '#FEC54B', flex: 1},
-        modalVisible ? {opacity: 0.3} : {},
+        modalVisible ? {opacity: 0.9} : {},
       ]}>
       <StatusBar barStyle="dark-content" backgroundColor="#FEC54B" />
       <Image
@@ -60,7 +60,7 @@ const ProfileScreen = ({navigation}) => {
           borderColor: '#F0F0F0',
           borderWidth: 1,
           alignSelf: 'center',
-          marginTop: 50,
+          marginTop: 80,
           marginBottom: 10,
         }}
         source={{uri: user.avatarUrl}}

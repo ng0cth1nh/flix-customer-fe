@@ -38,6 +38,9 @@ const ApiConstants = {
   CREATE_COMMENT_API: '/confirmedUser/comment',
   SAVE_FCM_TOKEN: '/user/saveFCMToken',
   SEARCH_SUB_SERVICE_API: '/category/services/search',
+  GET_NOTIFICATIONS_API: '/user/notifications',
+  NOTIFICATION_API: '/user/notification',
 };
 
+export const NUMBER_RECORD_PER_PAGE = 10;
 export default ApiConstants;

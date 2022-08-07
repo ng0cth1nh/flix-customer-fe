@@ -38,6 +38,7 @@ const RequestDetailScreen = ({route, navigation}) => {
     typeSubmitButtonClick,
     submitButtonText,
     navigateFromScreen = null,
+    isNavigateFromNotiScreen = false,
   } = route.params;
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -175,6 +176,7 @@ const RequestDetailScreen = ({route, navigation}) => {
         title="Yêu cầu sửa chữa"
         isBackButton={true}
         statusBarColor="white"
+        isNavigateFromNotiScreen={isNavigateFromNotiScreen}
       />
       <SafeAreaView style={{flex: 1}}>
         {isError ? <NotFound /> : null}
