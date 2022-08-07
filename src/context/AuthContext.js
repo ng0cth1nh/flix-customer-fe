@@ -69,6 +69,7 @@ const sendOTPForgotPassword = dispatch => async params => {
   try {
     await axios.post(constants.SEND_OTP_FORGOT_PASSWORD_API, {
       phone: params.phone,
+      roleType: params.roleType,
     });
     RootNavigation.push('ConfirmOTPScreen', params);
   } catch (err) {

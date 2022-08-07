@@ -20,7 +20,7 @@ const FixingScreen = ({navigation}) => {
   const requests = useSelector(selectRequests);
 
   const [refreshControl, setRefreshControl] = useState(false);
- 
+
   const handleNavigationToListPrice = service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,
@@ -32,7 +32,7 @@ const FixingScreen = ({navigation}) => {
     navigation.push('RequestDetailScreen', {
       requestCode,
       isFetchFixedService: true,
-      isShowSubmitButton: true,
+      isShowSubmitButton: false,
       submitButtonText: 'Hủy yêu cầu',
       typeSubmitButtonClick: 'CANCEL_REQUEST',
       isShowCancelButton: true,

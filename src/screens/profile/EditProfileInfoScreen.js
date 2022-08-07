@@ -30,6 +30,8 @@ import {
   updateAvatar,
   updateProfile,
 } from '../../features/user/userSlice';
+import {removeAscent} from '../../utils/util';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 
 const EditProfileInfoScreen = ({navigation}) => {
   const customerAPI = useAxios();
@@ -56,21 +58,6 @@ const EditProfileInfoScreen = ({navigation}) => {
   const hideDatePicker = () => {
     setDateVisible(false);
   };
-
-  function removeAscent(str) {
-    if (str === null || str === undefined) {
-      return str;
-    }
-    str = str.toLowerCase();
-    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
-    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
-    str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
-    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
-    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
-    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
-    str = str.replace(/đ/g, 'd');
-    return str;
-  }
 
   const checkFullNameValid = () => {
     if (fullNames.trim() === '') {
@@ -135,7 +122,6 @@ const EditProfileInfoScreen = ({navigation}) => {
         email: emails,
       };
       await dispatch(updateProfile({customerAPI, body}));
-      // await updateProfile(fullName, dateOfBirth, gender, email);
       if (errorMessage) {
         Toast.show({
           type: 'customErrorToast',
@@ -188,18 +174,13 @@ const EditProfileInfoScreen = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: '#FEC54B', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FEC54B" />
-      <View
-        style={{
-          flex: 1,
-          height: 60,
-          width: '100%',
-          zIndex: 1,
-          position: 'absolute',
-          backgroundColor: '#FEC54B',
-        }}>
-        <BackButton onPressHandler={navigation.goBack} color="black" />
-      </View>
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Cập nhật thông tin tài khoản"
+        isBackButton={true}
+        statusBarColor="#FEC54B"
+        style={{borderBottomColor: '#FEC54B'}}
+      />
       <ScrollView showsVerticalScrollIndicator={false}>
         <ImageBackground
           source={avatar === null ? {uri: user.avatarUrl} : {uri: avatar.path}}
@@ -402,7 +383,7 @@ const styles = StyleSheet.create({
     borderRadius: width * 0.15,
     alignSelf: 'center',
     alignItems: 'flex-end',
-    marginTop: 80,
+    marginTop: 40,
     justifyContent: 'flex-end',
   },
   cameraButton: {
