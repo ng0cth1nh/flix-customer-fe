@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext, useEffect, useRef} from 'react';
 import {
   Text,
   View,
@@ -44,9 +44,14 @@ export default function RegisterScreen({navigation}) {
   const [passwordInputError, setPasswordInputError] = useState(null);
   const [repasswordInputError, setRePasswordInputError] = useState(null);
   const [addressError, setAddressError] = useState(null);
+  const [cityIdError, setCityIdError] = useState(null);
+  const [communeIdError, setCommuneIdError] = useState(null);
+  const [districtIdError, setDistrictIdError] = useState(null);
   const [listCity, setListCity] = useState([]);
   const [listDistrict, setListDistrict] = useState([]);
   const [listCommune, setListCommune] = useState([]);
+  const scrollRef = useRef();
+
   useEffect(() => {
     console.log(constants.GET_ALL_CITY_API);
     (async () => {
@@ -58,6 +63,17 @@ export default function RegisterScreen({navigation}) {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (state.errorCode !== '') {
+      if (
+        state.errorCode === 'ACCOUNT_EXISTED' ||
+        state.errorCode === 'INVALID_PHONE_NUMBER'
+      ) {
+        scrollRef.current?.scrollTo({x: 0, y: 0, animated: true});
+      }
+    }
+  }, [state.errorCode]);
 
   const selectAvatar = () => {
     ImagePicker.openPicker({
@@ -74,10 +90,10 @@ export default function RegisterScreen({navigation}) {
   };
   const checkPhoneNumberValid = () => {
     if (phoneNumber.trim() === '') {
-      setPhoneInputError('Vui lòng nhập số điện thoại');
+      setPhoneInputError('Không được bỏ trống');
       return false;
     } else if (!/(03|05|07|08|09|01[2|6|8|9])([0-9]{8})\b/.test(phoneNumber)) {
-      setPhoneInputError('Số điện thoại không đúng');
+      setPhoneInputError('Số điện thoại không hợp lệ');
       return false;
     }
     setPhoneInputError(null);
@@ -85,31 +101,39 @@ export default function RegisterScreen({navigation}) {
   };
   const checkPasswordValid = () => {
     if (password.trim() === '') {
-      setPasswordInputError('Vui lòng nhập mật khẩu');
+      setPasswordInputError('Không được bỏ trống');
       return false;
-    } else if (!/((?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,10})\b/.test(password)) {
-      setPasswordInputError(
-        'Mật khẩu phải từ 6 đến 10 kí tự và bao gồm ít nhất 1 số hoặc 1 kí tự',
-      );
+    } else if (!/^[a-zA-Z0-9\s]{6,10}$/.test(removeAscent(password.slice()))) {
+      setPasswordInputError('Độ dài từ 6 đến 10 ký tự, bao gồm chữ và số');
       return false;
     } else if (password.indexOf(' ') >= 0) {
-      setPasswordInputError('Mật khẩu không bao gồm khoảng trắng');
+      setPasswordInputError('Độ dài từ 6 đến 10 ký tự, bao gồm chữ và số');
       return false;
     }
     setPasswordInputError(null);
     return true;
   };
   const checkAddressValid = () => {
-    if (cityId && districtId && communeId && homeAddress !== '') {
-      setAddressError(null);
-      return true;
+    if (!homeAddress || homeAddress === '') {
+      setAddressError('Không được bỏ trống');
+      return false;
+    } else if (homeAddress.length > 150) {
+      setAddressError('Không nhập quá dài');
+      return false;
     }
-    setAddressError('Vui lòng chọn và điền đầy đủ thông tin địa chỉ của bạn');
-    return false;
+    setAddressError(null);
+    return true;
   };
   const checkRepasswordValid = () => {
+    if (!repassword || repassword === '') {
+      setRePasswordInputError('Không được bỏ trống');
+      return false;
+    }
+    if (!checkPasswordValid()) {
+      return true;
+    }
     if (repassword !== password && password.trim() !== '') {
-      setRePasswordInputError('Mật khẩu nhập lại không khớp');
+      setRePasswordInputError('Mật khẩu không khớp');
       return false;
     }
     setRePasswordInputError(null);
@@ -117,11 +141,11 @@ export default function RegisterScreen({navigation}) {
   };
   const checkUsernameValid = () => {
     if (username.trim() === '') {
-      setUsernameInputError('Vui lòng nhập tên của bạn');
+      setUsernameInputError('Không được bỏ trống');
       return false;
     } else if (!/^[a-zA-Z\s]{3,150}$/.test(removeAscent(username.slice()))) {
       setUsernameInputError(
-        'Họ và Tên từ 3 ký tự đến 150 kí tự không bao gồm số và kí tự đặc biệt',
+        'Họ và tên từ 3-150 ký tự, không bao gồm số hoặc kí tự đặc biệt',
       );
       return false;
     }
@@ -130,6 +154,7 @@ export default function RegisterScreen({navigation}) {
   };
 
   const onchangeCity = async value => {
+    setCityIdError(null);
     setCityId(value);
     setDistrictId(null);
     setAddressError(null);
@@ -149,6 +174,7 @@ export default function RegisterScreen({navigation}) {
     }
   };
   const onchangeDistrict = async value => {
+    setDistrictIdError(null);
     setDistrictId(value);
     setAddressError(null);
     setCommuneId(null);
@@ -174,9 +200,32 @@ export default function RegisterScreen({navigation}) {
     let isPhoneValid = checkPhoneNumberValid();
     let isPasswordValid = checkPasswordValid();
     let isRepasswordValid = checkRepasswordValid();
+
+    if (!cityId) {
+      setCityIdError('Không được bỏ trống');
+    }
+    if (!districtId) {
+      setDistrictIdError('Không được bỏ trống');
+    }
+    if (!communeId) {
+      setCommuneIdError('Không được bỏ trống');
+    }
+
+    if (!isUsernameValid || !isPhoneValid) {
+      scrollRef.current?.scrollTo({x: 0, y: 0, animated: true});
+    } else if (!cityId || !districtId || !communeId || !isAddressValid) {
+      scrollRef.current?.scrollTo({x: 0, y: 400, animated: true});
+    }
+
     if (
-      (isUsernameValid,
-      isAddressValid && isPasswordValid && isPhoneValid && isRepasswordValid)
+      isUsernameValid &&
+      isAddressValid &&
+      isPasswordValid &&
+      isPhoneValid &&
+      isRepasswordValid &&
+      cityId &&
+      communeId &&
+      districtId
     ) {
       showLoader();
       register({
@@ -190,6 +239,16 @@ export default function RegisterScreen({navigation}) {
         streetAddress: homeAddress,
         type: 'REGISTER',
       });
+      console.log('VALID: ', {
+        avatar,
+        fullName: username,
+        phone: phoneNumber,
+        password,
+        cityId,
+        districtId,
+        communeId,
+        streetAddress: homeAddress,
+      });
     }
   };
 
@@ -201,7 +260,8 @@ export default function RegisterScreen({navigation}) {
         <View style={styles.registerForm}>
           <ScrollView
             showsVerticalScrollIndicator={false}
-            style={styles.scrollView}>
+            style={styles.scrollView}
+            ref={scrollRef}>
             <ImageBackground
               source={
                 avatar === null
@@ -247,7 +307,10 @@ export default function RegisterScreen({navigation}) {
                 styles.inputView,
                 {
                   borderColor:
-                    phoneInputError || state.errorMessage
+                    phoneInputError ||
+                    (state.errorMessage !== '' &&
+                      (state.errorCode === 'ACCOUNT_EXISTED' ||
+                        state.errorCode === 'INVALID_PHONE_NUMBER'))
                       ? '#FF6442'
                       : '#CACACA',
                 },
@@ -266,10 +329,19 @@ export default function RegisterScreen({navigation}) {
               {phoneInputError && (
                 <Text style={styles.errorMessage}>{phoneInputError}</Text>
               )}
+              {state.errorMessage !== '' &&
+                (state.errorCode === 'ACCOUNT_EXISTED' ||
+                  state.errorCode === 'INVALID_PHONE_NUMBER') && (
+                  <Text style={styles.errorMessage}>{state.errorMessage}</Text>
+                )}
             </View>
             <Text style={styles.inputTittle}>Địa chỉ *</Text>
             <View style={styles.addressPicker}>
-              <View style={styles.addressSelectItem}>
+              <View
+                style={[
+                  styles.addressSelectItem,
+                  {borderColor: cityIdError ? '#FF6442' : '#CACACA'},
+                ]}>
                 <RNPickerSelect
                   value={cityId}
                   fixAndroidTouchableBug={true}
@@ -285,14 +357,24 @@ export default function RegisterScreen({navigation}) {
                     <Ionicons
                       name="chevron-down-sharp"
                       size={20}
-                      style={{marginTop: (0.075 * height) / 4, marginRight: 12}}
+                      style={{marginTop: (0.09 * height) / 4, marginRight: 6}}
                     />
                   )}
                 />
               </View>
+              {cityIdError && (
+                <Text style={styles.errorMessage}>{cityIdError}</Text>
+              )}
             </View>
             <View style={styles.addressPicker}>
-              <View style={[styles.addressSelectItem, {width: '49%'}]}>
+              <View
+                style={[
+                  styles.addressSelectItem,
+                  {
+                    width: '49%',
+                    borderColor: districtIdError ? '#FF6442' : '#CACACA',
+                  },
+                ]}>
                 <RNPickerSelect
                   value={districtId}
                   fixAndroidTouchableBug={true}
@@ -307,19 +389,29 @@ export default function RegisterScreen({navigation}) {
                     <Ionicons
                       name="chevron-down-sharp"
                       size={20}
-                      style={{marginTop: (0.075 * height) / 4, marginRight: 12}}
+                      style={{marginTop: (0.09 * height) / 4, marginRight: 6}}
                     />
                   )}
                   style={styles.pickerStyle}
                 />
+                {districtIdError && (
+                  <Text style={styles.errorMessage}>{districtIdError}</Text>
+                )}
               </View>
-              <View style={[styles.addressSelectItem, {width: '49%'}]}>
+              <View
+                style={[
+                  styles.addressSelectItem,
+                  {
+                    width: '49%',
+                    borderColor: communeIdError ? '#FF6442' : '#CACACA',
+                  },
+                ]}>
                 <RNPickerSelect
                   value={communeId}
                   fixAndroidTouchableBug={true}
                   onValueChange={value => {
                     setCommuneId(value);
-                    setAddressError(null);
+                    setCommuneIdError(null);
                   }}
                   items={listCommune}
                   placeholder={{
@@ -331,11 +423,14 @@ export default function RegisterScreen({navigation}) {
                     <Ionicons
                       name="chevron-down-sharp"
                       size={20}
-                      style={{marginTop: (0.075 * height) / 4, marginRight: 12}}
+                      style={{marginTop: (0.09 * height) / 4, marginRight: 6}}
                     />
                   )}
                   style={styles.pickerStyle}
                 />
+                {communeIdError && (
+                  <Text style={styles.errorMessage}>{communeIdError}</Text>
+                )}
               </View>
             </View>
             <View
@@ -432,9 +527,6 @@ export default function RegisterScreen({navigation}) {
               </TouchableOpacity>
               {repasswordInputError && (
                 <Text style={styles.errorMessage}>{repasswordInputError}</Text>
-              )}
-              {state.errorMessage !== '' && (
-                <Text style={styles.errorMessage}>{state.errorMessage}</Text>
               )}
             </View>
             <View style={styles.termContainer}>

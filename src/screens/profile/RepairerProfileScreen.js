@@ -4,14 +4,13 @@ import {
   Text,
   Dimensions,
   SafeAreaView,
-  StatusBar,
   ScrollView,
   FlatList,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-const {height, width} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 import BackButton from '../../components/BackButton';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {useSelector, useDispatch} from 'react-redux';
@@ -20,13 +19,13 @@ import {
   selectIsLoading,
   setIsLoading,
   fetchComments,
-  selectErrorMessage,
 } from '../../features/user/userSlice';
 import useFetchData from '../../hooks/useFetchData';
 import Loading from '../../components/Loading';
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
 import Toast from 'react-native-toast-message';
+import TopHeaderComponent from '../../components/TopHeaderComponent';
 
 const RepairerProfileScreen = ({navigation, route}) => {
   const {repairerId, repairerAvatar} = route.params;
@@ -80,24 +79,18 @@ const RepairerProfileScreen = ({navigation, route}) => {
 
   return (
     <View style={{backgroundColor: loading ? 'white' : '#FEC54B', flex: 1}}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FEC54B" />
+      <TopHeaderComponent
+        navigation={navigation}
+        title="Thông tin thợ"
+        isBackButton={true}
+        style={{borderBottomColor: '#FEC54B'}}
+        statusBarColor="#FEC54B"
+      />
       {isError ? <NotFound /> : null}
       {loading ? (
         <Loading />
       ) : (
         <SafeAreaView style={{flex: 1}}>
-          <View
-            style={{
-              flex: 1,
-              height: 60,
-              width: '100%',
-              zIndex: 1,
-              position: 'absolute',
-              backgroundColor: '#FEC54B',
-            }}>
-            <BackButton onPressHandler={navigation.goBack} color="black" />
-          </View>
-
           <ScrollView showsVerticalScrollIndicator={false}>
             <Image
               style={{

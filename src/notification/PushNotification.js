@@ -28,7 +28,7 @@ async function getFcmToken() {
     }
   }
 }
-export const notificationListener = () => {
+export const notificationListener = setIsNotiReceived => {
   // Assume a message-notification contains a "type" property in the data payload of the screen to open
   PushNotification.createChannel(
     {
@@ -57,6 +57,7 @@ export const notificationListener = () => {
     });
   messaging().onMessage(async remoteMessage => {
     console.log('notification on foreround', remoteMessage);
+    setIsNotiReceived(true);
     PushNotification.localNotification({
       channelId: 'flix-cb844-customer',
       message: remoteMessage.notification.body,

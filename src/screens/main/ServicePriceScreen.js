@@ -49,7 +49,7 @@ const ServicePriceScreen = ({route, navigation}) => {
                 flex: 5,
                 color: 'black',
                 alignSelf: 'center',
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: 'bold',
                 paddingLeft: 10,
               }}>
@@ -57,13 +57,13 @@ const ServicePriceScreen = ({route, navigation}) => {
             </Text>
             <Text
               style={{
-                flex: 2,
+                flex: 3,
                 color: 'black',
                 alignSelf: 'center',
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: 'bold',
               }}>
-              Giá dịch vụ
+              Giá dịch vụ (vnđ)
             </Text>
           </View>
         ) : null}
@@ -87,7 +87,7 @@ const ServicePriceScreen = ({route, navigation}) => {
                 }}>
                 <Text
                   style={{
-                    flex: 2,
+                    flex: 5,
                     color: 'black',
                     fontSize: 14,
                     alignSelf: 'center',
@@ -97,7 +97,7 @@ const ServicePriceScreen = ({route, navigation}) => {
                 </Text>
                 <Text
                   style={{
-                    flex: 1,
+                    flex: 3,
                     color: 'black',
                     fontSize: 14,
                     fontWeight: 'bold',

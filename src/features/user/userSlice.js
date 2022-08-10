@@ -1,7 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import ApiConstants from '../../constants/Api';
 import getErrorMessage from '../../utils/getErrorMessage';
-import {NUMBER_RECORD_PER_PAGE} from '../../constants/Api';
 
 const initialState = {
   user: {
@@ -18,6 +17,7 @@ const initialState = {
   notifications: [],
   totalPageNotifications: null,
   pageNumbers: 0,
+  numberOfUnread: 0,
 };
 
 export const fetchProfile = createAsyncThunk(
@@ -273,6 +273,10 @@ export const userSlice = createSlice({
     setTotalPageNotifications(state, action) {
       state.totalPageNotifications = action.payload;
     },
+    setNumberOfUnread(state, action) {
+      state.numberOfUnread = action.payload;
+    },
+    resetState: () => initialState,
   },
   extraReducers: builder => {
     builder.addCase(fetchProfile.pending, state => {
@@ -378,18 +382,6 @@ export const userSlice = createSlice({
     });
     builder.addCase(fetchNotifications.fulfilled, (state, action) => {
       state.isLoading = false;
-      // state.notifications = state.notifications
-      //   ? [...state.notifications, ...action.payload.notifications]
-      //   : action.payload.notifications;
-      // if (!state.totalPageNotifications) {
-      //   state.totalPageNotifications = Math.ceil(
-      //     action.payload.totalRecord / NUMBER_RECORD_PER_PAGE,
-      //   );
-      // }
-      // console.log('typeof state.pageNumber: ', new Date().getTime());
-      // state.pageNumber =
-      //   typeof state.pageNumber === 'number' ? state.pageNumber + 1 : 0;
-
       state.errorMessage = null;
     });
     builder.addCase(fetchNotifications.rejected, (state, action) => {
@@ -420,10 +412,13 @@ export const {
   setNotifications,
   setPageNumbers,
   setTotalPageNotifications,
+  setNumberOfUnread,
+  resetState,
 } = userSlice.actions;
 export const selectUser = state => state.user.user;
 export const selectAddresses = state => state.user.addresses;
 export const selectNotifications = state => state.user.notifications;
+export const selectNumberOfUnread = state => state.user.numberOfUnread;
 export const selectTotalPageNotifications = state =>
   state.user.totalPageNotifications;
 export const selectPageNumbers = state => state.user.pageNumbers;

@@ -167,11 +167,9 @@ export const requestSlice = createSlice({
     setIsLoading(state) {
       state.isLoading = true;
     },
+    resetState: () => initialState,
   },
   extraReducers: builder => {
-    // builder.addCase(fetchRequests.pending, state => {
-    //   state.isLoading = true;
-    // });
     builder.addCase(fetchRequests.fulfilled, (state, action) => {
       state.isLoading = false;
       state.errorMessage = null;
@@ -202,10 +200,6 @@ export const requestSlice = createSlice({
       state.isLoading = false;
       state.errorMessage = action.payload;
     });
-
-    // builder.addCase(createRequest.pending, state => {
-    //   state.isLoading = true;
-    // });
     builder.addCase(createRequest.fulfilled, (state, action) => {
       state.isLoading = false;
       state.errorMessage = null;
@@ -252,9 +246,6 @@ export const requestSlice = createSlice({
     builder.addCase(fetchRequestDetail.rejected, (state, action) => {
       state.errorMessage = action.payload;
     });
-    // builder.addCase(cancelRequest.pending, state => {
-    //   state.isLoading = true;
-    // });
     builder.addCase(cancelRequest.fulfilled, (state, action) => {
       state.isLoading = false;
       state.errorMessage = null;
@@ -266,7 +257,7 @@ export const requestSlice = createSlice({
   },
 });
 
-export const {setIsLoading} = requestSlice.actions;
+export const {setIsLoading, resetState} = requestSlice.actions;
 export const selectRequests = state => state.request.requests;
 export const selectErrorMessage = state => state.request.errorMessage;
 export const selectIsLoading = state => state.request.isLoading;

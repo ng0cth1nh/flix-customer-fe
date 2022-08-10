@@ -59,13 +59,13 @@ const EditProfileInfoScreen = ({navigation}) => {
     setDateVisible(false);
   };
 
-  const checkFullNameValid = () => {
-    if (fullNames.trim() === '') {
-      setFullNameInputError('Vui lòng nhập tên của bạn');
+  const checkFullNameValid = async () => {
+    if (!fullNames || fullNames.trim() === '') {
+      setFullNameInputError('Không được bỏ trống');
       return false;
-    } else if (!/^[a-zA-Z\s]{3,}$/.test(removeAscent(fullNames.slice()))) {
+    } else if (!/^[a-zA-Z\s]{3,150}$/.test(removeAscent(fullNames.slice()))) {
       setFullNameInputError(
-        'Họ và Tên từ 3 ký tự trở lên không bao gồm số và kí tự đặc biệt!',
+        'Họ và tên từ 3-150 ký tự, không bao gồm số hoặc kí tự đặc biệt',
       );
       return false;
     }
@@ -73,11 +73,9 @@ const EditProfileInfoScreen = ({navigation}) => {
     return true;
   };
 
-  const checkEmailValid = () => {
-    if (emails === null || emails.trim() === '') {
-      setEmailInputError('Vui lòng nhập email của bạn');
-      return false;
-    } else if (
+  const checkEmailValid = async () => {
+    if (
+      emails &&
       !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emails.trim())
     ) {
       setEmailInputError('Email không đúng định dạng');
@@ -86,22 +84,22 @@ const EditProfileInfoScreen = ({navigation}) => {
     setEmailInputError(null);
     return true;
   };
-  const checkGenderValid = () => {
-    if (genders === null || typeof genders !== 'boolean') {
+  const checkGenderValid = async () => {
+    if (genders && typeof genders !== 'boolean') {
       setGenderInputError('Vui lòng chọn giới tính của bạn');
       return false;
     }
     setGenderInputError(null);
     return true;
   };
-  const checkDateOfBirthValid = () => {
+  const checkDateOfBirthValid = async () => {
     if (
-      dateOfBirths === null ||
+      dateOfBirths &&
       !/^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$/.test(
         dateOfBirths.trim(),
       )
     ) {
-      setDateOfBirthInputError('Vui lòng nggày sinh của bạn');
+      setDateOfBirthInputError('Vui lòng chọn ngày sinh của bạn');
       return false;
     }
     setDateOfBirthInputError(null);
@@ -109,12 +107,11 @@ const EditProfileInfoScreen = ({navigation}) => {
   };
 
   const handleUpdateProfile = async () => {
-    if (
-      checkFullNameValid() &&
-      checkEmailValid() &&
-      checkGenderValid() &&
-      checkDateOfBirthValid()
-    ) {
+    let isFullNameValid = await checkFullNameValid();
+    let isEmailValid = await checkEmailValid();
+    let isGenderValid = await checkGenderValid();
+    let isDateValid = await checkDateOfBirthValid();
+    if (isFullNameValid && isEmailValid && isGenderValid && isDateValid) {
       const body = {
         fullName: fullNames,
         dateOfBirth: dateOfBirths.replace(/\//g, '-'),
@@ -130,15 +127,10 @@ const EditProfileInfoScreen = ({navigation}) => {
       } else {
         Toast.show({
           type: 'customToast',
-          text1: 'Cập nhật thông tin thành công',
+          text1: 'Cập nhật thông tin cá nhân thành công',
         });
         await dispatch(fetchProfile(customerAPI));
       }
-    } else {
-      checkFullNameValid();
-      checkEmailValid();
-      checkGenderValid();
-      checkDateOfBirthValid();
     }
   };
 

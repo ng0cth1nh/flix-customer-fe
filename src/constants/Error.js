@@ -1,22 +1,23 @@
 export default {
   LOGIN_FAILED: 'Tài khoản hoặc mật khẩu không đúng',
   ACCOUNT_NOT_FOUND: 'Tài khoản không tồn tại',
-  ACCOUNT_EXISTED: 'Số điện thoại đăng kí đã tồn tại',
+  ACCOUNT_EXISTED: 'Số điện thoại đã được sử dụng trong hệ thống',
   INVALID_OTP: 'Mã chưa đúng, vui lòng thử lại',
   INVALID_PHONE_NUMBER: 'Số điện thoại đăng kí không hợp lệ',
   INVALID_PASSWORD: 'Mật khẩu đăng kí không hợp lệ',
   INVALID_CITY: 'Địa chỉ thành phố không tồn tại',
   INVALID_DISTRICT: 'Địa chỉ Quận/Huyện không tồn tại',
   INVALID_COMMUNE: 'Địa chỉ Phường/Xã không tồn tại',
-  WRONG_PASSWORD: 'Mật khẩu hiện tại không chính xác',
+  WRONG_PASSWORD: 'Mật khẩu hiện tại không đúng',
+  MAXIMUM_UPLOAD_SIZE_EXCEEDED: 'Vui lòng chọn ảnh không vượt quá 20MB',
   CAN_NOT_CREATE_NEW_REQUEST_WHEN_HAVE_OTHER_PAYMENT_WAITING_REQUEST:
-    'Không thể đặt lịch mới khi có lịch khác chưa thanh toán',
+    'Vui lòng thanh toán hóa đơn của đơn yêu cầu trước đó',
   EXPECT_FIXING_DAY_MUST_START_AFTER_1_HOURS_AND_BEFORE_30_DAYS:
     'Đơn yêu cầu phải sớm nhất sau 1 tiếng và muộn nhất là sau 30 ngày',
 };
 
 const temp = new Map();
-temp.set('00', 'Thanh toán thành công');
+temp.set('00', 'Thanh toán hóa đơn thành công');
 temp.set(
   '07',
   'Trừ tiền thành công. Giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).',

@@ -12,7 +12,12 @@ import dayjs from 'dayjs';
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'add_error':
-      return {...state, errorMessage: action.payload, loading: false};
+      return {
+        ...state,
+        errorMessage: action.payload.message,
+        errorCode: action.payload.code,
+        loading: false,
+      };
     case 'login':
       return {
         errorMessage: '',
@@ -21,7 +26,7 @@ const authReducer = (state, action) => {
         loading: false,
       };
     case 'clear_error_message':
-      return {...state, errorMessage: '', loading: false};
+      return {...state, errorMessage: '', errorCode: '', loading: false};
     case 'show_loader':
       return {...state, loading: true};
     case 'add_is_change_pass_success':
@@ -35,7 +40,13 @@ const authReducer = (state, action) => {
     case 'clear_temp_access_token':
       return {...state, tempAccessToken: null};
     case 'logout':
-      return {token: null, userId: null, errorMessage: '', loading: false};
+      return {
+        token: null,
+        userId: null,
+        errorMessage: '',
+        errorCode: '',
+        loading: false,
+      };
     default:
       return state;
   }
@@ -75,7 +86,10 @@ const sendOTPForgotPassword = dispatch => async params => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
   } finally {
     dispatch({type: 'hide_loader'});
@@ -89,7 +103,10 @@ const reSendOTPForgotPassword = dispatch => async params => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
   } finally {
     dispatch({type: 'hide_loader'});
@@ -114,9 +131,15 @@ const confirmOTPForgotPassword = dispatch => async params => {
     });
     RootNavigation.push('ForgotPassScreen');
   } catch (err) {
+    if (err.response.data.message !== 'INVALID_OTP') {
+      RootNavigation.goBack();
+    }
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
   } finally {
     dispatch({type: 'hide_loader'});
@@ -144,7 +167,10 @@ const resetPassword = dispatch => async params => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
   } finally {
     dispatch({type: 'hide_loader'});
@@ -158,7 +184,10 @@ const register = dispatch => async params => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
   } finally {
     dispatch({type: 'hide_loader'});
@@ -171,7 +200,10 @@ const reRegister = dispatch => async params => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
   } finally {
     dispatch({type: 'hide_loader'});
@@ -212,9 +244,15 @@ const confirmOTP = dispatch => async params => {
       },
     });
   } catch (err) {
+    if (err.response.data.message !== 'INVALID_OTP') {
+      RootNavigation.goBack();
+    }
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
   } finally {
     dispatch({type: 'hide_loader'});
@@ -274,7 +312,10 @@ const login = dispatch => async params => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: getErrorMessage(err),
+      payload: {
+        message: getErrorMessage(err),
+        code: err.response.data.message,
+      },
     });
     console.log(err.toString());
   }

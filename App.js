@@ -2,18 +2,18 @@ import './src/utils/ignoreWarnings';
 import 'react-native-gesture-handler';
 import React, {useEffect, useState, useContext} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {Image, View, Text} from 'react-native';
+import {Image, View, Text, Dimensions} from 'react-native';
 import {
   createStackNavigator,
   CardStyleInterpolators,
 } from '@react-navigation/stack';
-import axios from 'axios';
 import {navigationRef} from './src/RootNavigation';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   Provider as AuthProvider,
   Context as AuthContext,
 } from './src/context/AuthContext';
+const {width} = Dimensions.get('window');
 import {fetchProfile, selectErrorMessage} from './src/features/user/userSlice';
 import {useSelector, useDispatch} from 'react-redux';
 import {firebase} from '@react-native-firebase/database';
@@ -58,6 +58,15 @@ import {store} from './src/features/store';
 import useAxios from './src/hooks/useAxios';
 import linking from './global/Linking';
 import ApiConstants from './src/constants/Api';
+import {
+  fetchNotifications,
+  setNotifications as setNotis,
+  setPageNumbers,
+  setTotalPageNotifications,
+  setNumberOfUnread,
+  selectNumberOfUnread,
+} from './src/features/user/userSlice';
+import {NUMBER_RECORD_PER_PAGE} from './src/constants/Api';
 
 const toastConfig = {
   customToast: ({text1}) => (
@@ -113,21 +122,23 @@ const toastConfig = {
 function App() {
   const Stack = createStackNavigator();
   const Tab = createBottomTabNavigator();
-
   const [isLoading, setIsLoading] = useState(true);
+  const [isNotiReceived, setIsNotiReceived] = useState(false);
+  const numberOfUnread = useSelector(selectNumberOfUnread);
   const errorMessage = useSelector(selectErrorMessage);
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-
   let {state, TryLocalLogin, clearErrorMessage} = useContext(AuthContext);
+
   useEffect(() => {
     TryLocalLogin();
     requestUserPermission();
-    notificationListener();
+    notificationListener(setIsNotiReceived);
     setTimeout(() => {
       setIsLoading(false);
     }, 3000);
   }, [TryLocalLogin]);
+
   useEffect(() => {
     if (state.token) {
       console.log('token :', state.token);
@@ -153,8 +164,39 @@ function App() {
       };
       getUserProfile();
       saveFCMToken();
+      setIsNotiReceived(true);
     }
   }, [state.token]);
+
+  useEffect(() => {
+    (async () => {
+      if (isNotiReceived) {
+        try {
+          let temp = 0;
+          let res = await dispatch(
+            fetchNotifications({
+              customerAPI,
+              pageNumber: temp,
+              pageSize: NUMBER_RECORD_PER_PAGE,
+            }),
+          ).unwrap();
+          dispatch(
+            setNumberOfUnread(res.numberOfUnread ? res.numberOfUnread : 0),
+          );
+          dispatch(setNotis(res.notifications));
+          dispatch(setPageNumbers(0));
+          dispatch(
+            setTotalPageNotifications(
+              Math.ceil(+res.totalRecord / NUMBER_RECORD_PER_PAGE),
+            ),
+          );
+        } catch (err) {
+        } finally {
+          setIsNotiReceived(false);
+        }
+      }
+    })();
+  }, [isNotiReceived]);
 
   useEffect(() => {
     const userId = state.userId;
@@ -180,6 +222,7 @@ function App() {
         .then(() => console.log('On disconnect function configured.'));
     }
   }, [state.userId]);
+
   if (isLoading) {
     return <SplashScreen />;
   }
@@ -390,7 +433,33 @@ function App() {
                   ? require('./assets/images/type/messenger-active.png')
                   : require('./assets/images/type/messenger.png');
               }
-              return <Image style={{height: 24, width: 24}} source={icon} />;
+              return (
+                <View>
+                  <Image style={{height: 24, width: 24}} source={icon} />
+                  {route.name === 'Notification' && numberOfUnread !== 0 && (
+                    <View
+                      style={{
+                        backgroundColor: 'red',
+                        position: 'absolute',
+                        top: -6,
+                        right: -4,
+                        alignItems: 'center',
+                        width: 14,
+                        height: 14,
+                        borderRadius: width * 0.5,
+                      }}>
+                      <Text
+                        style={{
+                          color: 'white',
+                          fontSize: 10,
+                          fontWeight: '600',
+                        }}>
+                        {numberOfUnread}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              );
             },
           })}>
           <Tab.Screen name="HomeStackScreen" component={HomeStackScreen} />

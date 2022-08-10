@@ -44,6 +44,13 @@ const CreateAddressForm = ({
   setPhoneInputError,
   setAddressInputError,
   data,
+  cityIdError,
+  communeIdError,
+  districtIdError,
+  setCityIdError,
+  setCommuneIdError,
+  setDistrictIdError,
+  scrollRef,
 }) => {
   const [listCity, setListCity] = useState([]);
   const [listDistrict, setListDistrict] = useState([]);
@@ -76,7 +83,7 @@ const CreateAddressForm = ({
   }, []);
 
   const onchangeCity = async value => {
-    setAddressInputError(null);
+    setCityIdError(null);
     setCityId(value);
     setDistrictId(null);
     setCommuneId(null);
@@ -97,7 +104,7 @@ const CreateAddressForm = ({
 
   const onchangeDistrict = async value => {
     setDistrictId(value);
-    setAddressInputError(null);
+    setDistrictIdError(null);
     setCommuneId(null);
     if (!value) {
       setListCommune([]);
@@ -129,7 +136,8 @@ const CreateAddressForm = ({
             showsVerticalScrollIndicator={false}
             style={{
               paddingHorizontal: '4%',
-            }}>
+            }}
+            ref={scrollRef}>
             <View
               style={{
                 paddingBottom: 10,
@@ -204,7 +212,7 @@ const CreateAddressForm = ({
                   <View
                     style={[
                       styles.valueSpace,
-                      {borderColor: addressInputError ? '#FF6442' : '#CACACA'},
+                      {borderColor: cityIdError ? '#FF6442' : '#CACACA'},
                     ]}>
                     <RNPickerSelect
                       value={cityId}
@@ -226,13 +234,16 @@ const CreateAddressForm = ({
                       )}
                     />
                   </View>
+                  {cityIdError && (
+                    <Text style={styles.errorMessage}>{cityIdError}</Text>
+                  )}
                 </View>
                 <View style={styles.inputField}>
                   <Text style={styles.inputLabel}>Quận/Huyện</Text>
                   <View
                     style={[
                       styles.valueSpace,
-                      {borderColor: addressInputError ? '#FF6442' : '#CACACA'},
+                      {borderColor: districtIdError ? '#FF6442' : '#CACACA'},
                     ]}>
                     <RNPickerSelect
                       value={districtId}
@@ -254,20 +265,23 @@ const CreateAddressForm = ({
                       )}
                     />
                   </View>
+                  {districtIdError && (
+                    <Text style={styles.errorMessage}>{districtIdError}</Text>
+                  )}
                 </View>
                 <View style={styles.inputField}>
                   <Text style={styles.inputLabel}>Phường/Xã</Text>
                   <View
                     style={[
                       styles.valueSpace,
-                      {borderColor: addressInputError ? '#FF6442' : '#CACACA'},
+                      {borderColor: communeIdError ? '#FF6442' : '#CACACA'},
                     ]}>
                     <RNPickerSelect
                       value={communeId}
                       fixAndroidTouchableBug={true}
                       onValueChange={value => {
                         setCommuneId(value);
-                        setAddressInputError(null);
+                        setCommuneIdError(null);
                       }}
                       placeholder={{
                         label: 'Phường/Xã',
@@ -285,8 +299,10 @@ const CreateAddressForm = ({
                       )}
                     />
                   </View>
+                  {communeIdError && (
+                    <Text style={styles.errorMessage}>{communeIdError}</Text>
+                  )}
                 </View>
-
                 <View style={[styles.inputField, {marginBottom: 30}]}>
                   <Text style={styles.inputLabel}>Địa chỉ chi tiết</Text>
                   <View

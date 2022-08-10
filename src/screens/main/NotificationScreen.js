@@ -30,6 +30,8 @@ import {
   setNotifications as setNotis,
   setPageNumbers,
   setTotalPageNotifications,
+  setNumberOfUnread,
+  selectNumberOfUnread,
 } from '../../features/user/userSlice';
 
 const NotificationScreen = ({navigation}) => {
@@ -47,6 +49,7 @@ const NotificationScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const isLoading = useSelector(selectIsLoading);
   const [stopFetchMore, setStopFetchMore] = useState(false);
+  const numberOfUnread = useSelector(selectNumberOfUnread);
 
   const showModal = () => {
     setModalVisible(true);
@@ -54,11 +57,7 @@ const NotificationScreen = ({navigation}) => {
 
   useEffect(() => {
     (async () => {
-      if (
-        (refreshControl === null && notifications.length === 0) ||
-        refreshControl
-      ) {
-        console.log('loadNotifications: ');
+      if (refreshControl) {
         await loadNotifications();
       }
     })();
@@ -100,7 +99,6 @@ const NotificationScreen = ({navigation}) => {
   const loadNotifications = async () => {
     try {
       let temp = 0;
-      await dispatch(setIsLoading());
       let res = await dispatch(
         fetchNotifications({
           customerAPI,
@@ -108,14 +106,12 @@ const NotificationScreen = ({navigation}) => {
           pageSize: NUMBER_RECORD_PER_PAGE,
         }),
       ).unwrap();
+      dispatch(setNumberOfUnread(res.numberOfUnread ? res.numberOfUnread : 0));
       setNotifications(res.notifications);
       dispatch(setNotis(res.notifications));
-      if (refreshControl) {
-        setRefreshControl(false);
-        setStopFetchMore(false);
-        setPageNumber(0);
-        dispatch(setPageNumbers(0));
-      }
+      setStopFetchMore(false);
+      setPageNumber(0);
+      dispatch(setPageNumbers(0));
       setTotalPage(Math.ceil(+res.totalRecord / NUMBER_RECORD_PER_PAGE));
       dispatch(
         setTotalPageNotifications(
@@ -128,6 +124,8 @@ const NotificationScreen = ({navigation}) => {
         type: 'customErrorToast',
         text1: err,
       });
+    } finally {
+      setRefreshControl(false);
     }
   };
 
@@ -210,8 +208,8 @@ const NotificationScreen = ({navigation}) => {
         });
         setNotifications(temp);
         dispatch(setNotis(temp));
+        dispatch(setNumberOfUnread(numberOfUnread - 1));
       }
-      console.log(requestCode);
       let params = null;
       if (type.startsWith('REQUEST')) {
         if (type === 'REQUEST_APPROVED') {
@@ -324,7 +322,7 @@ const NotificationScreen = ({navigation}) => {
         <View style={{flexDirection: 'row'}}>
           <Image
             source={
-              !item.type
+              !item.type || (item.type && item.type.startsWith('REQUEST'))
                 ? require('../../../assets/images/type/archive.png')
                 : item.type.startsWith('RESPONSE_FEEDBACK')
                 ? require('../../../assets/images/type/help-desk.png')
@@ -350,7 +348,7 @@ const NotificationScreen = ({navigation}) => {
                 color: '#E67F1E',
                 fontWeight: 'bold',
               }}>
-              {index + 1}
+              {item.title}
             </Text>
             <Text
               style={{
@@ -426,7 +424,7 @@ const NotificationScreen = ({navigation}) => {
                 color: '#E67F1E',
                 fontWeight: 'bold',
               }}>
-              {index + 1}
+              {item.title}
             </Text>
             <Text
               style={{
@@ -494,7 +492,7 @@ const NotificationScreen = ({navigation}) => {
           onScrollBeginDrag={() => {
             setStopFetchMore(false);
           }}
-          onEndReachedThreshold={1}
+          onEndReachedThreshold={0.5}
         />
       </SafeAreaView>
       <CustomModal

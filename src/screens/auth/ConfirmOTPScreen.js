@@ -25,6 +25,7 @@ export default function ConfirmOTPScreen({route, navigation}) {
     confirmOTPForgotPassword,
     reSendOTPForgotPassword,
   } = useContext(AuthContext);
+
   const {phone, type} = route.params;
   const [code, setCode] = useState('');
   const handleConfirmOTP = () => {
@@ -86,6 +87,9 @@ export default function ConfirmOTPScreen({route, navigation}) {
   }, []);
 
   const handleResendOTP = () => {
+    if (state.errorMessage !== '') {
+      clearErrorMessage();
+    }
     clearTimer(getDeadTime());
     showLoader();
     if (type === 'REGISTER') {
@@ -130,7 +134,7 @@ export default function ConfirmOTPScreen({route, navigation}) {
             codeInputFieldStyle={styles.otpTextStyle}
             codeInputHighlightStyle={styles.underlineStyleHighLighted}
           />
-           {state.errorMessage !== '' && (
+          {state.errorMessage !== '' && (
             <Text
               style={{
                 alignSelf: 'center',

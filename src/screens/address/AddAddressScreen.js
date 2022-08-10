@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import CreateAddressForm from '../../components/CreateAddressForm';
 import {removeAscent} from '../../utils/util';
 import useAxios from '../../hooks/useAxios';
@@ -25,13 +25,17 @@ const AddAddressScreen = ({navigation}) => {
   const [phoneInputError, setPhoneInputError] = useState(null);
   const [addressInputError, setAddressInputError] = useState(null);
   const isLoading = useSelector(selectIsLoading);
+  const [cityIdError, setCityIdError] = useState(null);
+  const [communeIdError, setCommuneIdError] = useState(null);
+  const [districtIdError, setDistrictIdError] = useState(null);
+  const scrollRef = useRef();
 
   const checkPhoneNumberValid = async () => {
     if (!phone || phone.trim() === '') {
-      setPhoneInputError('Vui lòng nhập số điện thoại');
+      setPhoneInputError('Không được bỏ trống');
       return false;
     } else if (!/(03|05|07|08|09|01[2|6|8|9])([0-9]{8})\b/.test(phone)) {
-      setPhoneInputError('Số điện thoại không đúng');
+      setPhoneInputError('Số điện thoại không hợp lệ');
       return false;
     }
     setPhoneInputError(null);
@@ -40,11 +44,11 @@ const AddAddressScreen = ({navigation}) => {
 
   const checkFullNameValid = async () => {
     if (!fullName || fullName.trim() === '') {
-      setFullNameInputError('Vui lòng nhập tên của bạn');
+      setFullNameInputError('Không được bỏ trống');
       return false;
-    } else if (!/^[a-zA-Z\s]{3,}$/.test(removeAscent(fullName.slice()))) {
+    } else if (!/^[a-zA-Z\s]{3,150}$/.test(removeAscent(fullName.slice()))) {
       setFullNameInputError(
-        'Họ và Tên từ 3 ký tự trở lên không bao gồm số và kí tự đặc biệt',
+        'Họ và tên từ 3-150 ký tự, không bao gồm số hoặc kí tự đặc biệt',
       );
       return false;
     }
@@ -52,30 +56,46 @@ const AddAddressScreen = ({navigation}) => {
     return true;
   };
 
-  const checkAddressValid = async () => {
-    if (
-      cityId &&
-      districtId &&
-      communeId &&
-      streetAddress &&
-      streetAddress.length !== 0
-    ) {
-      setAddressInputError(null);
-      return true;
+  const checkAddressValid = () => {
+    if (!streetAddress || streetAddress === '') {
+      setAddressInputError('Địa chỉ chi tiết không được bỏ trống');
+      return false;
+    } else if (streetAddress.length > 150) {
+      setAddressInputError('Không nhập quá dài');
+      return false;
     }
-    setAddressInputError(
-      'Vui lòng chọn và điền đầy đủ thông tin địa chỉ của bạn',
-    );
-    return false;
+    setAddressInputError(null);
+    return true;
   };
 
   const handleAddAddressButtonClick = async () => {
     try {
-      let isFullNameValid = checkFullNameValid();
-      let isAddressValid = checkAddressValid();
-      let isPhoneValid = checkPhoneNumberValid();
+      let isFullNameValid = await checkFullNameValid();
+      let isAddressValid = await checkAddressValid();
+      let isPhoneValid = await checkPhoneNumberValid();
 
-      if (isFullNameValid && isAddressValid && isPhoneValid) {
+      if (!isFullNameValid || !isPhoneValid) {
+        scrollRef.current?.scrollTo({x: 0, y: 0, animated: true});
+      }
+
+      if (!cityId) {
+        setCityIdError('Thành phố không được bỏ trống');
+      }
+      if (!districtId) {
+        setDistrictIdError('Quận huyện không được bỏ trống');
+      }
+      if (!communeId) {
+        setCommuneIdError('Phường xã không được bỏ trống');
+      }
+
+      if (
+        isFullNameValid &&
+        isAddressValid &&
+        isPhoneValid &&
+        cityId &&
+        communeId &&
+        districtId
+      ) {
         await dispatch(setIsLoading());
         await dispatch(
           addAddress({
@@ -118,10 +138,17 @@ const AddAddressScreen = ({navigation}) => {
         saveButtonClicked={handleAddAddressButtonClick}
         fullNameInputError={fullNameInputError}
         phoneInputError={phoneInputError}
+        cityIdError={cityIdError}
+        communeIdError={communeIdError}
+        districtIdError={districtIdError}
         addressInputError={addressInputError}
+        setCityIdError={setCityIdError}
+        setCommuneIdError={setCommuneIdError}
+        setDistrictIdError={setDistrictIdError}
         setFullNameInputError={setFullNameInputError}
         setPhoneInputError={setPhoneInputError}
         setAddressInputError={setAddressInputError}
+        scrollRef={scrollRef}
       />
       <ProgressLoader
         visible={isLoading}

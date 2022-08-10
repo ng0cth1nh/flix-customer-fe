@@ -101,7 +101,6 @@ const InvoiceScreen = ({route, navigation}) => {
             vnp_TxnRef,
           );
           if (vnp_ResponseCode && vnp_ResponseCode === '00') {
-            //await loadData();
             Toast.show({
               type: 'customToast',
               text1: VnPayCode.get(vnp_ResponseCode),

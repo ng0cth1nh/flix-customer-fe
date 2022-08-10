@@ -59,7 +59,7 @@ const RequestScreen = ({navigation, route}) => {
 
   const handleClickGetSubServices = () => {
     navigation.push('ServicePriceScreen', {
-      serviceId: service.id,
+      serviceId: service.id ? service.id : service.serviceId,
       serviceName: service.serviceName,
     });
   };

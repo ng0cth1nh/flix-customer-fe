@@ -17,8 +17,10 @@ import {
   fetchProfile,
   selectErrorMessage,
   selectUser,
+  resetState as resetUserState,
 } from '../../features/user/userSlice';
 import Toast from 'react-native-toast-message';
+import {resetState as resetRequestState} from '../../features/request/requestSlice';
 
 const ProfileScreen = ({navigation}) => {
   const {logout} = useContext(AuthContext);
@@ -182,7 +184,11 @@ const ProfileScreen = ({navigation}) => {
           }}>
           <TouchableOpacity
             style={[styles.button, styles.buttonOpen]}
-            onPress={logout}>
+            onPress={() => {
+              dispatch(resetRequestState());
+              dispatch(resetUserState());
+              logout();
+            }}>
             <Text style={styles.textStyle}>ĐĂNG XUẤT</Text>
           </TouchableOpacity>
           <TouchableOpacity
