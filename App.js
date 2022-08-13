@@ -50,6 +50,7 @@ import ChatListScreen from './src/screens/chat/ChatListScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import {Provider} from 'react-redux';
 import InvoiceScreen from './src/screens/request/InvoiceScreen';
+import firestore from '@react-native-firebase/firestore';
 import {
   requestUserPermission,
   notificationListener,
@@ -124,6 +125,9 @@ function App() {
   const Tab = createBottomTabNavigator();
   const [isLoading, setIsLoading] = useState(true);
   const [isNotiReceived, setIsNotiReceived] = useState(false);
+  const [countOne, setCountOne] = useState(0);
+  const [countTwo, setCountTwo] = useState(0);
+  const [numberOfUnreadMessage, setNumberOfUnreadMessage] = useState(0);
   const numberOfUnread = useSelector(selectNumberOfUnread);
   const errorMessage = useSelector(selectErrorMessage);
   const dispatch = useDispatch();
@@ -220,8 +224,46 @@ function App() {
         .onDisconnect()
         .remove()
         .then(() => console.log('On disconnect function configured.'));
+
+      const firstOneSubscriber = firestore()
+        .collection('conversations')
+        .where('memberOne', '==', userId)
+        .onSnapshot(onResult(1), onError);
+      const secondOneSubscriber = firestore()
+        .collection('conversations')
+        .where('memberTwo', '==', userId)
+        .onSnapshot(onResult(2), onError);
+
+      return () => {
+        firstOneSubscriber();
+        secondOneSubscriber();
+      };
     }
   }, [state.userId]);
+
+  const onResult = index => querySnapshot => {
+    let count = 0;
+    if (querySnapshot.size > 0) {
+      count = querySnapshot.docs.filter(doc => {
+        return (
+          doc.data().senderId !== state.userId && doc.data().isRead === false
+        );
+      }).length;
+    }
+    if (index === 1) {
+      setCountOne(count);
+    } else {
+      setCountTwo(count);
+    }
+  };
+
+  function onError(error) {
+    setNumberOfUnreadMessage(0);
+  }
+
+  useEffect(() => {
+    setNumberOfUnreadMessage(countOne + countTwo);
+  }, [countOne, countTwo]);
 
   if (isLoading) {
     return <SplashScreen />;
@@ -458,6 +500,29 @@ function App() {
                       </Text>
                     </View>
                   )}
+                  {route.name === 'ChatStackScreen' &&
+                    numberOfUnreadMessage !== 0 && (
+                      <View
+                        style={{
+                          backgroundColor: 'red',
+                          position: 'absolute',
+                          top: -6,
+                          right: -4,
+                          alignItems: 'center',
+                          width: 14,
+                          height: 14,
+                          borderRadius: width * 0.5,
+                        }}>
+                        <Text
+                          style={{
+                            color: 'white',
+                            fontSize: 10,
+                            fontWeight: '600',
+                          }}>
+                          {numberOfUnreadMessage}
+                        </Text>
+                      </View>
+                    )}
                 </View>
               );
             },
