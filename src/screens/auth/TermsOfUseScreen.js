@@ -24,7 +24,7 @@ export default function TermsOfUseScreen({navigation}) {
             />
           </View>
         </View>
-        <Text style={styles.headerText}>Điều khoản sử dụng dịch vụ</Text>
+        <Text style={styles.headerText}>Điều khoản sử dụng - FLIX</Text>
         <ScrollView>
           <View>
             <Text style={styles.titleText}>1. Giới thiệu</Text>
