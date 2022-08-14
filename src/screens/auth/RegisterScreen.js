@@ -77,8 +77,8 @@ export default function RegisterScreen({navigation}) {
 
   const selectAvatar = () => {
     ImagePicker.openPicker({
-      width: 400,
-      height: 400,
+      width: 600,
+      height: 600,
       cropping: true,
     })
       .then(image => {

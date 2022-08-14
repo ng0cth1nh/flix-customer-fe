@@ -72,8 +72,6 @@ const ChatListScreen = ({navigation}) => {
     if (querySnapshot.size > 0) {
       const conversationsMap = await Promise.all(
         querySnapshot.docs.map(async doc => {
-          // get active , get profile here
-          //fullName,phone,avatar,id
           try {
             const renderId =
               doc.data().memberOne === state.userId
