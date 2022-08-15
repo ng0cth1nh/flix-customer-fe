@@ -152,7 +152,7 @@ const CreateAddressForm = ({
                   <Text style={styles.tittleText}>Thông tin khách hàng</Text>
                 </View>
                 <View style={styles.inputField}>
-                  <Text style={styles.inputLabel}>Họ và tên</Text>
+                  <Text style={styles.inputLabel}>Họ và tên *</Text>
                   <View
                     style={[
                       styles.valueSpace,
@@ -173,7 +173,9 @@ const CreateAddressForm = ({
                   </View>
                 </View>
                 <View style={styles.inputField}>
-                  <Text style={styles.inputLabel}>Số điện thoại liên lạc</Text>
+                  <Text style={styles.inputLabel}>
+                    Số điện thoại liên lạc *
+                  </Text>
                   <View
                     style={[
                       styles.valueSpace,
@@ -208,7 +210,7 @@ const CreateAddressForm = ({
                   <Text style={styles.tittleText}>Địa chỉ</Text>
                 </View>
                 <View style={styles.inputField}>
-                  <Text style={styles.inputLabel}>Tỉnh/Thành Phố</Text>
+                  <Text style={styles.inputLabel}>Tỉnh/Thành Phố *</Text>
                   <View
                     style={[
                       styles.valueSpace,
@@ -239,7 +241,7 @@ const CreateAddressForm = ({
                   )}
                 </View>
                 <View style={styles.inputField}>
-                  <Text style={styles.inputLabel}>Quận/Huyện</Text>
+                  <Text style={styles.inputLabel}>Quận/Huyện *</Text>
                   <View
                     style={[
                       styles.valueSpace,
@@ -270,7 +272,7 @@ const CreateAddressForm = ({
                   )}
                 </View>
                 <View style={styles.inputField}>
-                  <Text style={styles.inputLabel}>Phường/Xã</Text>
+                  <Text style={styles.inputLabel}>Phường/Xã *</Text>
                   <View
                     style={[
                       styles.valueSpace,
@@ -304,7 +306,7 @@ const CreateAddressForm = ({
                   )}
                 </View>
                 <View style={[styles.inputField, {marginBottom: 30}]}>
-                  <Text style={styles.inputLabel}>Địa chỉ chi tiết</Text>
+                  <Text style={styles.inputLabel}>Địa chỉ chi tiết *</Text>
                   <View
                     style={[
                       styles.valueSpace,

@@ -25,7 +25,7 @@ export default function ConfirmOTPScreen({route, navigation}) {
     confirmOTPForgotPassword,
     reSendOTPForgotPassword,
   } = useContext(AuthContext);
-
+  const [clearInput, setClearInput] = useState(false);
   const {phone, type} = route.params;
   const [code, setCode] = useState('');
   const handleConfirmOTP = () => {
@@ -90,6 +90,7 @@ export default function ConfirmOTPScreen({route, navigation}) {
     if (state.errorMessage !== '') {
       clearErrorMessage();
     }
+    setClearInput(true);
     clearTimer(getDeadTime());
     showLoader();
     if (type === 'REGISTER') {
@@ -128,8 +129,10 @@ export default function ConfirmOTPScreen({route, navigation}) {
             style={styles.otpView}
             pinCount={6}
             onCodeChanged={pin => {
+              setClearInput(false);
               setCode(pin);
             }}
+            clearInputs={clearInput}
             autoFocusOnLoad
             codeInputFieldStyle={styles.otpTextStyle}
             codeInputHighlightStyle={styles.underlineStyleHighLighted}
