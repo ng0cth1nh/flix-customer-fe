@@ -57,6 +57,7 @@ const EditProfileInfoScreen = ({navigation}) => {
   };
   const hideDatePicker = () => {
     setDateVisible(false);
+    setDateOfBirths(null);
   };
 
   const checkFullNameValid = async () => {
@@ -114,9 +115,9 @@ const EditProfileInfoScreen = ({navigation}) => {
     if (isFullNameValid && isEmailValid && isGenderValid && isDateValid) {
       const body = {
         fullName: fullNames,
-        dateOfBirth: dateOfBirths.replace(/\//g, '-'),
+        dateOfBirth: dateOfBirths && dateOfBirths.replace(/\//g, '-'),
         gender: genders,
-        email: emails,
+        email: emails === '' ? null : emails,
       };
       await dispatch(updateProfile({customerAPI, body}));
       if (errorMessage) {
@@ -130,6 +131,7 @@ const EditProfileInfoScreen = ({navigation}) => {
           text1: 'Cập nhật thông tin cá nhân thành công',
         });
         await dispatch(fetchProfile(customerAPI));
+        navigation.goBack();
       }
     }
   };
@@ -225,7 +227,7 @@ const EditProfileInfoScreen = ({navigation}) => {
               <Text style={styles.tittleText}>Thông tin tài khoản</Text>
             </View>
             <View style={styles.inputField}>
-              <Text style={styles.inputLabel}>Họ và tên</Text>
+              <Text style={styles.inputLabel}>Họ và tên *</Text>
               <View
                 style={[
                   styles.valueSpace,

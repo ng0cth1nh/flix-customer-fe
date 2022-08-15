@@ -9,7 +9,11 @@ const CustomDatePicker = props => {
       onConfirm={props.handleConfirm}
       onCancel={props.hideDatePicker}
       minimumDate={props.minimumDate ? new Date() : null}
-      maximumDate={new Date(moment().add(14, 'days'))}
+      maximumDate={
+        !props.minimumDate
+          ? new Date(moment())
+          : new Date(moment().add(30, 'days'))
+      }
     />
   );
 };
