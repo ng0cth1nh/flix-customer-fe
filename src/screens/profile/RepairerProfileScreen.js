@@ -143,7 +143,7 @@ const RepairerProfileScreen = ({navigation, route}) => {
                     source={require('../../../assets/images/type/portfolio.png')}
                   />
                   <Text style={styles.tittleText}>
-                    {data.experienceYear} năm
+                    {data.experienceYear ? data.experienceYear : 0} năm
                   </Text>
                   <Text style={{color: 'black'}}>Kinh nghiệm làm việc</Text>
                 </View>
@@ -153,7 +153,7 @@ const RepairerProfileScreen = ({navigation, route}) => {
                     source={require('../../../assets/images/type/support.png')}
                   />
                   <Text style={styles.tittleText}>
-                    {data.successfulRepair} lượt
+                    {data.successfulRepair ? data.successfulRepair : 0} lượt
                   </Text>
                   <Text style={{color: 'black'}}>Sửa chữa thành công</Text>
                 </View>
@@ -163,7 +163,7 @@ const RepairerProfileScreen = ({navigation, route}) => {
                     source={require('../../../assets/images/type/star.png')}
                   />
                   <Text style={styles.tittleText}>
-                    {data.rating.toString().substr(0, 3)}
+                    {data.rating ? data.rating.toString().substr(0, 3) : 0}
                   </Text>
                   <Text style={{color: 'black'}}>Trung bình đánh giá</Text>
                 </View>
