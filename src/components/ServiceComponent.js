@@ -46,7 +46,7 @@ const ServiceComponent = ({
           <TouchableOpacity
             style={styles.editTouch}
             onPress={onPressPriceHandler}>
-            <Text style={styles.editText}>Xem thêm{'>'}</Text>
+            <Text style={styles.editText}>Xem thêm</Text>
           </TouchableOpacity>
         </View>
         <View

@@ -33,6 +33,7 @@ import {
   setNumberOfUnread,
   selectNumberOfUnread,
 } from '../../features/user/userSlice';
+import EmptyNoti from '../../components/EmptyNoti';
 
 const NotificationScreen = ({navigation}) => {
   const [notifications, setNotifications] = useState(
@@ -465,6 +466,7 @@ const NotificationScreen = ({navigation}) => {
           showsVerticalScrollIndicator={false}
           data={notifications}
           renderItem={renderItem}
+          ListEmptyComponent={EmptyNoti}
           keyExtractor={(item, index) => index.toString()}
           refreshControl={
             <RefreshControl

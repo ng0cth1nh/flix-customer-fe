@@ -9,7 +9,7 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 const {width, height} = Dimensions.get('window');
 import Carousel from 'react-native-snap-carousel';
 import BannerSlider from '../../components/BannerSlider';
@@ -21,6 +21,9 @@ import useAxios from '../../hooks/useAxios';
 import {fetchAddresses} from '../../features/user/userSlice';
 import {useDispatch} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import CustomModal from '../../components/CustomModal';
+import SubmitButton from '../../components/SubmitButton';
+
 const ENTRIES = [
   {
     title: 'Ưu đãi hôm nay',
@@ -29,7 +32,7 @@ const ENTRIES = [
   },
   {
     title: 'Ưu đãi cho khách hàng mới',
-    image: 'https://i.imgur.com/UPrs1EWl.jpg',
+    image: 'https://i.ibb.co/X2D7Hr4/theme-photos-Klby0nxse-Y8-unsplash.jpg',
   },
 ];
 
@@ -64,13 +67,12 @@ const HomeScreen = ({navigation}) => {
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
   const customerAPI = useAxios();
-
-  const goForward = () => {
-    carouselRef.current.snapToNext();
-  };
+  const [modalVisible, setModalVisible] = useState(false);
 
   const renderBanner = ({item, index}) => {
-    return <BannerSlider data={item} />;
+    return (
+      <BannerSlider data={item} handleOnPress={() => setModalVisible(true)} />
+    );
   };
 
   useEffect(() => {
@@ -164,7 +166,10 @@ const HomeScreen = ({navigation}) => {
               }}>
               Danh mục
             </Text>
-            <ForwardButton color="black" onPressHandler={console.log('a')} />
+            <ForwardButton
+              color="black"
+              onPressHandler={() => setModalVisible(true)}
+            />
           </View>
           <ScrollView
             horizontal={true}
@@ -179,7 +184,7 @@ const HomeScreen = ({navigation}) => {
                 alignItems: 'center',
                 marginRight: 10,
               }}
-              onPress={console.log('home pressssss')}>
+              onPress={() => navigation.push('CategoryListScreen')}>
               <Image
                 source={require('../../../assets/images/type/wrench.png')}
                 style={{width: 30, height: 30, marginTop: 20}}
@@ -197,7 +202,7 @@ const HomeScreen = ({navigation}) => {
                 alignItems: 'center',
                 marginHorizontal: 10,
               }}
-              onPress={console.log('a')}>
+              onPress={() => setModalVisible(true)}>
               <Image
                 source={require('../../../assets/images/type/cpu.png')}
                 style={{width: 30, height: 30, marginTop: 20}}
@@ -215,7 +220,7 @@ const HomeScreen = ({navigation}) => {
                 alignItems: 'center',
                 marginHorizontal: 10,
               }}
-              onPress={console.log('a')}>
+              onPress={() => setModalVisible(true)}>
               <Image
                 source={require('../../../assets/images/type/discount.png')}
                 style={{width: 30, height: 30, marginTop: 20}}
@@ -233,9 +238,9 @@ const HomeScreen = ({navigation}) => {
                 alignItems: 'center',
                 marginLeft: 10,
               }}
-              onPress={console.log('a')}>
+              onPress={() => setModalVisible(true)}>
               <Image
-                source={require('../../../assets/images/type/discount.png')}
+                source={require('../../../assets/images/type/event.png')}
                 style={{width: 30, height: 30, marginTop: 20}}
               />
               <Text style={{fontSize: 16, fontWeight: '700', color: 'black'}}>
@@ -244,12 +249,44 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
           </ScrollView>
         </ScrollView>
+        <CustomModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          modalRatio={0.28}>
+          <Text style={styles.modalText}>Thông báo</Text>
+          <View style={{marginVertical: 10}}>
+            <Text>Tính năng sẽ sớm ra mắt trong thời gian tới</Text>
+          </View>
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}>
+            <SubmitButton
+              style={{
+                marginVertical: 8,
+                width: '100%',
+                alignSelf: 'center',
+              }}
+              onPress={() => setModalVisible(false)}
+              buttonText="ĐỒNG Ý"
+            />
+          </View>
+        </CustomModal>
       </SafeAreaView>
     </>
   );
 };
 
 const styles = StyleSheet.create({
+  modalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
   searchForm: {
     flexDirection: 'row',
     backgroundColor: '#F0F0F0',

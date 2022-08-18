@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {View, SafeAreaView, ActivityIndicator} from 'react-native';
+import {View, SafeAreaView, Text, StyleSheet} from 'react-native';
 import moment from 'moment';
-import ApiConstants from '../../constants/Api';
-import useFetchData from '../../hooks/useFetchData';
+import CustomModal from '../../components/CustomModal';
+import SubmitButton from '../../components/SubmitButton';
 import RequestForm from '../../components/RequestForm';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
@@ -36,8 +36,7 @@ const RequestScreen = ({navigation, route}) => {
   const dispatch = useDispatch();
   const addresses = useSelector(selectAddresses);
   const [address, setAddress] = useState(getMainAddress(addresses));
-  //const {loading, data} = useFetchData(ApiConstants.GET_MAIN_ADDRESS_API);
-
+  const [modalVisible, setModalVisible] = useState(false);
   const handleClickVoucher = () => {
     navigation.push('PickVoucherCodeScreen');
   };
@@ -108,7 +107,6 @@ const RequestScreen = ({navigation, route}) => {
         statusBarColor="white"
       />
       <SafeAreaView style={{flex: 1}}>
-        {/* {loading ? <Loading /> : null} */}
         <ProgressLoader
           visible={isLoading}
           isModal={true}
@@ -135,10 +133,45 @@ const RequestScreen = ({navigation, route}) => {
           editable={true}
           handleClickGetSubServices={handleClickGetSubServices}
           isFetchFixedService={false}
+          setModalVisible={setModalVisible}
         />
+        <CustomModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          modalRatio={0.28}>
+          <Text style={styles.modalText}>Thông báo</Text>
+          <View style={{marginVertical: 10}}>
+            <Text>Tính năng voucher sẽ sớm ra mắt trong thời gian tới</Text>
+          </View>
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}>
+            <SubmitButton
+              style={{
+                marginVertical: 8,
+                width: '100%',
+                alignSelf: 'center',
+              }}
+              onPress={() => setModalVisible(false)}
+              buttonText="ĐỒNG Ý"
+            />
+          </View>
+        </CustomModal>
       </SafeAreaView>
     </View>
   );
 };
+const styles = StyleSheet.create({
+  modalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+});
 
 export default RequestScreen;

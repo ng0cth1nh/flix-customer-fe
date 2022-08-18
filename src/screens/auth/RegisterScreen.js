@@ -133,9 +133,6 @@ export default function RegisterScreen({navigation}) {
       setRePasswordInputError('Không được bỏ trống');
       return false;
     }
-    if (!checkPasswordValid()) {
-      return true;
-    }
     if (repassword !== password && password.trim() !== '') {
       setRePasswordInputError('Mật khẩu không khớp');
       return false;

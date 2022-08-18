@@ -41,9 +41,9 @@ const RequestForm = function ({
   handleChangeAddress,
   handleClickGetSubServices,
   handleClickRepairerProfile,
+  setModalVisible = null,
 }) {
   const [dateVisible, setDateVisible] = useState(false);
-  //const [shouldPay, setShouldPay] = useState(data.price);
   const handleDateConfirm = selectedDate => {
     setDate(moment(selectedDate));
     setDateVisible(false);
@@ -421,7 +421,7 @@ const RequestForm = function ({
               {editable && (
                 <TouchableOpacity
                   style={styles.editTouch}
-                  onPress={handleClickVoucher}>
+                  onPress={() => setModalVisible(true)}>
                   <Text style={styles.editText}>Chọn hoặc nhập mã</Text>
                 </TouchableOpacity>
               )}
