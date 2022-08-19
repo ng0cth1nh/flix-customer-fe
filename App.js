@@ -14,7 +14,7 @@ import {
   Context as AuthContext,
 } from './src/context/AuthContext';
 const {width} = Dimensions.get('window');
-import {fetchProfile, selectErrorMessage} from './src/features/user/userSlice';
+import {fetchProfile} from './src/features/user/userSlice';
 import {useSelector, useDispatch} from 'react-redux';
 import {firebase} from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -46,6 +46,8 @@ import EditProfileInfoScreen from './src/screens/profile/EditProfileInfoScreen';
 import FeedbackScreen from './src/screens/feedback/FeedbackScreen';
 import CommentScreen from './src/screens/feedback/CommentScreen';
 import PickVoucherCodeScreen from './src/screens/voucher/PickVoucherCodeScreen';
+import AccessoriesScreen from './src/screens/main/AccessoriesScreen';
+import AccessoriesDetailScreen from './src/screens/main/AccessoriesDetailScreen';
 import ChatListScreen from './src/screens/chat/ChatListScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import {Provider} from 'react-redux';
@@ -68,6 +70,8 @@ import {
   selectNumberOfUnread,
 } from './src/features/user/userSlice';
 import {NUMBER_RECORD_PER_PAGE} from './src/constants/Api';
+import {RequestStatus} from './src/utils/util';
+import {fetchRequests} from './src/features/request/requestSlice';
 
 const toastConfig = {
   customToast: ({text1}) => (
@@ -125,11 +129,11 @@ function App() {
   const Tab = createBottomTabNavigator();
   const [isLoading, setIsLoading] = useState(true);
   const [isNotiReceived, setIsNotiReceived] = useState(false);
+  const [notificationType, setNotificationType] = useState('');
   const [countOne, setCountOne] = useState(0);
   const [countTwo, setCountTwo] = useState(0);
   const [numberOfUnreadMessage, setNumberOfUnreadMessage] = useState(0);
   const numberOfUnread = useSelector(selectNumberOfUnread);
-  const errorMessage = useSelector(selectErrorMessage);
   const dispatch = useDispatch();
   const customerAPI = useAxios();
   let {state, TryLocalLogin, clearErrorMessage} = useContext(AuthContext);
@@ -137,23 +141,41 @@ function App() {
   useEffect(() => {
     TryLocalLogin();
     requestUserPermission();
-    notificationListener(setIsNotiReceived);
+    notificationListener(setIsNotiReceived, setNotificationType);
     setTimeout(() => {
       setIsLoading(false);
     }, 3000);
   }, [TryLocalLogin]);
 
   useEffect(() => {
+    if (notificationType === 'REQUEST_DONE') {
+      dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
+      );
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
+    } else if (notificationType === 'REQUEST_CANCELED') {
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.APPROVED}));
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.FIXING}));
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.CANCELLED}));
+    } else if (notificationType === 'REQUEST_APPROVED') {
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.PENDING}));
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.APPROVED}));
+    } else if (notificationType === 'CREATE_INVOICE') {
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.FIXING}));
+      dispatch(
+        fetchRequests({customerAPI, status: RequestStatus.PAYMENT_WAITING}),
+      );
+    } else if (notificationType === 'REQUEST_CONFIRM_FIXING') {
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.APPROVED}));
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.FIXING}));
+    }
+  }, [notificationType]);
+
+  useEffect(() => {
     if (state.token) {
       console.log('token :', state.token);
       const getUserProfile = async () => {
         await dispatch(fetchProfile(customerAPI));
-        if (errorMessage) {
-          Toast.show({
-            type: 'customErrorToast',
-            text1: errorMessage,
-          });
-        }
       };
       const saveFCMToken = async () => {
         let fcmToken = await AsyncStorage.getItem('fcmtoken');
@@ -301,6 +323,11 @@ function App() {
           component={ChoosePaymentMethodScreen}
         />
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
+        <Stack.Screen name="AccessoriesScreen" component={AccessoriesScreen} />
+        <Stack.Screen
+          name="AccessoriesDetailScreen"
+          component={AccessoriesDetailScreen}
+        />
       </Stack.Navigator>
     );
   }

@@ -476,7 +476,8 @@ const NotificationScreen = ({navigation}) => {
             />
           }
           ListFooterComponent={() =>
-            isLoading && (
+            isLoading &&
+            !refreshControl && (
               <ActivityIndicator
                 size="small"
                 color="#FEC54B"

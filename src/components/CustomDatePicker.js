@@ -12,7 +12,7 @@ const CustomDatePicker = props => {
       maximumDate={
         !props.minimumDate
           ? new Date(moment())
-          : new Date(moment().add(30, 'days'))
+          : new Date(moment().add(14, 'days'))
       }
     />
   );
