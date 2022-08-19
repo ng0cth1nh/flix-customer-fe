@@ -172,7 +172,7 @@ const ProfileScreen = ({navigation}) => {
       <CustomModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        modalRatio={0.3}>
+        modalRatio={0.28}>
         <Text style={styles.modalText}>
           Bạn có chắc chắn muốn đăng xuất tài khoản này không?
         </Text>
@@ -184,10 +184,10 @@ const ProfileScreen = ({navigation}) => {
           }}>
           <TouchableOpacity
             style={[styles.button, styles.buttonOpen]}
-            onPress={() => {
+            onPress={async () => {
+              await logout();
               dispatch(resetRequestState());
               dispatch(resetUserState());
-              logout();
             }}>
             <Text style={styles.textStyle}>ĐĂNG XUẤT</Text>
           </TouchableOpacity>

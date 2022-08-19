@@ -11,7 +11,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import NotFound from '../../components/NotFound';
 import Icon from 'react-native-vector-icons/Ionicons';
 const {height} = Dimensions.get('window');
@@ -40,33 +40,52 @@ export default function SearchScreen({navigation}) {
           source={{uri: item.icon}}
           style={{marginBottom: 3, marginRight: 15, height: 24, width: 24}}
         />
-        <Text style={{color: 'black', fontSize: 16, fontWeight: '600'}}>
+        <Text
+          style={{
+            color: 'black',
+            fontSize: 16,
+            fontWeight: '600',
+            flexWrap: 'wrap',
+            marginRight: 20,
+          }}>
           {item.serviceName}
         </Text>
       </TouchableOpacity>
     );
   };
 
+  useEffect(() => {
+    const searchInit = async () => {
+      try {
+        setLoading(true);
+        let data = await searchAccessories(search);
+        setSearchedSubService(data);
+      } catch (error) {
+      } finally {
+        setLoading(false);
+      }
+    };
+    searchInit();
+  }, []);
+
   const handleOnChangeSearch = async text => {
     setSearch(text);
-    if (text === '') {
-      return;
-    }
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
     setLoading(true);
     typingTimeoutRef.current = setTimeout(async () => {
-      let response = await customerAPI.get(
-        ApiConstants.SEARCH_SUB_SERVICE_API,
-        {
-          params: {keyword: text},
-        },
-      );
-      console.log('search: ' + text);
-      setSearchedSubService(response.data.services);
+      let data = await searchAccessories(text);
+      setSearchedSubService(data);
       setLoading(false);
     }, 200);
+  };
+
+  const searchAccessories = async text => {
+    let response = await customerAPI.get(ApiConstants.SEARCH_SUB_SERVICE_API, {
+      params: {keyword: text},
+    });
+    response.data.services;
   };
 
   return (
@@ -107,7 +126,7 @@ export default function SearchScreen({navigation}) {
                 <View>
                   <View style={styles.titleBox}>
                     <Text style={[styles.textBold, {fontSize: 20}]}>
-                      Kết quả tìm kiếm
+                      {search === '' ? 'Tất cả dịch vụ' : 'Kết quả tìm kiếm'}
                     </Text>
                   </View>
                   <FlatList

@@ -202,7 +202,7 @@ const HomeScreen = ({navigation}) => {
                 alignItems: 'center',
                 marginHorizontal: 10,
               }}
-              onPress={() => setModalVisible(true)}>
+              onPress={() => navigation.push('AccessoriesScreen')}>
               <Image
                 source={require('../../../assets/images/type/cpu.png')}
                 style={{width: 30, height: 30, marginTop: 20}}

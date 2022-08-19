@@ -22,6 +22,8 @@ const ApiConstants = {
   GET_REPAIRER_COMMENT_API: '/customer/repairer/comment',
   PROFILE_INFO_API: '/customer/profile',
   UPDATE_PROFILE_AVATAR_API: '/user/avatar',
+  SEARCH_ACCESSORIES_API: '/user/search/accessories',
+  GET_ACCESSORIES_API: '/user/accessories',
   CHANGE_PASSWORD_API: '/user/changePassword',
   GET_ADDRESS_LIST_API: '/customer/address/list',
   GET_MAIN_ADDRESS_API: '/customer/address/main',

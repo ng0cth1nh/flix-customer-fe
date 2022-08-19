@@ -13,8 +13,8 @@ export default {
   MAXIMUM_UPLOAD_SIZE_EXCEEDED: 'Vui lòng chọn ảnh không vượt quá 20MB',
   CAN_NOT_CREATE_NEW_REQUEST_WHEN_HAVE_OTHER_PAYMENT_WAITING_REQUEST:
     'Vui lòng thanh toán hóa đơn của đơn yêu cầu trước đó',
-  EXPECT_FIXING_DAY_MUST_START_AFTER_1_HOURS_AND_BEFORE_30_DAYS:
-    'Đơn yêu cầu phải sớm nhất sau 1 tiếng và muộn nhất là sau 30 ngày',
+  EXPECT_FIXING_DAY_MUST_START_AFTER_1_HOURS_AND_BEFORE_14_DAYS:
+    'Đơn yêu cầu phải sớm nhất sau 1 tiếng và muộn nhất là sau 14 ngày',
 };
 
 const temp = new Map();

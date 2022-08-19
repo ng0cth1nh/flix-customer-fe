@@ -66,6 +66,20 @@ export const fetchNotifications = createAsyncThunk(
   },
 );
 
+export const fetchAccessories = createAsyncThunk(
+  'user/fetchAccessories',
+  async ({customerAPI, pageNumber, pageSize}, {rejectWithValue}) => {
+    try {
+      const response = await customerAPI.get(ApiConstants.GET_ACCESSORIES_API, {
+        params: {pageNumber, pageSize},
+      });
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(getErrorMessage(err));
+    }
+  },
+);
+
 export const deleteNotification = createAsyncThunk(
   'user/deleteNotification',
   async ({customerAPI, id}, {rejectWithValue}) => {
@@ -385,6 +399,14 @@ export const userSlice = createSlice({
       state.errorMessage = null;
     });
     builder.addCase(fetchNotifications.rejected, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = action.payload;
+    });
+    builder.addCase(fetchAccessories.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.errorMessage = null;
+    });
+    builder.addCase(fetchAccessories.rejected, (state, action) => {
       state.isLoading = false;
       state.errorMessage = action.payload;
     });
