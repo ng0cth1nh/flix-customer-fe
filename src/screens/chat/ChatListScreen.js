@@ -23,7 +23,7 @@ import {getDiffTimeBetweenTwoDate} from '../../utils/util';
 const ChatListScreen = ({navigation}) => {
   const {state} = useContext(AuthContext);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [listMemberOne, setListMemberOne] = useState(null);
+  const [listMemberOne, setListMemberOne] = useState([]);
   const [listMemberTwo, setListMemberTwo] = useState([]);
   const [listOnline, setListOnline] = useState(null);
   const [firebaseLoading, setFireBaseLoading] = useState(true);
@@ -34,11 +34,11 @@ const ChatListScreen = ({navigation}) => {
     const firstOneSubscriber = firestore()
       .collection('conversations')
       .where('memberOne', '==', state.userId)
-      .onSnapshot(onResult, onError);
+      .onSnapshot(onResult(1), onError);
     const secondOneSubscriber = firestore()
       .collection('conversations')
       .where('memberTwo', '==', state.userId)
-      .onSnapshot(onResult, onError);
+      .onSnapshot(onResult(2), onError);
     const onlineRef = firebase
       .app()
       .database(
@@ -68,7 +68,7 @@ const ChatListScreen = ({navigation}) => {
   const onGetStatus = snapshot => {
     setListOnline(snapshot.val());
   };
-  const onResult = async querySnapshot => {
+  const onResult = index => async querySnapshot => {
     if (querySnapshot.size > 0) {
       const conversationsMap = await Promise.all(
         querySnapshot.docs.map(async doc => {
@@ -92,13 +92,17 @@ const ChatListScreen = ({navigation}) => {
           }
         }),
       );
-      if (querySnapshot.docs[0].data().memberOne === state.userId) {
+      if (index === 1) {
         setListMemberOne(conversationsMap);
+        console.log('conversationsMap 1:', conversationsMap);
       } else {
         setListMemberTwo(conversationsMap);
+        console.log('conversationsMap 2:', conversationsMap);
       }
     }
-    setFireBaseLoading(false);
+    if (index === 2) {
+      setFireBaseLoading(false);
+    }
   };
 
   function onError(error) {
@@ -198,8 +202,7 @@ const ChatListScreen = ({navigation}) => {
           <Loading />
         ) : errorMessage ? (
           <NotFound />
-        ) : !listMemberOne ? null : listMemberOne.length === 0 &&
-          listMemberTwo.length === 0 ? (
+        ) : listMemberOne.length === 0 && listMemberTwo.length === 0 ? (
           <NotFound />
         ) : (
           <FlatList

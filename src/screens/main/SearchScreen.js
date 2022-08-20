@@ -25,6 +25,7 @@ export default function SearchScreen({navigation}) {
   const [loading, setLoading] = useState(false);
   const customerAPI = useAxios();
   const [searchedSubService, setSearchedSubService] = useState(null);
+  const [allSubService, setAllSearchedSubService] = useState(null);
 
   const renderItem = ({item, index}) => {
     return (
@@ -60,16 +61,24 @@ export default function SearchScreen({navigation}) {
         setLoading(true);
         let data = await searchAccessories(search);
         setSearchedSubService(data);
+        setAllSearchedSubService(data);
       } catch (error) {
       } finally {
         setLoading(false);
       }
     };
-    searchInit();
-  }, []);
+    if (search === '' && !allSubService) {
+      searchInit();
+    } else {
+      setSearchedSubService(allSubService);
+    }
+  }, [search]);
 
   const handleOnChangeSearch = async text => {
     setSearch(text);
+    if (text === '') {
+      return;
+    }
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
@@ -85,7 +94,7 @@ export default function SearchScreen({navigation}) {
     let response = await customerAPI.get(ApiConstants.SEARCH_SUB_SERVICE_API, {
       params: {keyword: text},
     });
-    response.data.services;
+    return response.data.services;
   };
 
   return (
