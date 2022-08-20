@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useState} from 'react';
 import {
   FlatList,
   SafeAreaView,
-  StyleSheet,
   Text,
   View,
   Image,
@@ -10,7 +9,6 @@ import {
 } from 'react-native';
 import {Context as AuthContext} from '../../context/AuthContext';
 import {firebase} from '@react-native-firebase/database';
-
 import ApiConstants from '../../constants/Api';
 import NotFound from '../../components/NotFound';
 import useAxios from '../../hooks/useAxios';
@@ -19,6 +17,7 @@ import firestore from '@react-native-firebase/firestore';
 import getErrorMessage from '../../utils/getErrorMessage';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import {getDiffTimeBetweenTwoDate} from '../../utils/util';
+import EmptyMessage from '../../components/EmptyMessage';
 
 const ChatListScreen = ({navigation}) => {
   const {state} = useContext(AuthContext);
@@ -203,7 +202,7 @@ const ChatListScreen = ({navigation}) => {
         ) : errorMessage ? (
           <NotFound />
         ) : listMemberOne.length === 0 && listMemberTwo.length === 0 ? (
-          <NotFound />
+          <EmptyMessage />
         ) : (
           <FlatList
             keyExtractor={item => item.conversationId}
