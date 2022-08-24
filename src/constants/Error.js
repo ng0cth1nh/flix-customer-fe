@@ -4,6 +4,7 @@ export default {
   ACCOUNT_EXISTED: 'Số điện thoại đã được sử dụng trong hệ thống',
   INVALID_OTP: 'Mã chưa đúng, vui lòng thử lại',
   INVALID_PHONE_NUMBER: 'Số điện thoại đăng kí không hợp lệ',
+  INVALID_FULL_NAME: 'Họ và tên không hợp lệ',
   INVALID_PASSWORD: 'Mật khẩu đăng kí không hợp lệ',
   INVALID_CITY: 'Địa chỉ thành phố không tồn tại',
   INVALID_DISTRICT: 'Địa chỉ Quận/Huyện không tồn tại',

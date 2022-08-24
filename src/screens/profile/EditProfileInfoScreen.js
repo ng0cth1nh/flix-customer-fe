@@ -4,16 +4,14 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
-  StatusBar,
   ScrollView,
   TextInput,
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 const {height, width} = Dimensions.get('window');
 import ImagePicker from 'react-native-image-crop-picker';
-import BackButton from '../../components/BackButton';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import CustomDatePicker from '../../components/CustomDatePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -25,7 +23,6 @@ import {useSelector, useDispatch} from 'react-redux';
 import useAxios from '../../hooks/useAxios';
 import {
   fetchProfile,
-  selectErrorMessage,
   selectUser,
   updateAvatar,
   updateProfile,
@@ -36,9 +33,7 @@ import TopHeaderComponent from '../../components/TopHeaderComponent';
 const EditProfileInfoScreen = ({navigation}) => {
   const customerAPI = useAxios();
   const dispatch = useDispatch();
-  const errorMessage = useSelector(selectErrorMessage);
   const user = useSelector(selectUser);
-
   const [avatar, setAvatar] = useState(null);
   const [fullNames, setFullNames] = useState(user.fullName);
   const [phones, setPhones] = useState(user.phone);
@@ -108,24 +103,19 @@ const EditProfileInfoScreen = ({navigation}) => {
   };
 
   const handleUpdateProfile = async () => {
-    let isFullNameValid = await checkFullNameValid();
-    let isEmailValid = await checkEmailValid();
-    let isGenderValid = await checkGenderValid();
-    let isDateValid = await checkDateOfBirthValid();
-    if (isFullNameValid && isEmailValid && isGenderValid && isDateValid) {
-      const body = {
-        fullName: fullNames,
-        dateOfBirth: dateOfBirths && dateOfBirths.replace(/\//g, '-'),
-        gender: genders,
-        email: emails === '' ? null : emails,
-      };
-      await dispatch(updateProfile({customerAPI, body}));
-      if (errorMessage) {
-        Toast.show({
-          type: 'customErrorToast',
-          text1: errorMessage,
-        });
-      } else {
+    try {
+      let isFullNameValid = await checkFullNameValid();
+      let isEmailValid = await checkEmailValid();
+      let isGenderValid = await checkGenderValid();
+      let isDateValid = await checkDateOfBirthValid();
+      if (isFullNameValid && isEmailValid && isGenderValid && isDateValid) {
+        const body = {
+          fullName: fullNames,
+          dateOfBirth: dateOfBirths && dateOfBirths.replace(/\//g, '-'),
+          gender: genders,
+          email: emails === '' ? null : emails,
+        };
+        await dispatch(updateProfile({customerAPI, body})).unwrap();
         Toast.show({
           type: 'customToast',
           text1: 'Cập nhật thông tin cá nhân thành công',
@@ -133,22 +123,27 @@ const EditProfileInfoScreen = ({navigation}) => {
         await dispatch(fetchProfile(customerAPI));
         navigation.goBack();
       }
+    } catch (error) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: error,
+      });
     }
   };
 
   const handleUpdateAvatar = async avatar => {
-    await dispatch(updateAvatar({customerAPI, avatar}));
-    if (errorMessage) {
-      Toast.show({
-        type: 'customErrorToast',
-        text1: errorMessage,
-      });
-    } else {
+    try {
+      await dispatch(updateAvatar({customerAPI, avatar})).unwrap();
       Toast.show({
         type: 'customToast',
         text1: 'Cập nhật ảnh đại diện thành công',
       });
       await dispatch(fetchProfile(customerAPI));
+    } catch (error) {
+      Toast.show({
+        type: 'customErrorToast',
+        text1: error,
+      });
     }
   };
 

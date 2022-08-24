@@ -223,7 +223,7 @@ const RepairerProfileScreen = ({navigation, route}) => {
                   </View>
                 )}
                 ListFooterComponent={() =>
-                  isLoading ? ( //  a==b ? b : a
+                  isLoading ? (
                     <View
                       style={{
                         marginTop: 10,
