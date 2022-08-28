@@ -221,6 +221,7 @@ const ChatScreen = ({route, navigation}) => {
         messType,
         latestTimestamp: timestamp,
         isRead: false,
+        enabled: true,
       })
       .then(() => {
         console.log('Conversations updated!');

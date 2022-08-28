@@ -36,6 +36,7 @@ const PaymentWaitingScreen = ({navigation}) => {
       isShowSubmitButton: false,
       submitButtonText: 'Hủy yêu cầu',
       typeSubmitButtonClick: 'CANCEL_REQUEST',
+      isEnableChatButton: true,
     });
   };
 

@@ -36,6 +36,7 @@ const PendingScreen = ({navigation}) => {
       typeSubmitButtonClick: 'CANCEL_REQUEST',
       isShowCancelButton: true,
       navigateFromScreen: 'PENDING',
+      isEnableChatButton: true,
     });
   };
 

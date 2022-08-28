@@ -42,6 +42,7 @@ const RequestForm = function ({
   handleClickGetSubServices,
   handleClickRepairerProfile,
   setModalVisible = null,
+  isEnableChatButton,
 }) {
   const [dateVisible, setDateVisible] = useState(false);
   const handleDateConfirm = selectedDate => {
@@ -99,13 +100,15 @@ const RequestForm = function ({
                   <Text style={{color: 'black', marginBottom: 5}}>
                     {data.repairerAddress}
                   </Text>
-                  <TouchableOpacity
-                    onPress={chatHandler}
-                    style={[styles.viewServiceButton, {width: '40%'}]}>
-                    <Text style={[styles.textBold, {textAlign: 'center'}]}>
-                      Nhắn tin
-                    </Text>
-                  </TouchableOpacity>
+                  {isEnableChatButton && (
+                    <TouchableOpacity
+                      onPress={chatHandler}
+                      style={[styles.viewServiceButton, {width: '40%'}]}>
+                      <Text style={[styles.textBold, {textAlign: 'center'}]}>
+                        Nhắn tin
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             </View>

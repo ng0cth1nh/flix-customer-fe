@@ -11,6 +11,7 @@ export default {
   INVALID_COMMUNE: 'Địa chỉ Phường/Xã không tồn tại',
   WRONG_PASSWORD: 'Mật khẩu hiện tại không đúng',
   USER_IS_INACTIVE: 'Số điện thoại này đã bị vô hiệu hóa',
+  SERVICE_IS_INACTIVE: 'Dịch vụ không còn hoạt động',
   MAXIMUM_UPLOAD_SIZE_EXCEEDED: 'Vui lòng chọn ảnh không vượt quá 20MB',
   CAN_NOT_CREATE_NEW_REQUEST_WHEN_HAVE_OTHER_PAYMENT_WAITING_REQUEST:
     'Vui lòng thanh toán hóa đơn của đơn yêu cầu trước đó',

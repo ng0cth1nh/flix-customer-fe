@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   Text,
   View,
@@ -25,10 +25,13 @@ import {
   selectIsLoading,
   fetchFixedService,
   fetchRequestDetail,
+  selectRequests,
 } from '../../features/request/requestSlice';
 import ProgressLoader from 'rn-progress-loader';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import Loading from '../../components/Loading';
+import {Context as AuthContext} from '../../context/AuthContext';
+import disableFirebaseChat from '../../utils/DisableFirebaseChat';
 
 const RequestDetailScreen = ({route, navigation}) => {
   const {
@@ -39,8 +42,9 @@ const RequestDetailScreen = ({route, navigation}) => {
     submitButtonText,
     navigateFromScreen = null,
     isNavigateFromNotiScreen = false,
+    isEnableChatButton = false,
   } = route.params;
-
+  let {state} = useContext(AuthContext);
   const [modalVisible, setModalVisible] = useState(false);
   const isLoading = useSelector(selectIsLoading);
   const [reason, setReason] = useState({index: 0, reason: CancelReasons[0]});
@@ -49,11 +53,49 @@ const RequestDetailScreen = ({route, navigation}) => {
   const [loading, setLoading] = useState(false);
   const [fixedService, setFixedService] = useState(null);
   const [isError, setIsError] = useState(false);
+  const requests = useSelector(selectRequests);
 
   const customerAPI = useAxios();
   const dispatch = useDispatch();
   const showModal = () => {
     setModalVisible(true);
+  };
+
+  const checkValidToDeleteConversation = () => {
+    let temp =
+      requests.approved &&
+      requests.approved.findIndex(request => {
+        return (
+          request.repairerId === data.repairerId &&
+          request.requestCode !== data.requestCode
+        );
+      });
+    if (temp !== -1) {
+      return false;
+    }
+    temp =
+      requests.fixing &&
+      requests.fixing.findIndex(request => {
+        return (
+          request.repairerId === data.repairerId &&
+          request.requestCode !== data.requestCode
+        );
+      });
+    if (temp !== -1) {
+      return false;
+    }
+    temp =
+      requests.paymentWaiting &&
+      requests.paymentWaiting.findIndex(request => {
+        return (
+          request.repairerId === data.repairerId &&
+          request.requestCode !== data.requestCode
+        );
+      });
+    if (temp !== -1) {
+      return false;
+    }
+    return true;
   };
 
   const handleClickGetSubServices = () => {
@@ -116,6 +158,9 @@ const RequestDetailScreen = ({route, navigation}) => {
         type: 'customToast',
         text1: 'Hủy yêu cầu thành công',
       });
+      if (checkValidToDeleteConversation()) {
+        disableFirebaseChat(state.userId, data.repairerId, false);
+      }
       navigateFromScreen === 'FIXING'
         ? dispatch(
             fetchRequests({customerAPI, status: RequestStatus.FIXING}),
@@ -199,6 +244,7 @@ const RequestDetailScreen = ({route, navigation}) => {
             isRequestIdVisible={true}
             isShowSubmitButton={isShowSubmitButton}
             submitButtonText={submitButtonText}
+            isEnableChatButton={isEnableChatButton}
             handleClickGetSubServices={handleClickGetSubServices}
             handleClickRepairerProfile={handleClickRepairerProfile}
             handleSubmitButtonClick={

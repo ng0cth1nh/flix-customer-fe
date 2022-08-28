@@ -20,7 +20,6 @@ const ApprovedScreen = ({navigation}) => {
   const requests = useSelector(selectRequests);
   const [refreshControl, setRefreshControl] = useState(false);
 
-
   const handleNavigationToListPrice = async service => {
     navigation.push('ServicePriceScreen', {
       serviceName: service.serviceName,
@@ -37,6 +36,7 @@ const ApprovedScreen = ({navigation}) => {
       typeSubmitButtonClick: 'CANCEL_REQUEST',
       isShowCancelButton: true,
       navigateFromScreen: 'APPROVED',
+      isEnableChatButton: true,
     });
   };
 

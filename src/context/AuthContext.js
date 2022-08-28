@@ -18,6 +18,11 @@ const authReducer = (state, action) => {
         errorCode: action.payload.code,
         loading: false,
       };
+    case 'set_connected':
+      return {
+        ...state,
+        connected: action.payload,
+      };
     case 'login':
       return {
         errorMessage: '',
@@ -56,6 +61,14 @@ const clearErrorMessage = dispatch => {
 };
 const showLoader = dispatch => {
   return () => dispatch({type: 'show_loader'});
+};
+
+const setConnected = dispatch => async params => {
+  return () =>
+    dispatch({
+      type: 'set_connected',
+      payload: params.connected,
+    });
 };
 
 const clearIsChangePassSuccess = dispatch => {
@@ -343,6 +356,7 @@ export const {Provider, Context} = createDataContext(
     reSendOTPForgotPassword,
     resetPassword,
     clearIsChangePassSuccess,
+    setConnected,
   },
   {token: null, errorMessage: '', userId: null, loading: false},
 );

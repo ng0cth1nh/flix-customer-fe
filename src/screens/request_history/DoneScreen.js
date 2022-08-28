@@ -36,6 +36,7 @@ const DoneScreen = ({navigation}) => {
       isShowSubmitButton: false,
       submitButtonText: 'Hủy yêu cầu',
       typeSubmitButtonClick: 'CANCEL_REQUEST',
+      isEnableChatButton: false,
     });
   };
   return (

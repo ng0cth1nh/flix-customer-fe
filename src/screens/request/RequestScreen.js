@@ -84,9 +84,7 @@ const RequestScreen = ({navigation, route}) => {
         type: 'customToast',
         text1: 'Đặt lịch thành công',
       });
-      await dispatch(
-        fetchRequests({customerAPI, status: RequestStatus.PENDING}),
-      ).unwrap();
+      dispatch(fetchRequests({customerAPI, status: RequestStatus.PENDING}));
       navigation.navigate('RequestHistoryStackScreen', {
         screen: 'PendingScreen',
       });

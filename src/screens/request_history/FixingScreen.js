@@ -37,6 +37,7 @@ const FixingScreen = ({navigation}) => {
       typeSubmitButtonClick: 'CANCEL_REQUEST',
       isShowCancelButton: true,
       navigateFromScreen: 'FIXING',
+      isEnableChatButton: true,
     });
   };
 

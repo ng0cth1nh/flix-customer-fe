@@ -4,16 +4,12 @@ import {
   View,
   SafeAreaView,
   StyleSheet,
-  StatusBar,
   ScrollView,
-  Dimensions,
   Image,
   TouchableOpacity,
 } from 'react-native';
-const {width, height} = Dimensions.get('window');
 import {RadioButton} from 'react-native-paper';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import BackButton from '../../components/BackButton';
 import Button from '../../components/SubmitButton';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 
@@ -39,8 +35,6 @@ const ChoosePaymentMethodScreen = ({navigation, route}) => {
             paddingHorizontal: 20,
             flex: 1,
             paddingBottom: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: '#CACACA',
           }}>
           <TouchableOpacity
             style={styles.box}
@@ -84,7 +78,7 @@ const ChoosePaymentMethodScreen = ({navigation, route}) => {
         <View>
           <Button
             style={{
-              marginVertical: 20,
+              marginVertical: 10,
               marginHorizontal: '5%',
             }}
             onPress={buttonClicked}

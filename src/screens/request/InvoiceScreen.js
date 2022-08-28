@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useContext} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {
   Text,
@@ -25,7 +25,9 @@ import {
   fetchFixedService,
   confirmInvoice,
   fetchInvoice,
+  selectRequests,
 } from '../../features/request/requestSlice';
+//import {setIsShowToast, selectIsShowToast} from '../../features/user/userSlice';
 import useAxios from '../../hooks/useAxios';
 import Toast from 'react-native-toast-message';
 import NotFound from '../../components/NotFound';
@@ -34,9 +36,11 @@ import {useSelector, useDispatch} from 'react-redux';
 import TopHeaderComponent from '../../components/TopHeaderComponent';
 import {numberWithCommas} from '../../utils/util';
 import Loading from '../../components/Loading';
-
 import {VnPayCode} from '../../constants/Error';
 import {RequestStatus} from '../../utils/util';
+import {Context as AuthContext} from '../../context/AuthContext';
+import disableFirebaseChat from '../../utils/DisableFirebaseChat';
+
 const InvoiceScreen = ({route, navigation}) => {
   const {
     vnp_ResponseCode,
@@ -44,7 +48,8 @@ const InvoiceScreen = ({route, navigation}) => {
     vnp_TxnRef,
     isNavigateFromNotiScreen = false,
   } = route.params;
-
+  let {state} = useContext(AuthContext);
+  const requests = useSelector(selectRequests);
   const isLoading = useSelector(selectIsLoading);
   const [isLoad, setIsLoad] = useState(false);
   const customerAPI = useAxios();
@@ -53,6 +58,9 @@ const InvoiceScreen = ({route, navigation}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isShowToast, setIsShowToast] = useState(false);
+  //const isShowToast = useSelector(selectIsShowToast);
+
   const renderServiceItem = ({item, index}) => {
     return (
       <View
@@ -91,16 +99,60 @@ const InvoiceScreen = ({route, navigation}) => {
     });
   };
 
+  useEffect(() => {
+    (async () => {
+      await loadData();
+    })();
+  }, []);
+
+  const checkValidToDeleteConversation = () => {
+    let temp =
+      requests.approved &&
+      requests.approved.findIndex(request => {
+        return (
+          request.repairerId === data.repairerId &&
+          request.requestCode !== data.requestCode
+        );
+      });
+    if (temp !== -1) {
+      return false;
+    }
+    temp =
+      requests.fixing &&
+      requests.fixing.findIndex(request => {
+        return (
+          request.repairerId === data.repairerId &&
+          request.requestCode !== data.requestCode
+        );
+      });
+    if (temp !== -1) {
+      return false;
+    }
+    temp =
+      requests.paymentWaiting &&
+      requests.paymentWaiting.findIndex(request => {
+        return (
+          request.repairerId === data.repairerId &&
+          request.requestCode !== data.requestCode
+        );
+      });
+    if (temp !== -1) {
+      return false;
+    }
+    return true;
+  };
+
   useFocusEffect(
     useCallback(() => {
       (async () => {
         if (vnp_ResponseCode && vnp_TxnRef) {
           console.log(
-            'FOCUS - vnp_ResponseCode - vnp_TxnRef: ',
+            'FOCUS - vnp_ResponseCode - vnp_TxnRef - isSHowTOAST: ',
             vnp_ResponseCode,
             vnp_TxnRef,
+            isShowToast,
           );
-          if (vnp_ResponseCode && vnp_ResponseCode === '00') {
+          if (vnp_ResponseCode && vnp_ResponseCode === '00' && !isShowToast) {
             Toast.show({
               type: 'customToast',
               text1: VnPayCode.get(vnp_ResponseCode),
@@ -112,15 +164,26 @@ const InvoiceScreen = ({route, navigation}) => {
               }),
             );
             dispatch(fetchRequests({customerAPI, status: RequestStatus.DONE}));
-          } else if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
+            setIsShowToast(true);
+            if (checkValidToDeleteConversation()) {
+              console.log('checkValidToDeleteConversation == true');
+              console.log('INMVOICE: ', data);
+              disableFirebaseChat(state.userId, data.repairerId, false);
+            }
+          } else if (
+            vnp_ResponseCode &&
+            vnp_ResponseCode !== '00' &&
+            !isShowToast
+          ) {
             Toast.show({
               type: 'customErrorToast',
               text1: VnPayCode.get(vnp_ResponseCode),
             });
+            setIsShowToast(true);
           }
         }
       })();
-    }, [vnp_ResponseCode, vnp_TxnRef]),
+    }, [vnp_ResponseCode, vnp_TxnRef, isShowToast]),
   );
 
   const handleConfirmPayment = async () => {
@@ -143,6 +206,8 @@ const InvoiceScreen = ({route, navigation}) => {
         type: 'customErrorToast',
         text1: err,
       });
+    } finally {
+      setIsShowToast(false);
     }
   };
 
@@ -181,12 +246,6 @@ const InvoiceScreen = ({route, navigation}) => {
       await setLoading(false);
     }
   };
-
-  useEffect(() => {
-    (async () => {
-      await loadData();
-    })();
-  }, []);
 
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>

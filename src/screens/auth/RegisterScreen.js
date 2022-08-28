@@ -24,6 +24,9 @@ import Button from '../../components/SubmitButton';
 import axios from 'axios';
 import {removeAscent} from '../../utils/util';
 import ProgressLoader from 'rn-progress-loader';
+import {useNetInfo} from '@react-native-community/netinfo';
+import CustomModal from '../../components/CustomModal';
+import SubmitButton from '../../components/SubmitButton';
 
 export default function RegisterScreen({navigation}) {
   const {register, state, clearErrorMessage, showLoader} =
@@ -51,6 +54,8 @@ export default function RegisterScreen({navigation}) {
   const [listDistrict, setListDistrict] = useState([]);
   const [listCommune, setListCommune] = useState([]);
   const scrollRef = useRef();
+  const netInfo = useNetInfo();
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     console.log(constants.GET_ALL_CITY_API);
@@ -228,28 +233,32 @@ export default function RegisterScreen({navigation}) {
       communeId &&
       districtId
     ) {
-      showLoader();
-      register({
-        avatar,
-        fullName: username,
-        phone: phoneNumber,
-        password,
-        cityId,
-        districtId,
-        communeId,
-        streetAddress: homeAddress,
-        type: 'REGISTER',
-      });
-      console.log('VALID: ', {
-        avatar,
-        fullName: username,
-        phone: phoneNumber,
-        password,
-        cityId,
-        districtId,
-        communeId,
-        streetAddress: homeAddress,
-      });
+      if (netInfo.isConnected) {
+        showLoader();
+        register({
+          avatar,
+          fullName: username,
+          phone: phoneNumber,
+          password,
+          cityId,
+          districtId,
+          communeId,
+          streetAddress: homeAddress,
+          type: 'REGISTER',
+        });
+        console.log('VALID: ', {
+          avatar,
+          fullName: username,
+          phone: phoneNumber,
+          password,
+          cityId,
+          districtId,
+          communeId,
+          streetAddress: homeAddress,
+        });
+      } else {
+        setModalVisible(true);
+      }
     }
   };
 
@@ -558,6 +567,31 @@ export default function RegisterScreen({navigation}) {
           </ScrollView>
         </View>
       </SafeAreaView>
+      <CustomModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        modalRatio={0.28}>
+        <Text style={styles.modalText}>Lưu ý</Text>
+        <View style={{marginVertical: 10}}>
+          <Text>Không có kết nối internet</Text>
+        </View>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+          }}>
+          <SubmitButton
+            style={{
+              marginVertical: 8,
+              width: '100%',
+              alignSelf: 'center',
+            }}
+            onPress={() => setModalVisible(false)}
+            buttonText="ĐÓNG"
+          />
+        </View>
+      </CustomModal>
       <ProgressLoader
         visible={state.loading ? state.loading : false}
         isModal={true}
@@ -580,6 +614,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 18,
     backgroundColor: 'white',
     paddingBottom: 60,
+  },
+  modalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center',
+    marginBottom: 5,
   },
   scrollView: {
     width: '100%',
